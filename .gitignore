@@ -1,0 +1,43 @@
+# ── Preview (APK Android de teste) ───────────────────────────────────────────
+preview/android/*.apk
+
+# ── Frontend (Expo / React Native) ──────────────────────────────────────────
+frontend/node_modules/
+frontend/.expo/
+frontend/dist/
+frontend/web-build/
+frontend/expo-env.d.ts
+frontend/.metro-health-check*
+frontend/.env
+frontend/.env*.local
+
+# Native build artifacts
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# ── Backend ──────────────────────────────────────────────────────────────────
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/.env*.local
+
+# ── TypeScript ───────────────────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Debug logs ───────────────────────────────────────────────────────────────
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.pem
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.idea/
+.vscode/

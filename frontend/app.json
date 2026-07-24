@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Squire",
+    "slug": "squire",
+    "version": "1.0.0",
+    "orientation": "default",
+    "scheme": "squire",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#161024"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.squire.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#161024"
+      },
+      "package": "com.squire.app",
+      "googleServicesFile": "./google-services.json"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      [
+        "expo-dev-client",
+        {
+          "toolsButton": false
+        }
+      ],
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Squire precisa acessar suas fotos para importar retratos e capas."
+        }
+      ],
+      "expo-image"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    }
+  }
+}

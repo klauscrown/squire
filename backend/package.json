@@ -1,0 +1,13 @@
+{
+  "name": "squire-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Squire backend — Cloud Functions, Firestore rules and data seeds",
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~5.3.3"
+  }
+}

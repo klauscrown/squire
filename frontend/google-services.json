@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "538115722613",
+    "project_id": "squire-1840a",
+    "storage_bucket": "squire-1840a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538115722613:android:6b65fdbe1e3547ce84d73c",
+        "android_client_info": {
+          "package_name": "com.squire.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDW0_TTVwZe_baSemHv3RX_s2t9OD711KE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

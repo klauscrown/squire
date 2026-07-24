@@ -1,0 +1,11 @@
+Squire � APK de teste
+Gerado: 2026-07-17 16:48
+
+Arquivo: preview/android/squire-test.apk
+Pacote:  com.squire.app
+
+Instalar (com celular/emulador conectado):
+  preview\install.bat
+
+Ou manualmente:
+  adb install -r preview/android/squire-test.apk
