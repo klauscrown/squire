@@ -39,13 +39,13 @@ export function PortalIcon({ size = 24 }: { size?: number }) {
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx="12" cy="12" r="10" fill="rgba(77, 136, 255, 0.18)" />
       <Circle cx="12" cy="12" r="10" stroke="rgba(129, 140, 248, 0.55)" strokeWidth="1.2" />
+      <Path d="M9 7h6v10H9V7z" fill="rgba(99, 102, 241, 0.45)" stroke="#A5B4FC" strokeWidth="1" />
       <Path
-        d="M9 7h6v10H9V7z"
-        fill="rgba(99, 102, 241, 0.45)"
-        stroke="#A5B4FC"
-        strokeWidth="1"
+        d="M9 12H6.5M9 9H7.5M9 15H7.5"
+        stroke="#818CF8"
+        strokeWidth="1.2"
+        strokeLinecap="round"
       />
-      <Path d="M9 12H6.5M9 9H7.5M9 15H7.5" stroke="#818CF8" strokeWidth="1.2" strokeLinecap="round" />
       <Path d="M12 12h1.5" stroke="#C4B5FD" strokeWidth="1.4" strokeLinecap="round" />
       <Circle cx="12" cy="12" r="3" fill="rgba(147, 197, 253, 0.25)" />
     </Svg>

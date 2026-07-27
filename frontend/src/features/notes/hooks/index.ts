@@ -2,13 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { QUERY_KEYS } from '@/constants';
 
-import {
-  createNote,
-  deleteNote,
-  getNote,
-  getNotes,
-  updateNote,
-} from '../services/notesService';
+import { createNote, deleteNote, getNote, getNotes, updateNote } from '../services/notesService';
 import type { CreateNoteInput, UpdateNoteInput } from '../types';
 
 export function useGetNotes(campaignId: string) {
@@ -42,8 +36,7 @@ export function useUpdateNote(campaignId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: string; input: UpdateNoteInput }) =>
-      updateNote(id, input),
+    mutationFn: ({ id, input }: { id: string; input: UpdateNoteInput }) => updateNote(id, input),
     onSuccess: (_data, { id }) => {
       void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.notes, campaignId] });
       void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.notes, 'detail', id] });

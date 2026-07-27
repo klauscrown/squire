@@ -2,11 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Platform, StyleSheet, View } from 'react-native';
 
-import {
-  GrimoireEmptyState,
-  GrimoireModuleScreen,
-  ModuleListHeader,
-} from '@/components/grimoire';
+import { GrimoireEmptyState, GrimoireModuleScreen, ModuleListHeader } from '@/components/grimoire';
 import { CreateNoteSheet, NoteCard } from '@/features/notes/components';
 import { useGetNotes } from '@/features/notes/hooks';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -23,7 +19,11 @@ export default function NotesListScreen() {
   const numColumns = isDesktopGrid ? 2 : 1;
 
   return (
-    <GrimoireModuleScreen loading={isLoading} error={isError} errorMessage="Erro ao carregar anotações">
+    <GrimoireModuleScreen
+      loading={isLoading}
+      error={isError}
+      errorMessage="Erro ao carregar anotações"
+    >
       <ModuleListHeader
         eyebrow="Narrativa"
         title="Anotações"

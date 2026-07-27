@@ -58,7 +58,15 @@ supabase link --project-ref <seu-project-ref>
 supabase db push
 ```
 
-No dashboard Supabase, ative **Authentication > Providers > Anonymous Sign-Ins** para o fluxo "Continuar sem conta".
+No dashboard Supabase, ative em **Authentication > Providers**:
+
+- **Email** — login e cadastro com e-mail/senha
+- **Google** — use o **mesmo OAuth Client ID/Secret** do Firebase/Google Cloud
+- **Anonymous Sign-Ins** — fluxo "Continuar sem conta" / modo explorador
+
+No **Firebase Console**, ative **Authentication > Sign-in method > Google** e copie o **Web client ID** para `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` no `frontend/.env`.
+
+Se a confirmação de e-mail estiver habilitada, novos cadastros por e-mail precisam confirmar o endereço antes do primeiro login.
 
 ## Gerar types TypeScript (opcional)
 

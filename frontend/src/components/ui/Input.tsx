@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text as RNText, TextInput, type TextInputProps, View, type ViewStyle } from 'react-native';
+import { Text as RNText, TextInput, type TextInputProps, type TextStyle, View } from 'react-native';
 
 import { useTheme } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
@@ -32,7 +32,7 @@ export function Input({
   const theme = useTheme();
   const [focused, setFocused] = useState(false);
 
-  const inputStyle: ViewStyle = {
+  const inputStyle: TextStyle = {
     backgroundColor: INPUT_BG,
     borderColor: error ? ERROR_COLOR : focused ? INPUT_BORDER_FOCUS : INPUT_BORDER,
     borderWidth: 1,

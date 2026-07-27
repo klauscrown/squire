@@ -33,7 +33,11 @@ export function LoginScreenLayout({ children, contentStyle }: LoginScreenLayoutP
   return (
     <View style={styles.root}>
       <LinearGradient
-        colors={[loginTheme.background.top, loginTheme.background.mid, loginTheme.background.bottom]}
+        colors={[
+          loginTheme.background.top,
+          loginTheme.background.mid,
+          loginTheme.background.bottom,
+        ]}
         style={StyleSheet.absoluteFill}
       />
       <LinearGradient

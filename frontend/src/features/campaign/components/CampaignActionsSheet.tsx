@@ -1,12 +1,6 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
-import {
-  Archive,
-  Copy,
-  PencilSimple,
-  Play,
-  Trash,
-} from 'phosphor-react-native';
+import { Archive, Copy, PencilSimple, Play, Trash } from 'phosphor-react-native';
 import { useCallback, useMemo, useRef } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 
@@ -47,16 +41,13 @@ export function CampaignActionsSheet({
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['38%'], []);
 
-  const handleAction = useCallback(
-    (action: () => void) => {
-      if (Platform.OS !== 'web') {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
-      bottomSheetRef.current?.close();
-      setTimeout(action, 200);
-    },
-    [],
-  );
+  const handleAction = useCallback((action: () => void) => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    bottomSheetRef.current?.close();
+    setTimeout(action, 200);
+  }, []);
 
   const actions: ActionItem[] = useMemo(() => {
     if (!campaign) return [];
@@ -98,12 +89,7 @@ export function CampaignActionsSheet({
 
   const renderBackdrop = useCallback(
     (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />
     ),
     [],
   );

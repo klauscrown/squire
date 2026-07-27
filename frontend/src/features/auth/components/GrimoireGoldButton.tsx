@@ -38,11 +38,7 @@ export function GrimoireGoldButton({
       ]}
     >
       {isOutline && Platform.OS !== 'web' ? (
-        <BlurView
-          intensity={grimoire.blur.input}
-          tint="dark"
-          style={StyleSheet.absoluteFill}
-        />
+        <BlurView intensity={grimoire.blur.input} tint="dark" style={StyleSheet.absoluteFill} />
       ) : null}
       {loading ? (
         <ActivityIndicator color={isOutline ? grimoire.colors.gold : grimoire.colors.purpleDeep} />

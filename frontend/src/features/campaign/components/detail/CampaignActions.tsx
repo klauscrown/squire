@@ -14,11 +14,7 @@ interface CampaignActionsProps {
 export function CampaignActions({ onDelete, loading }: CampaignActionsProps) {
   return (
     <View style={styles.container}>
-      <AnimatedPressable
-        onPress={onDelete}
-        disabled={loading}
-        style={styles.deleteButton}
-      >
+      <AnimatedPressable onPress={onDelete} disabled={loading} style={styles.deleteButton}>
         {loading ? (
           <ActivityIndicator size="small" color={grimoire.colors.destructive} />
         ) : (

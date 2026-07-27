@@ -1,7 +1,10 @@
-[project]
-id = "squire"
-name = "Squire"
-api_url = "http://127.0.0.1:54321"
+# Configuração local do Supabase CLI — https://supabase.com/docs/guides/local-development/cli/config
+
+project_id = "squire"
+
+[api]
+enabled = true
+port = 54321
 
 [db]
 port = 54322
@@ -9,9 +12,6 @@ major_version = 15
 
 [studio]
 port = 54323
-
-[inbucket]
-port = 54324
 
 [auth]
 site_url = "http://localhost:8081"

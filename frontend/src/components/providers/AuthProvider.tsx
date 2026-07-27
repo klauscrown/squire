@@ -1,49 +1,48 @@
 import type { Session } from '@supabase/supabase-js';
-import type { User as FirebaseUser } from 'firebase/auth';
-import {
-  createContext,
-  useContext,
-  type ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useContext, type ReactNode, useEffect, useMemo, useState } from 'react';
 
-import { isFirebaseConfigured } from '@/services/firebase';
 import {
-  mapFirebaseAuthError,
-  signInWithEmail as firebaseSignInWithEmail,
-  signOutFirebase,
-  signUpWithEmail as firebaseSignUpWithEmail,
-  subscribeFirebaseAuth,
-} from '@/services/firebaseAuth';
+  isGoogleSignInConfigured,
+  mapGoogleSignInError,
+  signInWithGoogleViaFirebase,
+  signOutGoogleViaFirebase,
+} from '@/services/firebase';
 import {
   getCurrentSession,
   getCurrentUserId,
+  getUserAvatarUrl,
+  getUserDisplayName,
+  getUserEmail,
+  hasPermanentAccount,
+  isAnonymousUser,
   isSupabaseConfigured,
   signInAnonymously as supabaseSignInAnonymously,
+  signInWithGoogleTokens,
+  signInWithPassword,
   signOut as supabaseSignOut,
+  signUpWithEmail as supabaseSignUpWithEmail,
   tryGetSupabaseClient,
 } from '@/services/supabase';
 
 interface AuthContextValue {
-  /** Supabase configurado (persistência de campanhas/dados). */
+  /** Supabase configurado (auth e-mail/anônimo + dados). */
   isSupabaseConfigured: boolean;
-  /** Firebase configurado (login e-mail/senha). */
-  isFirebaseConfigured: boolean;
-  /** Alias: Supabase configurado (compatível com telas existentes). */
+  /** Firebase + Web Client ID prontos para login Google. */
+  isGoogleSignInConfigured: boolean;
+  /** Alias de compatibilidade. */
   isConfigured: boolean;
   isLoading: boolean;
-  /** Usuário Firebase (conta com e-mail), se houver. */
-  firebaseUser: FirebaseUser | null;
-  /** Sessão Supabase (anônima), usada para dados na nuvem. */
   session: Session | null;
-  /** ID preferencial da conta Firebase; fallback Supabase. */
   userId: string | null;
   email: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
+  isAnonymous: boolean;
+  hasEmailAccount: boolean;
   isAuthenticated: boolean;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signInAnonymously: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -54,22 +53,11 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-async function ensureSupabaseDataSession(): Promise<Session | null> {
-  if (!isSupabaseConfigured()) return null;
-
-  const current = await getCurrentSession();
-  if (current) return current;
-
-  return supabaseSignInAnonymously();
-}
-
 export function AuthProvider({ children }: AuthProviderProps) {
-  const firebaseReady = isFirebaseConfigured();
   const supabaseReady = isSupabaseConfigured();
-
-  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const googleReady = isGoogleSignInConfigured();
   const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(firebaseReady || supabaseReady);
+  const [isLoading, setIsLoading] = useState(supabaseReady);
 
   useEffect(() => {
     let mounted = true;
@@ -77,42 +65,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (mounted) setIsLoading(false);
     }, 8_000);
 
-    if (!firebaseReady && !supabaseReady) {
+    if (!supabaseReady) {
       setIsLoading(false);
       clearTimeout(authTimeout);
       return;
     }
 
-    let remaining = (firebaseReady ? 1 : 0) + (supabaseReady ? 1 : 0);
-    let firebaseSettled = false;
-
-    function settle() {
-      remaining -= 1;
-      if (remaining <= 0 && mounted) {
-        setIsLoading(false);
+    void (async () => {
+      try {
+        const current = await getCurrentSession();
+        if (mounted) setSession(current);
+      } finally {
+        if (mounted) setIsLoading(false);
       }
-    }
-
-    const unsubscribeFirebase = firebaseReady
-      ? subscribeFirebaseAuth((user) => {
-          if (mounted) setFirebaseUser(user);
-          if (!firebaseSettled) {
-            firebaseSettled = true;
-            settle();
-          }
-        })
-      : null;
-
-    if (supabaseReady) {
-      void (async () => {
-        try {
-          const current = await getCurrentSession();
-          if (mounted) setSession(current);
-        } finally {
-          settle();
-        }
-      })();
-    }
+    })();
 
     const supabase = tryGetSupabaseClient();
     const supabaseSub = supabase
@@ -124,50 +90,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       mounted = false;
       clearTimeout(authTimeout);
-      unsubscribeFirebase?.();
       supabaseSub?.unsubscribe();
     };
-  }, [firebaseReady, supabaseReady]);
+  }, [supabaseReady]);
 
   const value = useMemo<AuthContextValue>(() => {
-    const supabaseUserId = getCurrentUserId(session);
+    const user = session?.user ?? null;
 
     return {
       isSupabaseConfigured: supabaseReady,
-      isFirebaseConfigured: firebaseReady,
+      isGoogleSignInConfigured: googleReady,
       isConfigured: supabaseReady,
       isLoading,
-      firebaseUser,
       session,
-      userId: firebaseUser?.uid ?? supabaseUserId,
-      email: firebaseUser?.email ?? null,
-      isAuthenticated: Boolean(firebaseUser || session),
+      userId: getCurrentUserId(session),
+      email: getUserEmail(user),
+      displayName: getUserDisplayName(user),
+      avatarUrl: getUserAvatarUrl(user),
+      isAnonymous: isAnonymousUser(user),
+      hasEmailAccount: hasPermanentAccount(session),
+      isAuthenticated: Boolean(session),
       signInWithEmail: async (email, password) => {
-        try {
-          const user = await firebaseSignInWithEmail(email, password);
-          setFirebaseUser(user);
-          try {
-            const dataSession = await ensureSupabaseDataSession();
-            setSession(dataSession);
-          } catch {
-            // Conta Firebase ok; dados podem ficar locais se a nuvem falhar
-          }
-        } catch (error) {
-          throw new Error(mapFirebaseAuthError(error));
-        }
+        const nextSession = await signInWithPassword(email, password);
+        setSession(nextSession);
       },
       signUpWithEmail: async (email, password) => {
+        const nextSession = await supabaseSignUpWithEmail(email, password);
+        setSession(nextSession);
+      },
+      signInWithGoogle: async () => {
+        if (!supabaseReady) {
+          throw new Error('Supabase não configurado.');
+        }
+        if (!googleReady) {
+          throw new Error(
+            'Login Google não configurado. Preencha EXPO_PUBLIC_FIREBASE_* e EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID.',
+          );
+        }
+
         try {
-          const user = await firebaseSignUpWithEmail(email, password);
-          setFirebaseUser(user);
-          try {
-            const dataSession = await ensureSupabaseDataSession();
-            setSession(dataSession);
-          } catch {
-            // Conta Firebase ok; dados podem ficar locais se a nuvem falhar
-          }
+          const googleTokens = await signInWithGoogleViaFirebase();
+          const nextSession = await signInWithGoogleTokens(googleTokens);
+          setSession(nextSession);
         } catch (error) {
-          throw new Error(mapFirebaseAuthError(error));
+          await signOutGoogleViaFirebase();
+          throw new Error(mapGoogleSignInError(error));
         }
       },
       signInAnonymously: async () => {
@@ -176,14 +143,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       },
       signOut: async () => {
         await Promise.allSettled([
-          signOutFirebase(),
           supabaseReady ? supabaseSignOut() : Promise.resolve(),
+          signOutGoogleViaFirebase(),
         ]);
-        setFirebaseUser(null);
         setSession(null);
       },
     };
-  }, [firebaseReady, supabaseReady, isLoading, firebaseUser, session]);
+  }, [supabaseReady, googleReady, isLoading, session]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

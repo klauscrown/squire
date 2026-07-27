@@ -25,7 +25,11 @@ export function SquireHint({
     return (
       <View style={styles.softCard}>
         <View style={styles.softRow}>
-          <GrimoireImage source={grimoireImages.mascot} style={styles.softAvatar} contentFit="cover" />
+          <GrimoireImage
+            source={grimoireImages.mascot}
+            style={styles.softAvatar}
+            contentFit="cover"
+          />
           <View style={styles.textWrap}>
             <Text style={styles.softLabel}>{label}</Text>
             <Text style={styles.softMessage}>{message}</Text>

@@ -57,11 +57,7 @@ export function CampaignOverviewStats({ stats }: CampaignOverviewStatsProps) {
               alignItems: 'center',
             }}
           >
-            <Icon
-              size={18}
-              color={theme.colors.accent}
-              strokeWidth={2}
-            />
+            <Icon size={18} color={theme.colors.accent} strokeWidth={2} />
             <View style={{ height: CAMPAIGN_SPACING.xs }} />
             <Text
               variant="h3"

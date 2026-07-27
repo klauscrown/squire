@@ -2,9 +2,7 @@ import type { BottomTabNavigationOptions } from 'expo-router/build/react-navigat
 
 import { CURVED_TAB_BAR_FOOTPRINT } from '@/components/layout/AppTabBar';
 
-export function getTabNavigatorScreenOptions(
-  bottomInset = 0,
-): BottomTabNavigationOptions {
+export function getTabNavigatorScreenOptions(bottomInset = 0): BottomTabNavigationOptions {
   return {
     headerShown: false,
     sceneStyle: { backgroundColor: 'transparent' },

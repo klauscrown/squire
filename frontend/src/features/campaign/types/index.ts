@@ -42,11 +42,19 @@ export const updateCampaignSchema = z.object({
   title: z.string().min(1).max(100).optional(),
   description: z.string().max(500).optional(),
   system: z.string().max(50).optional(),
+  coverImageUrl: z.string().optional(),
   status: z.enum(['active', 'paused', 'completed']).optional(),
   playersCount: z.number().int().min(1).max(20).optional(),
 });
 
 export type UpdateCampaignInput = z.infer<typeof updateCampaignSchema>;
+
+export function resolvePlayersCount(
+  value: CreateCampaignInput['playersCount'],
+): number | undefined {
+  if (value === '' || value == null) return undefined;
+  return typeof value === 'number' ? value : Number(value);
+}
 
 export const STATUS_LABELS: Record<CampaignStatus, string> = {
   active: 'Ativa',

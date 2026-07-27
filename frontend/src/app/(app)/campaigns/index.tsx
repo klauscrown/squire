@@ -6,6 +6,7 @@ import { Plus } from 'phosphor-react-native';
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Platform,
   Pressable,
@@ -26,7 +27,7 @@ import {
   CampaignEmptyState,
   CampaignSearchBar,
 } from '@/features/campaign/components';
-import { useGetCampaigns } from '@/features/campaign/hooks';
+import { useDeleteCampaign, useGetCampaigns } from '@/features/campaign/hooks';
 import type { Campaign } from '@/features/campaign/types';
 import { grimoire } from '@/theme/grimoire';
 import { fontFamily } from '@/theme/typography';
@@ -48,6 +49,26 @@ export default function CampaignsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: campaigns, isLoading, isError, refetch, isFetching } = useGetCampaigns();
+  const { mutate: deleteCampaign } = useDeleteCampaign();
+
+  function showComingSoon(feature: string) {
+    Alert.alert('Em breve', `${feature} estará disponível em uma próxima atualização.`);
+  }
+
+  function handleDeleteCampaign(campaign: Campaign) {
+    Alert.alert(
+      'Excluir campanha',
+      `Tem certeza que deseja excluir "${campaign.title}"? Esta ação não pode ser desfeita.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: () => deleteCampaign(campaign.id),
+        },
+      ],
+    );
+  }
 
   const filteredCampaigns = useMemo(() => {
     if (!campaigns) return [];
@@ -168,10 +189,10 @@ export default function CampaignsScreen() {
           campaign={selectedCampaign}
           onDismiss={() => setSelectedCampaign(null)}
           onContinue={(campaign) => router.push(`/(app)/campaigns/${campaign.id}`)}
-          onEdit={(campaign) => router.push(`/(app)/campaigns/${campaign.id}`)}
-          onDuplicate={() => setSelectedCampaign(null)}
-          onArchive={() => setSelectedCampaign(null)}
-          onDelete={() => setSelectedCampaign(null)}
+          onEdit={() => showComingSoon('Edição de campanha')}
+          onDuplicate={() => showComingSoon('Duplicação de campanha')}
+          onArchive={() => showComingSoon('Arquivamento de campanha')}
+          onDelete={handleDeleteCampaign}
         />
       ) : null}
     </CampaignsShell>

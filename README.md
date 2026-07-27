@@ -97,7 +97,7 @@ frontend/src/
 │   └── notes/
 ├── services/
 │   ├── supabase/           Cliente, auth, types e mappers
-│   ├── firebase/           Legado (será removido)
+│   ├── firebase/           Login Google (OAuth → token para Supabase)
 │   └── api/                Placeholder para integrações HTTP
 ├── hooks/
 ├── store/                  Zustand (estado global de UI)

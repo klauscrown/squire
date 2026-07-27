@@ -6,62 +6,39 @@
 
  */
 
-
-
 import type { Campaign, CreateCampaignInput, UpdateCampaignInput } from '../types';
-
-
+import { resolvePlayersCount } from '../types';
 
 let store: Campaign[] = [];
 
-
-
 function generateId(): string {
-
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
-
 }
 
-
-
 export async function getCampaigns(userId: string): Promise<Campaign[]> {
-
   return store
 
     .filter((c) => c.createdBy === userId)
 
     .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-
 }
 
-
-
 export async function getCampaign(id: string): Promise<Campaign> {
-
   const campaign = store.find((c) => c.id === id);
 
   if (!campaign) throw new Error('Campanha não encontrada.');
 
   return campaign;
-
 }
 
-
-
 export async function createCampaign(
-
   input: CreateCampaignInput,
 
   userId: string,
-
 ): Promise<Campaign> {
-
   const now = new Date();
 
-
-
   const campaign: Campaign = {
-
     id: generateId(),
 
     title: input.title,
@@ -72,9 +49,7 @@ export async function createCampaign(
 
     status: input.status ?? 'active',
 
-    playersCount:
-
-      input.playersCount && input.playersCount !== '' ? Number(input.playersCount) : undefined,
+    playersCount: resolvePlayersCount(input.playersCount),
 
     coverImageUrl: input.coverImageUrl || undefined,
 
@@ -83,35 +58,17 @@ export async function createCampaign(
     createdAt: now,
 
     updatedAt: now,
-
   };
-
-
 
   store = [campaign, ...store];
 
   return campaign;
-
 }
-
-
 
 export async function updateCampaign(id: string, input: UpdateCampaignInput): Promise<void> {
-
-  store = store.map((c) =>
-
-    c.id === id ? { ...c, ...input, updatedAt: new Date() } : c,
-
-  );
-
+  store = store.map((c) => (c.id === id ? { ...c, ...input, updatedAt: new Date() } : c));
 }
-
-
 
 export async function deleteCampaign(id: string): Promise<void> {
-
   store = store.filter((c) => c.id !== id);
-
 }
-
-

@@ -81,7 +81,10 @@ type VariantStyle = {
   textColor: string;
 };
 
-function getVariantStyles(variant: ButtonVariant, theme: ReturnType<typeof useTheme>): VariantStyle {
+function getVariantStyles(
+  variant: ButtonVariant,
+  theme: ReturnType<typeof useTheme>,
+): VariantStyle {
   const styles: Record<ButtonVariant, VariantStyle> = {
     primary: {
       container: { backgroundColor: GOLD },

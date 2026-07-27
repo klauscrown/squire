@@ -22,7 +22,7 @@ import { useAppStore } from '@/store/appStore';
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const { isFirebaseConfigured, signUpWithEmail } = useAuth();
+  const { isSupabaseConfigured, signUpWithEmail } = useAuth();
   const setExplorerMode = useAppStore((state) => state.setExplorerMode);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -38,8 +38,10 @@ export default function RegisterScreen() {
   async function onSubmit(data: RegisterInput) {
     setNotice(null);
 
-    if (!isFirebaseConfigured) {
-      setNotice('Firebase não configurado. Preencha as variáveis EXPO_PUBLIC_FIREBASE_* no .env.');
+    if (!isSupabaseConfigured) {
+      setNotice(
+        'Supabase não configurado. Preencha EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_ANON_KEY no .env.',
+      );
       return;
     }
 
@@ -61,7 +63,7 @@ export default function RegisterScreen() {
         compact
       />
 
-      <ExplorerNoticeCard isSupabaseMode={false} />
+      <ExplorerNoticeCard isSupabaseMode={isSupabaseConfigured} />
 
       {notice ? (
         <Text variant="caption" style={styles.notice}>
@@ -131,7 +133,7 @@ export default function RegisterScreen() {
           title="Forjar grimório"
           onPress={handleSubmit(onSubmit)}
           loading={isSubmitting}
-          disabled={!isFirebaseConfigured}
+          disabled={!isSupabaseConfigured}
         />
       </View>
 

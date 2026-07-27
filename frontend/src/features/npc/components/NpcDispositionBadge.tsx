@@ -4,10 +4,7 @@ import { fontFamily } from '@/theme/typography';
 
 import { DISPOSITION_LABELS, type NpcDisposition } from '../types';
 
-const STYLES: Record<
-  NpcDisposition,
-  { bg: string; border: string; text: string }
-> = {
+const STYLES: Record<NpcDisposition, { bg: string; border: string; text: string }> = {
   ally: {
     bg: 'rgba(45, 255, 45, 0.1)',
     border: 'rgba(45, 255, 45, 0.35)',
@@ -39,9 +36,7 @@ export function NpcDispositionBadge({ disposition }: NpcDispositionBadgeProps) {
 
   return (
     <View style={[styles.badge, { backgroundColor: tone.bg, borderColor: tone.border }]}>
-      <Text style={[styles.label, { color: tone.text }]}>
-        {DISPOSITION_LABELS[disposition]}
-      </Text>
+      <Text style={[styles.label, { color: tone.text }]}>{DISPOSITION_LABELS[disposition]}</Text>
     </View>
   );
 }

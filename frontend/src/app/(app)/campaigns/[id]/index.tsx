@@ -17,8 +17,11 @@ export default function CampaignDetailScreen() {
   const campaignId = id ?? '';
 
   const { data: campaign, isLoading } = useGetCampaign(campaignId);
-  const { stats, lastSessionRelative, isLoading: isOverviewLoading } =
-    useCampaignOverview(campaignId);
+  const {
+    stats,
+    lastSessionRelative,
+    isLoading: isOverviewLoading,
+  } = useCampaignOverview(campaignId);
   const { mutate: deleteCampaign, isPending: isDeleting } = useDeleteCampaign();
 
   function handleDelete() {

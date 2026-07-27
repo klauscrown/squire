@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { useGetLocations } from '@/features/location/hooks';
 import { useGetNotes } from '@/features/notes/hooks';
 import { useGetNpcs } from '@/features/npc/hooks';
 import { useGetSessions } from '@/features/session/hooks';
@@ -41,6 +42,7 @@ export function useCampaignOverview(campaignId: string) {
   const sessionsQuery = useGetSessions(campaignId);
   const npcsQuery = useGetNpcs(campaignId);
   const notesQuery = useGetNotes(campaignId);
+  const locationsQuery = useGetLocations(campaignId);
 
   const stats: CampaignModuleStats = useMemo(
     () => ({
@@ -49,16 +51,13 @@ export function useCampaignOverview(campaignId: string) {
       notes: notesQuery.data?.length ?? 0,
       quests: 0,
       items: 0,
-      locations: 0,
+      locations: locationsQuery.data?.length ?? 0,
       factions: 0,
     }),
-    [sessionsQuery.data, npcsQuery.data, notesQuery.data],
+    [sessionsQuery.data, npcsQuery.data, notesQuery.data, locationsQuery.data],
   );
 
-  const lastSession = useMemo(
-    () => getLastSession(sessionsQuery.data),
-    [sessionsQuery.data],
-  );
+  const lastSession = useMemo(() => getLastSession(sessionsQuery.data), [sessionsQuery.data]);
 
   const lastSessionLabel = useMemo(() => {
     if (!lastSession) return 'Nenhuma sessão registrada';
@@ -73,7 +72,10 @@ export function useCampaignOverview(campaignId: string) {
   }, [lastSession]);
 
   const isLoading =
-    sessionsQuery.isLoading || npcsQuery.isLoading || notesQuery.isLoading;
+    sessionsQuery.isLoading ||
+    npcsQuery.isLoading ||
+    notesQuery.isLoading ||
+    locationsQuery.isLoading;
 
   return {
     stats,

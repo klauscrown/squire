@@ -3,8 +3,7 @@ import { Platform, type TextStyle } from 'react-native';
 import { loginFonts } from './loginFonts';
 import { loginTheme } from './loginTheme';
 
-const androidText: TextStyle =
-  Platform.OS === 'android' ? { includeFontPadding: false } : {};
+const androidText: TextStyle = Platform.OS === 'android' ? { includeFontPadding: false } : {};
 
 export const loginTypography = {
   title: {

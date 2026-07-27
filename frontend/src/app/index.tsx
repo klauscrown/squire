@@ -7,7 +7,7 @@ import { useAppStore } from '@/store/appStore';
 import { grimoire } from '@/theme/grimoire';
 
 export default function Index() {
-  const { isLoading, firebaseUser, session } = useAuth();
+  const { isLoading, session } = useAuth();
   const isExplorerMode = useAppStore((state) => state.isExplorerMode);
 
   if (isLoading) {
@@ -18,7 +18,7 @@ export default function Index() {
     );
   }
 
-  if (firebaseUser || session || isExplorerMode) {
+  if (session || isExplorerMode) {
     return <Redirect href={ROUTES.app.home} />;
   }
 

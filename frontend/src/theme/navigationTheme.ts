@@ -1,4 +1,4 @@
-import { DarkTheme, type Theme } from 'expo-router';
+import { DarkTheme, type Theme } from '@react-navigation/native';
 
 import { grimoire } from '@/theme/grimoire';
 

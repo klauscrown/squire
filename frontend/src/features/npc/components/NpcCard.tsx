@@ -16,8 +16,8 @@ interface NpcCardProps {
 }
 
 function buildMetaLine(npc: Npc): string | null {
-  const parts = [npc.role, npc.race, npc.classType].filter(
-    (part): part is string => Boolean(part && part.trim()),
+  const parts = [npc.role, npc.race, npc.classType].filter((part): part is string =>
+    Boolean(part && part.trim()),
   );
   if (parts.length === 0) return null;
   return parts.join(' · ');
@@ -29,9 +29,7 @@ export function NpcCard({ npc, campaignId }: NpcCardProps) {
   const hasPortrait = Boolean(npc.portraitUrl?.trim());
 
   return (
-    <GrimoireListCard
-      onPress={() => router.push(`/(app)/campaigns/${campaignId}/npcs/${npc.id}`)}
-    >
+    <GrimoireListCard onPress={() => router.push(`/(app)/campaigns/${campaignId}/npcs/${npc.id}`)}>
       <View style={styles.row}>
         <View style={styles.portraitWrap}>
           {hasPortrait ? (

@@ -29,4 +29,14 @@ export const lightTheme = createTheme('light');
 export const darkTheme = createTheme('dark');
 
 export { animation, colors, elevation, fontFamily, palette, radius, spacing, typography };
-export type { ColorScheme, FontFamily, ModuleColorKey, ThemeAnimation, ThemeColors, ThemeElevation, ThemeRadius, ThemeSpacing, ThemeTypography };
+export type {
+  ColorScheme,
+  FontFamily,
+  ModuleColorKey,
+  ThemeAnimation,
+  ThemeColors,
+  ThemeElevation,
+  ThemeRadius,
+  ThemeSpacing,
+  ThemeTypography,
+};

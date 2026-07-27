@@ -2,11 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Platform, StyleSheet, View } from 'react-native';
 
-import {
-  GrimoireEmptyState,
-  GrimoireModuleScreen,
-  ModuleListHeader,
-} from '@/components/grimoire';
+import { GrimoireEmptyState, GrimoireModuleScreen, ModuleListHeader } from '@/components/grimoire';
 import { CreateSessionSheet, SessionCard } from '@/features/session/components';
 import { useGetSessions } from '@/features/session/hooks';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
@@ -17,9 +13,13 @@ export default function SessionsListScreen() {
   const breakpoint = useBreakpoint();
   const [showCreate, setShowCreate] = useState(false);
 
-  const { data: sessions, isLoading, isError, refetch, isFetching } = useGetSessions(
-    campaignId ?? '',
-  );
+  const {
+    data: sessions,
+    isLoading,
+    isError,
+    refetch,
+    isFetching,
+  } = useGetSessions(campaignId ?? '');
 
   const isDesktopGrid = Platform.OS === 'web' && breakpoint === 'desktop';
   const numColumns = isDesktopGrid ? 2 : 1;

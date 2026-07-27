@@ -1,11 +1,7 @@
 import { ChevronRight } from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { grimoire } from '@/theme/grimoire';
 import { fontFamily } from '@/theme/typography';

@@ -2,11 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Platform, StyleSheet, View } from 'react-native';
 
-import {
-  GrimoireEmptyState,
-  GrimoireModuleScreen,
-  ModuleListHeader,
-} from '@/components/grimoire';
+import { GrimoireEmptyState, GrimoireModuleScreen, ModuleListHeader } from '@/components/grimoire';
 import { CreateNpcSheet, NpcCard } from '@/features/npc/components';
 import { useGetNpcs } from '@/features/npc/hooks';
 import { useBreakpoint } from '@/hooks/useBreakpoint';

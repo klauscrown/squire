@@ -57,11 +57,7 @@ export function AmbientGlow({ variant = 'purple-right', style, animate = true }:
         );
       })}
       {Platform.OS !== 'web' ? (
-        <BlurView
-          intensity={grimoire.blur.glow}
-          tint="dark"
-          style={StyleSheet.absoluteFill}
-        />
+        <BlurView intensity={grimoire.blur.glow} tint="dark" style={StyleSheet.absoluteFill} />
       ) : null}
     </View>
   );
@@ -89,7 +85,7 @@ export function AmbientGlow({ variant = 'purple-right', style, animate = true }:
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     overflow: 'hidden',
   },
   glowCluster: {

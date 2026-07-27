@@ -27,9 +27,7 @@ export function LoginHero({
 
       <AuthText style={styles.eyebrow}>{eyebrow}</AuthText>
       <AuthText style={styles.title}>{title}</AuthText>
-      <AuthText style={[styles.subtitle, compact && styles.subtitleCompact]}>
-        {subtitle}
-      </AuthText>
+      <AuthText style={[styles.subtitle, compact && styles.subtitleCompact]}>{subtitle}</AuthText>
     </View>
   );
 }

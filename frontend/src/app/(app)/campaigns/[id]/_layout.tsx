@@ -12,6 +12,7 @@ export default function CampaignDetailLayout() {
       <Stack.Screen name="notes" options={{ headerShown: false }} />
       <Stack.Screen name="sessions" options={{ headerShown: false }} />
       <Stack.Screen name="npcs" options={{ headerShown: false }} />
+      <Stack.Screen name="locations" options={{ headerShown: false }} />
     </Stack>
   );
 }

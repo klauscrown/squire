@@ -25,7 +25,7 @@ const THEME_LABELS: Record<ThemeMode, string> = {
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { session, firebaseUser, email, signOut } = useAuth();
+  const { session, hasEmailAccount, email, displayName, signOut } = useAuth();
   const dataMode = useDataMode();
   const themeMode = useAppStore((state) => state.themeMode);
   const setThemeMode = useAppStore((state) => state.setThemeMode);
@@ -99,8 +99,8 @@ export default function SettingsScreen() {
           <SectionLabel variant="softGlass" title="Conta" />
           <View style={styles.card}>
             <Text style={styles.body}>
-              {firebaseUser
-                ? `Conectado como ${email ?? 'conta Firebase'}.`
+              {hasEmailAccount
+                ? `Conectado como ${email ?? displayName ?? 'sua conta'}.`
                 : session
                   ? 'Sessão anônima na nuvem. Crie uma conta com e-mail para recuperar o acesso neste dispositivo.'
                   : 'Sem conta. Entre com e-mail ou continue como explorador.'}

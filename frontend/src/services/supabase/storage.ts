@@ -4,7 +4,7 @@ export const MEDIA_BUCKET = 'media';
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
-export type MediaFolder = 'npcs' | 'campaigns';
+export type MediaFolder = 'npcs' | 'campaigns' | 'locations';
 
 export interface UploadMediaInput {
   localUri: string;

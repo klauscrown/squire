@@ -82,13 +82,7 @@ export function DiceRollerSheet({ visible, onClose }: DiceRollerSheetProps) {
       <View style={styles.resultWrap}>
         {result ? (
           <>
-            <Text
-              style={[
-                styles.resultValue,
-                isCrit && styles.crit,
-                isFail && styles.fail,
-              ]}
-            >
+            <Text style={[styles.resultValue, isCrit && styles.crit, isFail && styles.fail]}>
               {result.primary}
             </Text>
             {result.secondary != null ? (

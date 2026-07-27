@@ -1,13 +1,7 @@
 import type { LucideIcon } from 'lucide-react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  TextInput,
-  type TextInputProps,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, TextInput, type TextInputProps, View } from 'react-native';
 
 import { loginFonts } from '@/features/auth/constants/loginFonts';
 import { loginSpacing, loginTheme } from '@/features/auth/constants/loginTheme';
@@ -41,13 +35,7 @@ export function LoginAuthField({
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.field,
-          { borderColor },
-          focused && styles.fieldFocused,
-        ]}
-      >
+      <View style={[styles.field, { borderColor }, focused && styles.fieldFocused]}>
         <View style={styles.leadingIcon}>
           <Icon size={18} color={loginTheme.link} strokeWidth={1.5} />
         </View>

@@ -21,7 +21,9 @@ function getInitials(name?: string | null): string {
 
   const parts = source.split(/\s+/).filter(Boolean);
   if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    const first = parts[0]?.[0] ?? '';
+    const second = parts[1]?.[0] ?? '';
+    return `${first}${second}`.toUpperCase();
   }
   return source.slice(0, 2).toUpperCase();
 }
@@ -78,7 +80,9 @@ export function GrimoireAvatar({
         { width: size, height: size, borderRadius: radius },
       ]}
     >
-      <Text style={[styles.initials, isSoftGlass && styles.softInitials, { fontSize: size * 0.34 }]}>
+      <Text
+        style={[styles.initials, isSoftGlass && styles.softInitials, { fontSize: size * 0.34 }]}
+      >
         {initials}
       </Text>
     </View>

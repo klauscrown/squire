@@ -49,7 +49,10 @@ export function ModuleListHeader({
           <Pressable
             onPress={onCreatePress}
             accessibilityLabel={createLabel}
-            style={({ pressed }) => [styles.createButton, pressed && { transform: [{ scale: 0.95 }] }]}
+            style={({ pressed }) => [
+              styles.createButton,
+              pressed && { transform: [{ scale: 0.95 }] },
+            ]}
           >
             <Plus size={18} color={grimoire.colors.purpleDeep} strokeWidth={2} />
           </Pressable>

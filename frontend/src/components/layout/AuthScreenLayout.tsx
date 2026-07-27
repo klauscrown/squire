@@ -12,11 +12,7 @@ interface AuthScreenLayoutProps {
   useCard?: boolean;
 }
 
-export function AuthScreenLayout({
-  children,
-  cardStyle,
-  useCard = true,
-}: AuthScreenLayoutProps) {
+export function AuthScreenLayout({ children, cardStyle, useCard = true }: AuthScreenLayoutProps) {
   const theme = useTheme();
 
   const content = useCard ? (

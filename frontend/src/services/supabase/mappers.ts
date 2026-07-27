@@ -1,9 +1,10 @@
 import type { Campaign } from '@/features/campaign/types';
+import type { Location } from '@/features/location/types';
 import type { Note } from '@/features/notes/types';
 import type { Npc } from '@/features/npc/types';
 import type { Session } from '@/features/session/types';
 
-import type { CampaignRow, NoteRow, NpcRow, SessionRow } from './types/database';
+import type { CampaignRow, LocationRow, NoteRow, NpcRow, SessionRow } from './types/database';
 
 function toDate(value: string): Date {
   return new Date(value);
@@ -66,6 +67,20 @@ export function mapNoteRow(row: NoteRow): Note {
     campaignId: row.campaign_id,
     title: row.title,
     content: row.content,
+    createdAt: toDate(row.created_at),
+    updatedAt: toDate(row.updated_at),
+  };
+}
+
+export function mapLocationRow(row: LocationRow): Location {
+  return {
+    id: row.id,
+    campaignId: row.campaign_id,
+    name: row.name,
+    type: row.type,
+    region: row.region ?? undefined,
+    description: row.description,
+    imageUrl: row.image_url ?? undefined,
     createdAt: toDate(row.created_at),
     updatedAt: toDate(row.updated_at),
   };

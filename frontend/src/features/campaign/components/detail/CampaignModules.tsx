@@ -36,8 +36,7 @@ export function CampaignModules({ campaignId, stats, lastSessionRelative }: Camp
   const progress = estimateProgress(stats);
   const [gridWidth, setGridWidth] = useState(0);
 
-  const cellWidth =
-    gridWidth > 0 ? (gridWidth - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS : 0;
+  const cellWidth = gridWidth > 0 ? (gridWidth - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS : 0;
 
   function handlePress(key: ModuleKey) {
     const mod = getModuleByKey(key);

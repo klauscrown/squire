@@ -15,11 +15,7 @@ export function CampaignUniverseBackground() {
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
-        <Image
-          source={BACKGROUND_IMAGE}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <Image source={BACKGROUND_IMAGE} style={styles.image} resizeMode="cover" />
       </BlurTargetView>
 
       <BlurView
@@ -39,12 +35,12 @@ export function CampaignUniverseBackground() {
 
 const styles = StyleSheet.create({
   image: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
   scrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(8, 8, 12, 0.55)',
   },
 });

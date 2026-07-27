@@ -124,10 +124,7 @@ export default function SessionDetailScreen() {
 
   if (!session) {
     return (
-      <GrimoireDetailScreen
-        notFoundMessage="Sessão não encontrada"
-        onBack={() => router.back()}
-      />
+      <GrimoireDetailScreen notFoundMessage="Sessão não encontrada" onBack={() => router.back()} />
     );
   }
 

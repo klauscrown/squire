@@ -8,7 +8,7 @@ import {
 } from '@/services/supabase';
 
 import type { CreateSessionInput, Session, UpdateSessionInput } from '../types';
-import { parseDateInput } from '../types';
+import { parseDateInput, resolveSessionNumber } from '../types';
 
 function sortSessions(a: Session, b: Session): number {
   if (a.sessionNumber != null && b.sessionNumber != null) {
@@ -39,10 +39,7 @@ async function nextSessionNumber(campaignId: string): Promise<number> {
 
 export async function getSessions(campaignId: string): Promise<Session[]> {
   const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('sessions')
-    .select('*')
-    .eq('campaign_id', campaignId);
+  const { data, error } = await supabase.from('sessions').select('*').eq('campaign_id', campaignId);
 
   const rows = assertSupabaseOk(data, error, 'Erro ao carregar sessões.');
   return rows.map(mapSessionRow).sort(sortSessions);
@@ -62,9 +59,7 @@ export async function createSession(
 ): Promise<Session> {
   const supabase = getSupabaseClient();
   const sessionNumber =
-    input.sessionNumber && input.sessionNumber !== ''
-      ? Number(input.sessionNumber)
-      : await nextSessionNumber(campaignId);
+    resolveSessionNumber(input.sessionNumber) ?? (await nextSessionNumber(campaignId));
 
   const { data, error } = await supabase
     .from('sessions')

@@ -1,9 +1,5 @@
 import { Marcellus_400Regular } from '@expo-google-fonts/marcellus';
-import {
-  Cinzel_500Medium,
-  Cinzel_600SemiBold,
-  Cinzel_700Bold,
-} from '@expo-google-fonts/cinzel';
+import { Cinzel_500Medium, Cinzel_600SemiBold, Cinzel_700Bold } from '@expo-google-fonts/cinzel';
 import {
   CormorantGaramond_400Regular,
   CormorantGaramond_500Medium,

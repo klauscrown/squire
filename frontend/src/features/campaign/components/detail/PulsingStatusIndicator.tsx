@@ -17,10 +17,7 @@ const MONO = Platform.select({
   default: 'monospace',
 }) as string;
 
-const STATUS_CONFIG: Record<
-  CampaignStatus,
-  { label: string; color: string; glow: string }
-> = {
+const STATUS_CONFIG: Record<CampaignStatus, { label: string; color: string; glow: string }> = {
   active: { label: 'Ativa', color: '#4ADE80', glow: '#2DFF2D' },
   paused: { label: 'Pausada', color: '#FACC15', glow: '#FACC15' },
   completed: { label: 'Concluída', color: '#6B7280', glow: '#6B7280' },
@@ -56,11 +53,7 @@ export function PulsingStatusIndicator({ status }: PulsingStatusIndicatorProps) 
     <View style={styles.row} accessibilityLabel={`Status: ${config.label}`}>
       <View style={styles.dotWrap}>
         <Animated.View
-          style={[
-            styles.glowOuter,
-            { backgroundColor: `${config.glow}33` },
-            glowStyle,
-          ]}
+          style={[styles.glowOuter, { backgroundColor: `${config.glow}33` }, glowStyle]}
         >
           {Platform.OS !== 'web' ? (
             <BlurView intensity={18} tint="dark" style={styles.glowBlur}>

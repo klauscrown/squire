@@ -49,6 +49,13 @@ export const updateSessionSchema = z.object({
 
 export type UpdateSessionInput = z.infer<typeof updateSessionSchema>;
 
+export function resolveSessionNumber(
+  value: CreateSessionInput['sessionNumber'],
+): number | undefined {
+  if (value === '' || value == null) return undefined;
+  return typeof value === 'number' ? value : Number(value);
+}
+
 export function parseDateInput(value?: string): Date | undefined {
   if (!value?.trim()) return undefined;
 

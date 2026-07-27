@@ -4,9 +4,11 @@ import {
   getSupabaseClient,
   mapCampaignRow,
   stripUndefined,
+  type CampaignRow,
 } from '@/services/supabase';
 
 import type { Campaign, CreateCampaignInput, UpdateCampaignInput } from '../types';
+import { resolvePlayersCount } from '../types';
 
 export async function getCampaigns(userId: string): Promise<Campaign[]> {
   const supabase = getSupabaseClient();
@@ -16,7 +18,7 @@ export async function getCampaigns(userId: string): Promise<Campaign[]> {
     .eq('created_by', userId)
     .order('created_at', { ascending: false });
 
-  const rows = assertSupabaseOk(data, error, 'Erro ao carregar campanhas.');
+  const rows = assertSupabaseOk(data, error, 'Erro ao carregar campanhas.') as CampaignRow[];
   return rows.map(mapCampaignRow);
 }
 
@@ -24,7 +26,7 @@ export async function getCampaign(id: string): Promise<Campaign> {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase.from('campaigns').select('*').eq('id', id).maybeSingle();
 
-  const row = assertSupabaseOk(data, error, 'Campanha não encontrada.');
+  const row = assertSupabaseOk(data, error, 'Campanha não encontrada.') as CampaignRow;
   return mapCampaignRow(row);
 }
 
@@ -40,15 +42,14 @@ export async function createCampaign(
       description: input.description || null,
       system: input.system || null,
       status: input.status ?? 'active',
-      players_count:
-        input.playersCount && input.playersCount !== '' ? Number(input.playersCount) : null,
+      players_count: resolvePlayersCount(input.playersCount) ?? null,
       cover_image_url: input.coverImageUrl || null,
       created_by: userId,
     })
     .select('*')
     .single();
 
-  const row = assertSupabaseOk(data, error, 'Erro ao criar campanha.');
+  const row = assertSupabaseOk(data, error, 'Erro ao criar campanha.') as CampaignRow;
   return mapCampaignRow(row);
 }
 
@@ -63,6 +64,7 @@ export async function updateCampaign(id: string, input: UpdateCampaignInput): Pr
         system: input.system,
         status: input.status,
         players_count: input.playersCount,
+        cover_image_url: input.coverImageUrl ?? undefined,
       }),
     )
     .eq('id', id);

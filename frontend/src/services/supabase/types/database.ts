@@ -2,6 +2,21 @@ export type CampaignStatus = 'active' | 'paused' | 'completed';
 export type SessionStatus = 'planned' | 'completed' | 'cancelled';
 export type NpcDisposition = 'ally' | 'neutral' | 'enemy' | 'unknown';
 export type NpcStatus = 'alive' | 'dead' | 'missing';
+export type LocationType =
+  | 'settlement'
+  | 'dungeon'
+  | 'wilderness'
+  | 'landmark'
+  | 'building'
+  | 'other';
+
+type TableRelationship = {
+  foreignKeyName: string;
+  columns: string[];
+  isOneToOne?: boolean;
+  referencedRelation: string;
+  referencedColumns: string[];
+};
 
 export interface CampaignRow {
   id: string;
@@ -53,7 +68,19 @@ export interface NoteRow {
   updated_at: string;
 }
 
-export interface Database {
+export interface LocationRow {
+  id: string;
+  campaign_id: string;
+  name: string;
+  type: LocationType;
+  region: string | null;
+  description: string;
+  image_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type Database = {
   public: {
     Tables: {
       campaigns: {
@@ -79,7 +106,7 @@ export interface Database {
           players_count?: number | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: TableRelationship[];
       };
       sessions: {
         Row: SessionRow;
@@ -102,7 +129,7 @@ export interface Database {
           status?: SessionStatus;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: TableRelationship[];
       };
       npcs: {
         Row: NpcRow;
@@ -133,7 +160,7 @@ export interface Database {
           status?: NpcStatus;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: TableRelationship[];
       };
       notes: {
         Row: NoteRow;
@@ -150,17 +177,40 @@ export interface Database {
           content?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: TableRelationship[];
+      };
+      locations: {
+        Row: LocationRow;
+        Insert: {
+          id?: string;
+          campaign_id: string;
+          name: string;
+          type?: LocationType;
+          region?: string | null;
+          description?: string;
+          image_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          type?: LocationType;
+          region?: string | null;
+          description?: string;
+          image_url?: string | null;
+          updated_at?: string;
+        };
+        Relationships: TableRelationship[];
       };
     };
-    Views: Record<string, never>;
+    Views: {
+      [_ in never]: never;
+    };
     Functions: {
       is_campaign_owner: {
         Args: { campaign_id: string };
         Returns: boolean;
       };
     };
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
   };
-}
+};

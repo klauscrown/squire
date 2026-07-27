@@ -44,9 +44,7 @@ export function NpcStatusBadge({ status }: NpcStatusBadgeProps) {
       ]}
     >
       <View style={[styles.dot, { backgroundColor: DOT_COLORS[status] }]} />
-      <Text style={[styles.label, { color: LABEL_COLORS[status] }]}>
-        {STATUS_LABELS[status]}
-      </Text>
+      <Text style={[styles.label, { color: LABEL_COLORS[status] }]}>{STATUS_LABELS[status]}</Text>
     </View>
   );
 }

@@ -3,11 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
 import { Trophy } from 'lucide-react-native';
 import { Platform, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { getGrimoireBannerFallback } from '@/assets/grimoire';
 import { GrimoireImage } from '@/components/grimoire';
@@ -51,13 +47,7 @@ function nextSessionLabel(updatedAt: Date): string {
   return `Próxima sessão: Em ${diffDays} dias`;
 }
 
-export function CampaignCard({
-  campaign,
-  index,
-  onPress,
-  onLongPress,
-  style,
-}: CampaignCardProps) {
+export function CampaignCard({ campaign, index, onPress, onLongPress, style }: CampaignCardProps) {
   const scale = useSharedValue(1);
   const progress = estimateProgress(campaign);
   const progressPct = Math.round(progress * 100);
@@ -106,7 +96,12 @@ export function CampaignCard({
           />
 
           <LinearGradient
-            colors={['transparent', 'rgba(11,17,32,0.4)', 'rgba(11,17,32,0.92)', 'rgba(11,17,32,0.98)']}
+            colors={[
+              'transparent',
+              'rgba(11,17,32,0.4)',
+              'rgba(11,17,32,0.92)',
+              'rgba(11,17,32,0.98)',
+            ]}
             locations={[0, 0.4, 0.78, 1]}
             style={StyleSheet.absoluteFill}
           />
@@ -170,7 +165,7 @@ const styles = StyleSheet.create({
     borderColor: premium.surface.cardBorder,
   },
   cover: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   top: {
     position: 'absolute',

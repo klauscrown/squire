@@ -13,9 +13,7 @@ interface ExplorerNoticeCardProps {
 export function ExplorerNoticeCard({ isSupabaseMode }: ExplorerNoticeCardProps) {
   return (
     <GlassCard gold style={styles.card}>
-      <AuthText style={styles.title}>
-        {isSupabaseMode ? 'Modo Explorador' : 'Modo Local'}
-      </AuthText>
+      <AuthText style={styles.title}>{isSupabaseMode ? 'Modo Explorador' : 'Modo Local'}</AuthText>
       <AuthText style={styles.body}>
         {isSupabaseMode
           ? 'Comece sem conta. Salve suas crônicas neste dispositivo e sincronize quando sentir que o reino cresceu.'

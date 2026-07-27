@@ -1,13 +1,20 @@
 import { BlurView } from 'expo-blur';
 import { type ReactNode } from 'react';
-import { Platform, Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 
 import { grimoire } from '@/theme/grimoire';
 
 interface GrimoireSurfaceProps {
   children: ReactNode;
   gold?: boolean;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   contentStyle?: ViewStyle;
   padding?: number;
   borderRadius?: number;

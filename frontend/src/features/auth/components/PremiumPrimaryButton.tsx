@@ -40,7 +40,11 @@ export function PremiumPrimaryButton({
       {...props}
     >
       <LinearGradient
-        colors={[loginTheme.button.gradientStart, loginTheme.button.gradientMid, loginTheme.button.gradientEnd]}
+        colors={[
+          loginTheme.button.gradientStart,
+          loginTheme.button.gradientMid,
+          loginTheme.button.gradientEnd,
+        ]}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         style={styles.gradient}

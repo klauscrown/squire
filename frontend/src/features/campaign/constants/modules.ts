@@ -15,6 +15,23 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 
+export type ModuleKey =
+  | 'sessions'
+  | 'npcs'
+  | 'notes'
+  | 'quests'
+  | 'items'
+  | 'locations'
+  | 'factions'
+  | 'calendar'
+  | 'diary'
+  | 'bestiary'
+  | 'combats'
+  | 'timeline'
+  | 'sharedInventory'
+  | 'wiki'
+  | 'library';
+
 export interface CampaignModuleStats {
   sessions: number;
   npcs: number;
@@ -35,7 +52,7 @@ export interface CampaignModuleDefinition {
   getStatLabel?: (stats: CampaignModuleStats) => string;
 }
 
-export const MODULES = [
+export const MODULES: readonly CampaignModuleDefinition[] = [
   {
     key: 'sessions',
     label: 'Sessões',
@@ -43,9 +60,7 @@ export const MODULES = [
     icon: BookOpen,
     enabled: true,
     getStatLabel: (stats) =>
-      stats.sessions > 0
-        ? `${stats.sessions} ${stats.sessions === 1 ? 'sessão' : 'sessões'}`
-        : '',
+      stats.sessions > 0 ? `${stats.sessions} ${stats.sessions === 1 ? 'sessão' : 'sessões'}` : '',
   },
   {
     key: 'npcs',
@@ -54,9 +69,7 @@ export const MODULES = [
     icon: Users,
     enabled: true,
     getStatLabel: (stats) =>
-      stats.npcs > 0
-        ? `${stats.npcs} ${stats.npcs === 1 ? 'personagem' : 'personagens'}`
-        : '',
+      stats.npcs > 0 ? `${stats.npcs} ${stats.npcs === 1 ? 'personagem' : 'personagens'}` : '',
   },
   {
     key: 'notes',
@@ -65,9 +78,7 @@ export const MODULES = [
     icon: NotebookPen,
     enabled: true,
     getStatLabel: (stats) =>
-      stats.notes > 0
-        ? `${stats.notes} ${stats.notes === 1 ? 'documento' : 'documentos'}`
-        : '',
+      stats.notes > 0 ? `${stats.notes} ${stats.notes === 1 ? 'documento' : 'documentos'}` : '',
   },
   {
     key: 'quests',
@@ -92,9 +103,11 @@ export const MODULES = [
     label: 'Locais',
     tagline: 'Cidades, tavernas, masmorras e regiões.',
     icon: Castle,
-    enabled: false,
-    description: 'Em breve',
-    getStatLabel: () => 'Em breve',
+    enabled: true,
+    getStatLabel: (stats) =>
+      stats.locations > 0
+        ? `${stats.locations} ${stats.locations === 1 ? 'local' : 'locais'}`
+        : '',
   },
   {
     key: 'factions',
@@ -177,9 +190,7 @@ export const MODULES = [
     description: 'Em breve',
     getStatLabel: () => 'Em breve',
   },
-] as const satisfies readonly CampaignModuleDefinition[];
-
-export type ModuleKey = (typeof MODULES)[number]['key'];
+];
 
 export const MODULE_DISPLAY_ORDER: ModuleKey[] = [
   'sessions',
@@ -210,6 +221,8 @@ export function getModuleTileLabel(
       return stats.npcs > 0 ? `${stats.npcs} cadastrados` : 'Explorar';
     case 'notes':
       return stats.notes > 0 ? `${stats.notes} documentos` : 'Explorar';
+    case 'locations':
+      return stats.locations > 0 ? `${stats.locations} cadastrados` : 'Explorar';
     default:
       return 'Explorar';
   }
@@ -231,6 +244,7 @@ export function getModuleRoute(key: ModuleKey, campaignId: string): string | nul
     sessions: `/(app)/campaigns/${campaignId}/sessions`,
     npcs: `/(app)/campaigns/${campaignId}/npcs`,
     notes: `/(app)/campaigns/${campaignId}/notes`,
+    locations: `/(app)/campaigns/${campaignId}/locations`,
   };
   return routes[key] ?? null;
 }

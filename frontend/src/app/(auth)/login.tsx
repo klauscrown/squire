@@ -23,11 +23,12 @@ import { useAppStore } from '@/store/appStore';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { isFirebaseConfigured, isSupabaseConfigured, signInWithEmail, signInAnonymously } =
+  const { isSupabaseConfigured, isGoogleSignInConfigured, signInWithEmail, signInWithGoogle, signInAnonymously } =
     useAuth();
   const setExplorerMode = useAppStore((state) => state.setExplorerMode);
 
   const [guestLoading, setGuestLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   const {
@@ -42,8 +43,10 @@ export default function LoginScreen() {
   async function onSubmit(data: LoginInput) {
     setNotice(null);
 
-    if (!isFirebaseConfigured) {
-      setNotice('Firebase não configurado. Preencha as variáveis EXPO_PUBLIC_FIREBASE_* no .env.');
+    if (!isSupabaseConfigured) {
+      setNotice(
+        'Supabase não configurado. Preencha EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_ANON_KEY no .env.',
+      );
       return;
     }
 
@@ -67,7 +70,9 @@ export default function LoginScreen() {
           setExplorerMode(false);
         } catch {
           setExplorerMode(true);
-          setNotice('Nuvem indisponível. Explorando localmente — os dados ficam neste dispositivo.');
+          setNotice(
+            'Nuvem indisponível. Explorando localmente — os dados ficam neste dispositivo.',
+          );
         }
       } else {
         setExplorerMode(true);
@@ -85,7 +90,27 @@ export default function LoginScreen() {
     Alert.alert('Em breve', 'A recuperação de senha estará disponível em uma próxima atualização.');
   }
 
+  async function handleGoogleLogin() {
+    setNotice(null);
+    setGoogleLoading(true);
+
+    try {
+      await signInWithGoogle();
+      setExplorerMode(false);
+      router.replace(ROUTES.app.home);
+    } catch (err) {
+      setNotice(err instanceof Error ? err.message : 'Não foi possível entrar com Google.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  }
+
   function handleSocialLogin(provider: 'Google' | 'Discord') {
+    if (provider === 'Google') {
+      void handleGoogleLogin();
+      return;
+    }
+
     Alert.alert('Em breve', `Login com ${provider} estará disponível em uma próxima atualização.`);
   }
 
@@ -146,7 +171,7 @@ export default function LoginScreen() {
           icon={Sparkles}
           onPress={handleSubmit(onSubmit)}
           loading={isSubmitting}
-          disabled={!isFirebaseConfigured}
+          disabled={!isSupabaseConfigured}
         />
       </View>
 
@@ -156,7 +181,11 @@ export default function LoginScreen() {
         <LoginSocialButton
           label="Google"
           icon={<GoogleIcon size={18} />}
-          onPress={() => handleSocialLogin('Google')}
+          onPress={
+            isGoogleSignInConfigured && !googleLoading
+              ? () => handleSocialLogin('Google')
+              : undefined
+          }
         />
         <LoginSocialButton
           label="Discord"

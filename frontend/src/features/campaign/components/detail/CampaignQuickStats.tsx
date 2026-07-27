@@ -52,12 +52,18 @@ export function CampaignQuickStats({ stats, lastSessionRelative }: CampaignQuick
         return (
           <View
             key={stat.label}
-            style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+            style={[
+              styles.card,
+              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+            ]}
           >
             <Icon size={18} color={theme.colors.accent} strokeWidth={2} />
             <Text style={[styles.value, { color: theme.colors.foreground }]}>{value}</Text>
             <Text style={[styles.label, { color: theme.colors.muted }]}>{stat.label}</Text>
-            <Text numberOfLines={1} style={[styles.subtitle, { color: theme.colors.mutedForeground }]}>
+            <Text
+              numberOfLines={1}
+              style={[styles.subtitle, { color: theme.colors.mutedForeground }]}
+            >
               {subtitle}
             </Text>
           </View>

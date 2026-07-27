@@ -78,7 +78,7 @@ export function WebSidebar() {
                 style={{
                   fontWeight: active
                     ? theme.typography.fontWeight.semibold
-                    : theme.typography.fontWeight.normal,
+                    : theme.typography.fontWeight.regular,
                   color: active ? theme.colors.accent : theme.colors.foreground,
                 }}
               >

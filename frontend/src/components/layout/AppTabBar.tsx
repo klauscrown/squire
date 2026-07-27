@@ -4,11 +4,7 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BookOpen, Home, Plus, ScrollText, User } from 'lucide-react-native';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { ROUTES } from '@/constants';
 import { premium } from '@/theme/premium';
@@ -91,7 +87,11 @@ export function AppTabBar({ state, descriptors, navigation, insets }: BottomTabB
     <View style={[styles.root, { height: CURVED_TAB_BAR_FOOTPRINT + bottom }]}>
       <View style={[styles.shell, { bottom }]}>
         {Platform.OS === 'ios' ? (
-          <BlurView intensity={premium.glass.blurStrong} tint="dark" style={StyleSheet.absoluteFill} />
+          <BlurView
+            intensity={premium.glass.blurStrong}
+            tint="dark"
+            style={StyleSheet.absoluteFill}
+          />
         ) : Platform.OS !== 'web' ? (
           <View style={styles.androidBar} />
         ) : null}

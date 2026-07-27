@@ -23,8 +23,8 @@ function resolveMasterName(
 }
 
 export function HomeHeader({ subtitle }: HomeHeaderProps) {
-  const { firebaseUser, email } = useAuth();
-  const masterName = resolveMasterName(firebaseUser?.displayName, email ?? firebaseUser?.email);
+  const { displayName, email } = useAuth();
+  const masterName = resolveMasterName(displayName, email);
 
   return (
     <View style={styles.root}>

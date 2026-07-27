@@ -282,7 +282,7 @@ export default function NpcDetailScreen() {
         loading={isUploadingPortrait}
       />
 
-      {(npc.race || npc.classType || npc.location) ? (
+      {npc.race || npc.classType || npc.location ? (
         <GrimoireDetailSection title="Ficha técnica" icon={Shield}>
           <View style={styles.attrsRow}>
             <View style={styles.attrCol}>

@@ -3,7 +3,7 @@ const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
 
-// Firebase Auth (RN persistence) — resolve exports CJS corretamente no Metro
+// Metro — alguns pacotes CJS (ex.: dependências legadas) precisam de extensão .cjs
 config.resolver.sourceExts.push('cjs');
 config.resolver.unstable_enablePackageExports = false;
 

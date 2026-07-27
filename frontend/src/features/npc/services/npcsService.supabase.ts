@@ -65,9 +65,7 @@ export async function updateNpc(id: string, input: UpdateNpcInput): Promise<void
         description: input.description,
         disposition: input.disposition,
         status: input.status,
-        ...(input.portraitUrl !== undefined
-          ? { portrait_url: input.portraitUrl || null }
-          : {}),
+        ...(input.portraitUrl !== undefined ? { portrait_url: input.portraitUrl || null } : {}),
       }),
     )
     .eq('id', id);

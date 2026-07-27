@@ -1,10 +1,11 @@
+import { type ReactNode } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
 import { grimoire } from '@/theme/grimoire';
 import { fontFamily } from '@/theme/typography';
 
 interface GrimoireDetailMetaProps {
-  children: string;
+  children: ReactNode;
 }
 
 export function GrimoireDetailMeta({ children }: GrimoireDetailMetaProps) {

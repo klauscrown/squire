@@ -19,18 +19,15 @@ import { fontFamily } from '@/theme/typography';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { session, firebaseUser, email } = useAuth();
+  const { session, hasEmailAccount, email, displayName, avatarUrl } = useAuth();
   const dataMode = useDataMode();
   const { data: campaigns } = useGetCampaigns();
 
   const totalCampaigns = campaigns?.length ?? 0;
   const activeCampaigns = campaigns?.filter((c) => c.status === 'active').length ?? 0;
 
-  const displayName =
-    firebaseUser?.displayName?.trim() ||
-    (email ? email.split('@')[0] : null) ||
-    (firebaseUser ? 'Mestre' : 'Explorador');
-  const displaySubtitle = firebaseUser
+  const resolvedName = displayName?.trim() || (hasEmailAccount ? 'Mestre' : 'Explorador');
+  const displaySubtitle = hasEmailAccount
     ? 'Conta com e-mail'
     : dataMode === 'cloud'
       ? 'Sessão anônima na nuvem'
@@ -54,12 +51,12 @@ export default function ProfileScreen() {
           <View style={styles.profileRow}>
             <GrimoireAvatar
               variant="softGlass"
-              photoUrl={firebaseUser?.photoURL}
-              name={displayName}
+              photoUrl={avatarUrl}
+              name={resolvedName}
               size={56}
             />
             <View style={styles.profileText}>
-              <Text style={styles.name}>{displayName}</Text>
+              <Text style={styles.name}>{resolvedName}</Text>
               <Text style={styles.roleSubtitle}>{displaySubtitle}</Text>
             </View>
           </View>
@@ -77,8 +74,16 @@ export default function ProfileScreen() {
 
       <GrimoireFadeIn delay={160}>
         <View style={styles.statsRow}>
-          <StatTile variant="softGlass" label="Crônicas" value={String(totalCampaigns).padStart(2, '0')} />
-          <StatTile variant="softGlass" label="Ativas" value={String(activeCampaigns).padStart(2, '0')} />
+          <StatTile
+            variant="softGlass"
+            label="Crônicas"
+            value={String(totalCampaigns).padStart(2, '0')}
+          />
+          <StatTile
+            variant="softGlass"
+            label="Ativas"
+            value={String(activeCampaigns).padStart(2, '0')}
+          />
         </View>
       </GrimoireFadeIn>
 

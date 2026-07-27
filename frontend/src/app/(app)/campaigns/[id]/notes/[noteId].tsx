@@ -87,7 +87,10 @@ export default function NoteDetailScreen() {
 
   if (!note) {
     return (
-      <GrimoireDetailScreen notFoundMessage="Anotação não encontrada" onBack={() => router.back()} />
+      <GrimoireDetailScreen
+        notFoundMessage="Anotação não encontrada"
+        onBack={() => router.back()}
+      />
     );
   }
 

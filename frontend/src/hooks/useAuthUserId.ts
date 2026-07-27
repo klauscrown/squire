@@ -3,7 +3,7 @@ import { useAppStore } from '@/store/appStore';
 
 export const DEV_USER_ID = 'dev-user';
 
-/** ID usado nas writes do Supabase (RLS). Sempre a sessão Supabase, nunca o UID Firebase. */
+/** ID usado nas writes do Supabase (RLS). Sempre o usuário da sessão Supabase. */
 export function useAuthUserId(): string | null {
   const { isSupabaseConfigured, session } = useAuth();
   const isExplorerMode = useAppStore((state) => state.isExplorerMode);

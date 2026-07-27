@@ -25,7 +25,9 @@ export function CampaignHeader({ campaign, lastSessionLabel }: CampaignHeaderPro
   const lastSessionShort = lastSessionLabel.replace('Última sessão: ', '');
 
   return (
-    <View style={{ paddingTop: insets.top + CAMPAIGN_SPACING.sm, marginBottom: CAMPAIGN_SPACING.lg }}>
+    <View
+      style={{ paddingTop: insets.top + CAMPAIGN_SPACING.sm, marginBottom: CAMPAIGN_SPACING.lg }}
+    >
       <AnimatedPressable
         onPress={() => router.back()}
         style={{
@@ -51,7 +53,7 @@ export function CampaignHeader({ campaign, lastSessionLabel }: CampaignHeaderPro
           marginBottom: CAMPAIGN_SPACING.md,
         }}
       >
-        <CampaignStatusBadge status={campaign.status} variant="subtle" />
+        <CampaignStatusBadge status={campaign.status} />
         {campaign.system ? (
           <Text variant="caption" muted>
             {campaign.system}

@@ -107,10 +107,7 @@ function CharacterRow({
 
         <Pressable
           onPress={() => onAttach(character.id)}
-          style={[
-            styles.attachBtn,
-            character.attachmentUri && styles.attachBtnActive,
-          ]}
+          style={[styles.attachBtn, character.attachmentUri && styles.attachBtnActive]}
           accessibilityLabel="Anexar arquivo"
         >
           <Paperclip
@@ -238,8 +235,8 @@ export function CreateCampaignScreen() {
     createCampaign(
       {
         ...data,
-        coverImageUrl: coverUri ?? undefined,
         playersCount,
+        coverLocalUri: coverUri,
       },
       {
         onSuccess: (campaign) => {
@@ -267,10 +264,7 @@ export function CreateCampaignScreen() {
                   ]}
                 >
                   <Text
-                    style={[
-                      styles.stepNumber,
-                      (isActive || isDone) && styles.stepNumberActive,
-                    ]}
+                    style={[styles.stepNumber, (isActive || isDone) && styles.stepNumberActive]}
                   >
                     {index + 1}
                   </Text>
@@ -501,75 +495,75 @@ export function CreateCampaignScreen() {
     <GrimoireAtmosphereShell>
       <SafeAreaView style={styles.root} edges={['top', 'bottom']}>
         <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <View style={styles.header}>
-          <Pressable onPress={handleBack} style={styles.headerBtn} hitSlop={8}>
-            <ArrowLeft size={22} color={premium.text.primary} strokeWidth={1.75} />
-          </Pressable>
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>Nova Campanha</Text>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${progress}%` }]} />
-            </View>
-          </View>
-          <Pressable onPress={showHelp} style={styles.headerBtn} hitSlop={8}>
-            <HelpCircle size={22} color={premium.text.secondary} strokeWidth={1.75} />
-          </Pressable>
-        </View>
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-          {step === 0 ? renderHero() : null}
-          {renderStepper()}
-          {step === 0 ? renderStepOneSections() : renderStepContent()}
-        </ScrollView>
-
-        <View style={styles.footer}>
-          <Pressable
-            onPress={handleContinue}
-            disabled={isPending}
-            style={({ pressed }) => [styles.continueWrap, pressed && styles.continuePressed]}
-          >
-            <LinearGradient
-              colors={['#2563EB', '#6366F1', '#7C3AED']}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={styles.continueGradient}
-            >
-              <Sparkles size={17} color="#FFFFFF" strokeWidth={1.75} />
-              <View style={styles.continueCopy}>
-                <Text style={styles.continueLabel}>
-                  {isPending ? 'Criando...' : continueLabel}
-                </Text>
-                <Text style={styles.continueHint}>{continueHint}</Text>
+          <View style={styles.header}>
+            <Pressable onPress={handleBack} style={styles.headerBtn} hitSlop={8}>
+              <ArrowLeft size={22} color={premium.text.primary} strokeWidth={1.75} />
+            </Pressable>
+            <View style={styles.headerCenter}>
+              <Text style={styles.headerTitle}>Nova Campanha</Text>
+              <View style={styles.progressTrack}>
+                <View style={[styles.progressFill, { width: `${progress}%` }]} />
               </View>
-            </LinearGradient>
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
+            </View>
+            <Pressable onPress={showHelp} style={styles.headerBtn} hitSlop={8}>
+              <HelpCircle size={22} color={premium.text.secondary} strokeWidth={1.75} />
+            </Pressable>
+          </View>
 
-      <OptionPickerModal
-        visible={picker === 'system'}
-        title="Selecione o sistema"
-        options={RPG_SYSTEMS}
-        selected={system || undefined}
-        onSelect={(value) => setValue('system', value, { shouldValidate: true })}
-        onClose={() => setPicker(null)}
-      />
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            {step === 0 ? renderHero() : null}
+            {renderStepper()}
+            {step === 0 ? renderStepOneSections() : renderStepContent()}
+          </ScrollView>
 
-      <OptionPickerModal
-        visible={picker === 'level'}
-        title="Nível inicial"
-        options={INITIAL_LEVELS}
-        selected={initialLevel}
-        onSelect={setInitialLevel}
-        onClose={() => setPicker(null)}
-      />
+          <View style={styles.footer}>
+            <Pressable
+              onPress={handleContinue}
+              disabled={isPending}
+              style={({ pressed }) => [styles.continueWrap, pressed && styles.continuePressed]}
+            >
+              <LinearGradient
+                colors={['#2563EB', '#6366F1', '#7C3AED']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.continueGradient}
+              >
+                <Sparkles size={17} color="#FFFFFF" strokeWidth={1.75} />
+                <View style={styles.continueCopy}>
+                  <Text style={styles.continueLabel}>
+                    {isPending ? 'Criando...' : continueLabel}
+                  </Text>
+                  <Text style={styles.continueHint}>{continueHint}</Text>
+                </View>
+              </LinearGradient>
+            </Pressable>
+          </View>
+        </KeyboardAvoidingView>
+
+        <OptionPickerModal
+          visible={picker === 'system'}
+          title="Selecione o sistema"
+          options={RPG_SYSTEMS}
+          selected={system || undefined}
+          onSelect={(value) => setValue('system', value, { shouldValidate: true })}
+          onClose={() => setPicker(null)}
+        />
+
+        <OptionPickerModal
+          visible={picker === 'level'}
+          title="Nível inicial"
+          options={INITIAL_LEVELS}
+          selected={initialLevel}
+          onSelect={setInitialLevel}
+          onClose={() => setPicker(null)}
+        />
       </SafeAreaView>
     </GrimoireAtmosphereShell>
   );
