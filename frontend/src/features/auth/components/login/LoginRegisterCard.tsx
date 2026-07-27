@@ -1,115 +1,74 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronRight } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ROUTES } from '@/constants';
 import { loginFonts } from '@/features/auth/constants/loginFonts';
+import { loginLayout } from '@/features/auth/constants/loginLayout';
 import { loginTheme } from '@/features/auth/constants/loginTheme';
 
 import { AuthText } from '../AuthText';
-import { PortalIcon } from './LoginBrandIcons';
 
 export function LoginRegisterCard() {
   return (
-    <View style={styles.card}>
-      <View style={styles.portalWrap}>
-        <LinearGradient
-          colors={['rgba(77, 136, 255, 0.35)', 'rgba(99, 102, 241, 0.15)']}
-          style={styles.portalGlow}
-        >
-          <PortalIcon size={28} />
-        </LinearGradient>
-      </View>
+    <View style={styles.wrap}>
+      <AuthText style={styles.title}>Seu mundo ainda não existe?</AuthText>
+      <AuthText style={styles.subtitle}>
+        Crie sua conta e comece sua primeira aventura.
+      </AuthText>
 
-      <View style={styles.body}>
-        <View style={styles.copy}>
-          <AuthText style={styles.title} numberOfLines={2}>
-            Seu mundo ainda não existe?
-          </AuthText>
-          <AuthText style={styles.subtitle} numberOfLines={2}>
-            Crie sua conta e comece sua primeira aventura.
-          </AuthText>
-        </View>
-
-        <Link href={ROUTES.auth.register} asChild>
-          <Pressable style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}>
+      <Link href={ROUTES.auth.register} asChild>
+        <Pressable style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}>
+          <View style={styles.ctaRow}>
             <AuthText style={styles.ctaText}>Criar conta</AuthText>
             <ChevronRight size={14} color={loginTheme.link} strokeWidth={2.2} />
-          </Pressable>
-        </Link>
-      </View>
+          </View>
+        </Pressable>
+      </Link>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    marginTop: 6,
-    borderRadius: loginTheme.card.radius,
-    borderWidth: 1,
-    borderColor: loginTheme.card.border,
-    backgroundColor: loginTheme.card.background,
-    padding: 12,
-    flexDirection: 'row',
+  wrap: {
     alignItems: 'center',
-    gap: 10,
-  },
-  portalWrap: {
-    flexShrink: 0,
-  },
-  portalGlow: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(129, 140, 248, 0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#6366F1',
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 4,
-  },
-  body: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    minWidth: 0,
-  },
-  copy: {
-    flex: 1,
-    flexShrink: 1,
-    gap: 2,
-    minWidth: 0,
+    gap: loginLayout.register.gap,
+    marginTop: loginLayout.register.marginTop,
+    paddingHorizontal: 8,
   },
   title: {
     fontFamily: loginFonts.bodySemibold,
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: loginLayout.register.titleSize,
+    lineHeight: 18,
     color: loginTheme.text.title,
+    textAlign: 'center',
   },
   subtitle: {
     fontFamily: loginFonts.body,
-    fontSize: 10,
-    lineHeight: 14,
+    fontSize: loginLayout.register.subtitleSize,
+    lineHeight: 17,
     color: loginTheme.text.subtitle,
+    textAlign: 'center',
+    maxWidth: loginLayout.register.maxSubtitleWidth,
   },
   cta: {
-    flexShrink: 0,
+    marginTop: 2,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  ctaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 1,
-    paddingLeft: 4,
+    justifyContent: 'center',
+    gap: 2,
   },
   ctaPressed: {
     opacity: 0.75,
   },
   ctaText: {
     fontFamily: loginFonts.bodyMedium,
-    fontSize: 12,
+    fontSize: loginLayout.register.ctaSize,
+    lineHeight: 18,
     color: loginTheme.link,
   },
 });

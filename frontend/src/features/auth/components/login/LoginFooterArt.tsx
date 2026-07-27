@@ -1,8 +1,7 @@
-import { Dices } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { loginFonts } from '@/features/auth/constants/loginFonts';
-import { loginTheme } from '@/features/auth/constants/loginTheme';
+import { loginLayout } from '@/features/auth/constants/loginLayout';
 
 import { AuthText } from '../AuthText';
 
@@ -12,25 +11,19 @@ interface LoginFooterArtProps {
 }
 
 export function LoginFooterArt({ onExplore, exploreLoading }: LoginFooterArtProps) {
+  if (!onExplore) return null;
+
   return (
     <View style={styles.wrap}>
-      <View style={styles.d20Row}>
-        <View style={styles.line} />
-        <Dices size={13} color={loginTheme.link} strokeWidth={1.5} />
-        <View style={styles.line} />
-      </View>
-
-      {onExplore ? (
-        <Pressable
-          onPress={onExplore}
-          disabled={exploreLoading}
-          style={({ pressed }) => [styles.explorerBtn, pressed && styles.explorerPressed]}
-        >
-          <AuthText style={styles.explorerText}>
-            {exploreLoading ? 'Abrindo…' : 'Continuar como explorador'}
-          </AuthText>
-        </Pressable>
-      ) : null}
+      <Pressable
+        onPress={onExplore}
+        disabled={exploreLoading}
+        style={({ pressed }) => [styles.explorerBtn, pressed && styles.explorerPressed]}
+      >
+        <AuthText style={styles.explorerText}>
+          {exploreLoading ? 'Abrindo…' : 'Continuar como explorador'}
+        </AuthText>
+      </Pressable>
     </View>
   );
 }
@@ -38,29 +31,19 @@ export function LoginFooterArt({ onExplore, exploreLoading }: LoginFooterArtProp
 const styles = StyleSheet.create({
   wrap: {
     alignItems: 'center',
-    marginTop: 18,
-    gap: 10,
-  },
-  d20Row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  line: {
-    width: 52,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(129, 140, 248, 0.2)',
+    marginTop: loginLayout.footer.marginTop,
   },
   explorerBtn: {
-    paddingVertical: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
   },
   explorerPressed: {
     opacity: 0.7,
   },
   explorerText: {
     fontFamily: loginFonts.body,
-    fontSize: 11,
-    color: 'rgba(165, 180, 252, 0.45)',
+    fontSize: loginLayout.footer.fontSize,
+    lineHeight: 16,
+    color: 'rgba(165, 180, 252, 0.52)',
   },
 });

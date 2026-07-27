@@ -28,7 +28,7 @@ export function SquireHint({
           <GrimoireImage
             source={grimoireImages.mascot}
             style={styles.softAvatar}
-            contentFit="cover"
+            contentFit="contain"
           />
           <View style={styles.textWrap}>
             <Text style={styles.softLabel}>{label}</Text>
@@ -44,7 +44,7 @@ export function SquireHint({
       <View style={styles.row}>
         <View style={styles.avatarWrap}>
           <GlowPulse color={`${grimoire.colors.gold}88`} size={48} style={styles.avatarGlow} />
-          <GrimoireImage source={grimoireImages.mascot} style={styles.avatar} contentFit="cover" />
+          <GrimoireImage source={grimoireImages.mascot} style={styles.avatar} contentFit="contain" />
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.label}>{label}</Text>

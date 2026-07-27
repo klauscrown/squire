@@ -66,7 +66,7 @@ export function GrimoireAvatar({
         <GrimoireImage
           source={grimoireImages.mascot}
           style={{ width: size, height: size, borderRadius: radius }}
-          contentFit="cover"
+          contentFit="contain"
         />
       </View>
     );

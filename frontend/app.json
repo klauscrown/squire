@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#161024"
+      "backgroundColor": "#0A0E21"
     },
     "ios": {
       "supportsTablet": true,
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#161024"
+        "backgroundColor": "#0A0E21"
       },
       "package": "com.squire.app",
       "googleServicesFile": "./google-services.json"

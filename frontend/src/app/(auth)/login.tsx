@@ -17,6 +17,7 @@ import { LoginOrnamentDivider } from '@/features/auth/components/login/LoginOrna
 import { LoginRegisterCard } from '@/features/auth/components/login/LoginRegisterCard';
 import { LoginSocialButton } from '@/features/auth/components/login/LoginSocialButton';
 import { loginFonts } from '@/features/auth/constants/loginFonts';
+import { loginLayout } from '@/features/auth/constants/loginLayout';
 import { loginTheme } from '@/features/auth/constants/loginTheme';
 import { loginSchema, type LoginInput } from '@/features/auth/types';
 import { useAppStore } from '@/store/appStore';
@@ -180,7 +181,7 @@ export default function LoginScreen() {
       <View style={styles.socialRow}>
         <LoginSocialButton
           label="Google"
-          icon={<GoogleIcon size={18} />}
+          icon={<GoogleIcon size={22} />}
           onPress={
             isGoogleSignInConfigured && !googleLoading
               ? () => handleSocialLogin('Google')
@@ -189,7 +190,7 @@ export default function LoginScreen() {
         />
         <LoginSocialButton
           label="Discord"
-          icon={<DiscordIcon size={18} />}
+          icon={<DiscordIcon size={22} />}
           onPress={() => handleSocialLogin('Discord')}
         />
       </View>
@@ -214,9 +215,9 @@ const styles = StyleSheet.create({
   },
   forgotWrap: {
     alignSelf: 'flex-end',
-    marginTop: -6,
-    marginBottom: 4,
-    paddingVertical: 2,
+    marginTop: loginLayout.forgot.marginTop,
+    marginBottom: loginLayout.forgot.marginBottom,
+    paddingVertical: 4,
   },
   forgotPressed: {
     opacity: 0.75,
@@ -228,6 +229,6 @@ const styles = StyleSheet.create({
   },
   socialRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: loginLayout.social.gap,
   },
 });

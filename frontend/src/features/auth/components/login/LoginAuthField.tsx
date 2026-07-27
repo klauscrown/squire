@@ -1,9 +1,10 @@
 import type { LucideIcon } from 'lucide-react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { useState } from 'react';
-import { Pressable, StyleSheet, TextInput, type TextInputProps, View } from 'react-native';
+import { Pressable, Platform, StyleSheet, TextInput, type TextInputProps, View } from 'react-native';
 
 import { loginFonts } from '@/features/auth/constants/loginFonts';
+import { loginLayout } from '@/features/auth/constants/loginLayout';
 import { loginSpacing, loginTheme } from '@/features/auth/constants/loginTheme';
 
 import { AuthText } from '../AuthText';
@@ -35,7 +36,7 @@ export function LoginAuthField({
 
   return (
     <View style={styles.container}>
-      <View style={[styles.field, { borderColor }, focused && styles.fieldFocused]}>
+      <View style={[styles.field, { borderColor }]}>
         <View style={styles.leadingIcon}>
           <Icon size={18} color={loginTheme.link} strokeWidth={1.5} />
         </View>
@@ -92,15 +93,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: loginTheme.input.background,
   },
-  fieldFocused: {
-    shadowColor: '#6366F1',
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 3,
-  },
   leadingIcon: {
-    width: 46,
+    width: loginLayout.field.iconSlot,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -112,9 +106,12 @@ const styles = StyleSheet.create({
     color: loginTheme.text.title,
     paddingRight: 12,
     paddingVertical: 0,
+    ...(Platform.OS === 'android'
+      ? { includeFontPadding: false, textAlignVertical: 'center' as const }
+      : null),
   },
   trailingButton: {
-    width: 46,
+    width: loginLayout.field.iconSlot,
     height: FIELD_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',

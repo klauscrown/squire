@@ -120,7 +120,6 @@ export function MasterShortcutsSection() {
 
     if (id === 'encounter') {
       setShowDice(true);
-
       return;
     }
 

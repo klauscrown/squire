@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 
 import { loginFonts } from '@/features/auth/constants/loginFonts';
-import { loginSpacing, loginTheme } from '@/features/auth/constants/loginTheme';
+import { loginLayout } from '@/features/auth/constants/loginLayout';
+import { loginTheme } from '@/features/auth/constants/loginTheme';
 
 import { AuthText } from '../AuthText';
 
@@ -33,32 +34,32 @@ export function LoginBrandHeader() {
 const styles = StyleSheet.create({
   wrap: {
     alignItems: 'center',
-    marginBottom: loginSpacing.sectionGap,
+    marginBottom: loginLayout.header.sectionBottom,
   },
   heroSpacer: {
-    height: 56,
+    height: loginLayout.header.topSpacer,
   },
   logo: {
     fontFamily: loginFonts.display,
-    fontSize: 40,
-    letterSpacing: 9,
+    fontSize: loginLayout.header.logoSize,
+    letterSpacing: loginLayout.header.logoTracking,
     color: loginTheme.brand.title,
     textShadowColor: loginTheme.brand.glow,
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 14,
-    marginBottom: 12,
+    textShadowRadius: 8,
+    marginBottom: loginLayout.header.logoToTagline,
   },
   taglineRow: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 22,
+    marginBottom: loginLayout.header.taglineToWelcome,
   },
   taglineLine: {
     flex: 1,
     height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(212, 175, 55, 0.35)',
+    backgroundColor: 'rgba(201, 169, 98, 0.18)',
   },
   diamond: {
     width: 5,
@@ -76,15 +77,16 @@ const styles = StyleSheet.create({
   welcome: {
     fontFamily: loginFonts.bodySemibold,
     fontSize: 18,
+    lineHeight: 24,
     color: loginTheme.text.title,
     textAlign: 'center',
-    marginBottom: 6,
+    marginBottom: loginLayout.header.welcomeToSub,
   },
   subwelcome: {
     fontFamily: loginFonts.body,
     fontSize: 14,
     lineHeight: 20,
-    color: loginTheme.text.muted,
+    color: loginTheme.text.subtitle,
     textAlign: 'center',
   },
 });

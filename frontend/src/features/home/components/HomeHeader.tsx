@@ -2,9 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { Bell } from 'lucide-react-native';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { grimoireImages } from '@/assets/grimoire';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { GrimoireImage } from '@/components/grimoire/GrimoireImage';
 import { premium } from '@/theme/premium';
 import { fontFamily } from '@/theme/typography';
 
@@ -28,10 +26,6 @@ export function HomeHeader({ subtitle }: HomeHeaderProps) {
 
   return (
     <View style={styles.root}>
-      <View style={styles.mascotWrap}>
-        <GrimoireImage source={grimoireImages.mascot} style={styles.mascot} contentFit="cover" />
-      </View>
-
       <View style={styles.copy}>
         <Text style={styles.greeting} numberOfLines={2}>
           Bem-vindo de volta, {masterName}! ✨
@@ -55,32 +49,15 @@ export function HomeHeader({ subtitle }: HomeHeaderProps) {
   );
 }
 
-const MASCOT = 56;
-
 const styles = StyleSheet.create({
   root: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: premium.spacing.stack,
   },
-  mascotWrap: {
-    width: MASCOT,
-    height: MASCOT,
-    borderRadius: premium.radius.sm,
-    overflow: 'hidden',
-  },
-  mascot: {
-    width: MASCOT,
-    height: MASCOT,
-    borderRadius: premium.radius.sm,
-    borderWidth: 1,
-    borderColor: premium.surface.cardBorder,
-    backgroundColor: premium.surface.icon,
-  },
   copy: {
     flex: 1,
     minWidth: 0,
-    paddingTop: 2,
     gap: 4,
   },
   greeting: {

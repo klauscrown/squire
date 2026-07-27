@@ -36,6 +36,10 @@ yarn-error.*
 .env
 .env*.local
 
+# Firebase (credenciais locais — não versionar)
+google-services.json
+**/google-services.json
+
 # typescript
 *.tsbuildinfo
 

@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { loginFonts } from '@/features/auth/constants/loginFonts';
+import { loginLayout } from '@/features/auth/constants/loginLayout';
 import { loginTheme } from '@/features/auth/constants/loginTheme';
 
 import { AuthText } from '../AuthText';
@@ -9,22 +10,12 @@ interface LoginOrnamentDividerProps {
   label: string;
 }
 
-function Dot() {
-  return <View style={styles.dot} />;
-}
-
 export function LoginOrnamentDivider({ label }: LoginOrnamentDividerProps) {
   return (
     <View style={styles.row}>
-      <View style={styles.lineWrap}>
-        <Dot />
-        <View style={styles.line} />
-      </View>
+      <View style={styles.line} />
       <AuthText style={styles.label}>{label}</AuthText>
-      <View style={styles.lineWrap}>
-        <View style={styles.line} />
-        <Dot />
-      </View>
+      <View style={styles.line} />
     </View>
   );
 }
@@ -33,30 +24,18 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginVertical: 18,
-  },
-  lineWrap: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
+    gap: loginLayout.divider.gap,
+    marginVertical: loginLayout.divider.marginVertical,
   },
   line: {
     flex: 1,
     height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(129, 140, 248, 0.22)',
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: loginTheme.link,
-    opacity: 0.7,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   label: {
     fontFamily: loginFonts.body,
-    fontSize: 12,
-    color: loginTheme.text.muted,
+    fontSize: loginLayout.divider.fontSize,
+    letterSpacing: 0.2,
+    color: loginTheme.text.subtitle,
   },
 });
