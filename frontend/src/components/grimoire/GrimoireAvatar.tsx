@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { grimoireImages } from '@/assets/grimoire';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import { GrimoireImage } from './GrimoireImage';
@@ -34,10 +34,24 @@ export function GrimoireAvatar({
   size = 56,
   variant = 'default',
 }: GrimoireAvatarProps) {
+  const grimoire = useGrimoire();
+  const avatar = grimoire.softGlass.avatar;
   const isSoftGlass = variant === 'softGlass';
   const hasPhoto = Boolean(photoUrl?.trim());
   const radius = isSoftGlass ? size / 2 : size >= 48 ? 16 : grimoire.radius.sm;
-  const frameStyle = isSoftGlass ? styles.softFrame : styles.frame;
+  const frameStyle = isSoftGlass
+    ? {
+        overflow: 'hidden' as const,
+        borderWidth: avatar.borderWidth,
+        borderColor: avatar.borderColor,
+        backgroundColor: avatar.backgroundColor,
+      }
+    : {
+        overflow: 'hidden' as const,
+        borderWidth: 1,
+        borderColor: grimoire.colors.glassGoldBorder,
+        ...grimoire.elevation.goldSoft,
+      };
 
   if (hasPhoto) {
     return (
@@ -59,7 +73,8 @@ export function GrimoireAvatar({
       <View
         style={[
           frameStyle,
-          isSoftGlass ? styles.softInitialsFrame : styles.mascotFrame,
+          !isSoftGlass && { backgroundColor: grimoire.colors.glassGold },
+          isSoftGlass && { backgroundColor: avatar.backgroundColor },
           { width: size, height: size, borderRadius: radius },
         ]}
       >
@@ -76,12 +91,25 @@ export function GrimoireAvatar({
     <View
       style={[
         frameStyle,
-        isSoftGlass ? styles.softInitialsFrame : styles.initialsFrame,
-        { width: size, height: size, borderRadius: radius },
+        {
+          width: size,
+          height: size,
+          borderRadius: radius,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: isSoftGlass ? avatar.backgroundColor : grimoire.colors.glassGold,
+        },
       ]}
     >
       <Text
-        style={[styles.initials, isSoftGlass && styles.softInitials, { fontSize: size * 0.34 }]}
+        style={[
+          styles.initials,
+          {
+            fontSize: size * 0.34,
+            color: isSoftGlass ? grimoire.softGlass.gold : grimoire.colors.gold,
+          },
+          isSoftGlass && styles.softInitials,
+        ]}
       >
         {initials}
       </Text>
@@ -89,42 +117,13 @@ export function GrimoireAvatar({
   );
 }
 
-const avatar = grimoire.softGlass.avatar;
-
 const styles = StyleSheet.create({
-  frame: {
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
-    ...grimoire.elevation.goldSoft,
-  },
-  softFrame: {
-    overflow: 'hidden',
-    borderWidth: avatar.borderWidth,
-    borderColor: avatar.borderColor,
-    backgroundColor: avatar.backgroundColor,
-  },
-  mascotFrame: {
-    backgroundColor: grimoire.colors.glassGold,
-  },
-  initialsFrame: {
-    backgroundColor: grimoire.colors.glassGold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  softInitialsFrame: {
-    backgroundColor: avatar.backgroundColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   initials: {
     fontFamily: fontFamily.cormorant.medium,
-    color: grimoire.colors.gold,
     letterSpacing: 1,
   },
   softInitials: {
     fontFamily: fontFamily.cormorant.bold,
     fontWeight: '700',
-    color: grimoire.softGlass.gold,
   },
 });

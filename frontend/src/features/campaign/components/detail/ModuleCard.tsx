@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 const SPRING_IN = { damping: 18, stiffness: 380, mass: 0.6 };
@@ -18,6 +18,7 @@ interface ModuleCardProps {
 }
 
 export function ModuleCard({ label, hint, icon: Icon, enabled, onPress }: ModuleCardProps) {
+  const grimoire = useGrimoire();
   const scale = useSharedValue(1);
 
   const pressStyle = useAnimatedStyle(() => ({
@@ -35,14 +36,36 @@ export function ModuleCard({ label, hint, icon: Icon, enabled, onPress }: Module
       }}
       style={styles.modulePressable}
     >
-      <Animated.View style={[styles.moduleCard, !enabled && styles.moduleCardDisabled, pressStyle]}>
-        <View style={styles.moduleIconWrap}>
+      <Animated.View
+        style={[
+          styles.moduleCard,
+          {
+            borderRadius: grimoire.radius.md,
+            borderColor: grimoire.colors.cardBorder,
+            backgroundColor: grimoire.colors.glass,
+          },
+          !enabled && styles.moduleCardDisabled,
+          pressStyle,
+        ]}
+      >
+        <View
+          style={[
+            styles.moduleIconWrap,
+            {
+              borderColor: grimoire.colors.glassGoldBorder,
+              backgroundColor: grimoire.colors.glassGold,
+            },
+          ]}
+        >
           <Icon size={14} color={grimoire.colors.gold} strokeWidth={1.5} />
         </View>
-        <Text style={styles.moduleLabel} numberOfLines={1}>
+        <Text style={[styles.moduleLabel, { color: grimoire.colors.ivory }]} numberOfLines={1}>
           {label}
         </Text>
-        <Text style={styles.moduleHint} numberOfLines={2}>
+        <Text
+          style={[styles.moduleHint, { color: `${grimoire.colors.ivoryDim}99` }]}
+          numberOfLines={2}
+        >
           {hint}
         </Text>
         {enabled ? (
@@ -64,10 +87,7 @@ const styles = StyleSheet.create({
   },
   moduleCard: {
     minHeight: 92,
-    borderRadius: grimoire.radius.md,
     borderWidth: 1,
-    borderColor: grimoire.colors.cardBorder,
-    backgroundColor: grimoire.colors.glass,
     paddingHorizontal: 8,
     paddingVertical: 10,
     alignItems: 'center',
@@ -82,8 +102,6 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 9,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
-    backgroundColor: grimoire.colors.glassGold,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -91,7 +109,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.semibold,
     fontSize: 11,
     lineHeight: 14,
-    color: grimoire.colors.ivory,
     textAlign: 'center',
     width: '100%',
   },
@@ -99,7 +116,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.regular,
     fontSize: 9,
     lineHeight: 12,
-    color: `${grimoire.colors.ivoryDim}99`,
     textAlign: 'center',
     width: '100%',
     minHeight: 24,

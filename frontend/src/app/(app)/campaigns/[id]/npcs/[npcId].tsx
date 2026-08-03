@@ -29,7 +29,7 @@ import {
   type NpcStatus,
   type UpdateNpcInput,
 } from '@/features/npc/types';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 function formatDateTime(date: Date): string {
@@ -48,6 +48,7 @@ export default function NpcDetailScreen() {
   const { id: campaignId, npcId } = useLocalSearchParams<{ id: string; npcId: string }>();
   const router = useRouter();
   const navigation = useNavigation();
+  const grimoire = useGrimoire();
   const [isEditing, setIsEditing] = useState(false);
 
   const { data: npc, isLoading } = useGetNpc(npcId ?? '');
@@ -271,7 +272,9 @@ export default function NpcDetailScreen() {
   return (
     <GrimoireDetailScreen glow="petrol-left">
       <View style={styles.badgesRow}>
-        {npc.role ? <Text style={styles.role}>{npc.role}</Text> : null}
+        {npc.role ? (
+          <Text style={[styles.role, { color: grimoire.colors.goldMuted }]}>{npc.role}</Text>
+        ) : null}
         <NpcDispositionBadge disposition={npc.disposition} />
         <NpcStatusBadge status={npc.status} />
       </View>
@@ -286,22 +289,39 @@ export default function NpcDetailScreen() {
         <GrimoireDetailSection title="Ficha técnica" icon={Shield}>
           <View style={styles.attrsRow}>
             <View style={styles.attrCol}>
-              <Text style={styles.attrLabel}>Raça</Text>
-              <Text style={styles.attrValue} numberOfLines={2}>
+              <Text style={[styles.attrLabel, { color: `${grimoire.colors.ivoryDim}99` }]}>
+                Raça
+              </Text>
+              <Text
+                style={[styles.attrValue, { color: grimoire.colors.ivory }]}
+                numberOfLines={2}
+              >
                 {npc.race?.trim() || '—'}
               </Text>
             </View>
             <View style={styles.attrCol}>
-              <Text style={styles.attrLabel}>Classe</Text>
-              <Text style={styles.attrValue} numberOfLines={2}>
+              <Text style={[styles.attrLabel, { color: `${grimoire.colors.ivoryDim}99` }]}>
+                Classe
+              </Text>
+              <Text
+                style={[styles.attrValue, { color: grimoire.colors.ivory }]}
+                numberOfLines={2}
+              >
                 {npc.classType?.trim() || '—'}
               </Text>
             </View>
           </View>
           {npc.location ? (
-            <View style={styles.locationBlock}>
-              <Text style={styles.attrLabel}>Localização</Text>
-              <Text style={styles.attrValue} numberOfLines={2}>
+            <View
+              style={[styles.locationBlock, { borderTopColor: grimoire.colors.cardBorder }]}
+            >
+              <Text style={[styles.attrLabel, { color: `${grimoire.colors.ivoryDim}99` }]}>
+                Localização
+              </Text>
+              <Text
+                style={[styles.attrValue, { color: grimoire.colors.ivory }]}
+                numberOfLines={2}
+              >
                 {npc.location}
               </Text>
             </View>
@@ -311,9 +331,13 @@ export default function NpcDetailScreen() {
 
       <GrimoireDetailSection title="Biografia" icon={FileText} quote>
         {npc.description ? (
-          <Text style={styles.bodyText}>{npc.description}</Text>
+          <Text style={[styles.bodyText, { color: `${grimoire.colors.ivory}E6` }]}>
+            {npc.description}
+          </Text>
         ) : (
-          <Text style={styles.mutedText}>Sem descrição</Text>
+          <Text style={[styles.mutedText, { color: grimoire.colors.ivoryDim }]}>
+            Sem descrição
+          </Text>
         )}
       </GrimoireDetailSection>
 
@@ -344,7 +368,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: grimoire.colors.goldMuted,
   },
   attrsRow: {
     flexDirection: 'row',
@@ -358,31 +381,26 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    color: `${grimoire.colors.ivoryDim}99`,
   },
   attrValue: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 20,
-    color: grimoire.colors.ivory,
     marginTop: 4,
   },
   locationBlock: {
     marginTop: 16,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: grimoire.colors.cardBorder,
   },
   bodyText: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 15,
     lineHeight: 24,
-    color: `${grimoire.colors.ivory}E6`,
   },
   mutedText: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 14,
     lineHeight: 22,
-    color: grimoire.colors.ivoryDim,
   },
   rowInputs: {
     flexDirection: 'row',

@@ -8,12 +8,13 @@ import {
   CampaignModules,
 } from '@/features/campaign/components/detail';
 import { useCampaignOverview, useDeleteCampaign, useGetCampaign } from '@/features/campaign/hooks';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 export default function CampaignDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const grimoire = useGrimoire();
   const campaignId = id ?? '';
 
   const { data: campaign, isLoading } = useGetCampaign(campaignId);
@@ -51,9 +52,20 @@ export default function CampaignDetailScreen() {
   if (!campaign) {
     return (
       <GrimoireScreen scrollable={false} glow="purple-right" contentStyle={styles.centered}>
-        <Text style={styles.notFound}>Campanha não encontrada</Text>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Voltar</Text>
+        <Text style={[styles.notFound, { color: grimoire.colors.ivory }]}>
+          Campanha não encontrada
+        </Text>
+        <Pressable
+          onPress={() => router.back()}
+          style={[
+            styles.backButton,
+            {
+              borderRadius: grimoire.radius.md,
+              borderColor: grimoire.colors.glassGoldBorder,
+            },
+          ]}
+        >
+          <Text style={[styles.backButtonText, { color: grimoire.colors.gold }]}>Voltar</Text>
         </Pressable>
       </GrimoireScreen>
     );
@@ -107,21 +119,17 @@ const styles = StyleSheet.create({
   notFound: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 22,
-    color: grimoire.colors.ivory,
     textAlign: 'center',
     marginBottom: 20,
   },
   backButton: {
-    borderRadius: grimoire.radius.md,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
   backButtonText: {
     fontFamily: fontFamily.inter.medium,
     fontSize: 14,
-    color: grimoire.colors.gold,
   },
   hintWrap: {
     paddingHorizontal: 24,

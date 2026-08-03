@@ -12,25 +12,25 @@ export const palettes = {
   default: {
     name: 'Grimório',
     /** Atmosphere top — alinhado a grimoire.atmosphere.top */
-    gradientStart: '#2B1A66',
+    gradientStart: '#131A2E',
     /** Atmosphere base — alinhado a grimoire.atmosphere.base */
-    gradientEnd: '#08061A',
+    gradientEnd: '#0B1120',
     /** Roxo principal — tokens.arcanePurple / botões, pill ativa */
-    primary: '#7C3AED',
-    primaryLight: '#A78BFA',
+    primary: '#4F46E5',
+    primaryLight: '#818CF8',
     /** Alias do primary — default não usa CTA separado (só Tormenta diferencia) */
     buttonPrimary: '#7C3AED',
     buttonPrimaryShadow: 'rgba(124, 58, 237, 0.42)',
     /** Glow suave do FAB — mais baixo que o CTA retangular */
     fabShadow: 'rgba(124, 58, 237, 0.18)',
     /** Dourado antigo — tokens.ancientGold / chips, ícones, destaques */
-    accent: '#C9A962',
-    accentSoft: 'rgba(201, 169, 98, 0.15)',
+    accent: '#D4AF37',
+    accentSoft: '#F5E7A1',
     /** Wash de card — opacity.card.subtle */
-    surface: 'rgba(124, 58, 237, 0.08)',
+    surface: '#111827',
     surfaceBorder: 'rgba(201, 169, 98, 0.2)',
-    textPrimary: '#EFEDE8',
-    textSecondary: '#A8A49C',
+    textPrimary: '#F8FAFC',
+    textSecondary: '#94A3B8',
     /** Diferenciação cíclica dos quick actions (dourado / lilás / violeta / azul) */
     iconVariants: {
       a: '#C9A962',

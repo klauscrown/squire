@@ -29,7 +29,7 @@ import {
 } from '@/features/campaign/components';
 import { useDeleteCampaign, useGetCampaigns } from '@/features/campaign/hooks';
 import type { Campaign } from '@/features/campaign/types';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 function CampaignsShell({ children }: { children: ReactNode }) {
@@ -45,6 +45,7 @@ function CampaignsShell({ children }: { children: ReactNode }) {
 
 export default function CampaignsScreen() {
   const router = useRouter();
+  const grimoire = useGrimoire();
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -110,8 +111,12 @@ export default function CampaignsScreen() {
     return (
       <CampaignsShell>
         <View style={styles.errorWrap}>
-          <Text style={styles.errorTitle}>Erro ao carregar</Text>
-          <Text style={styles.errorBody}>Verifique sua conexão e tente novamente.</Text>
+          <Text style={[styles.errorTitle, { color: grimoire.colors.ivory }]}>
+            Erro ao carregar
+          </Text>
+          <Text style={[styles.errorBody, { color: grimoire.colors.ivoryDim }]}>
+            Verifique sua conexão e tente novamente.
+          </Text>
         </View>
       </CampaignsShell>
     );
@@ -122,7 +127,7 @@ export default function CampaignsScreen() {
   if (hasNoCampaigns) {
     return (
       <CampaignsShell>
-        <View style={styles.emptyRoot}>
+        <View style={[styles.emptyRoot, { paddingHorizontal: grimoire.spacing.screen }]}>
           <CampaignEmptyState onCreatePress={handleCreatePress} />
         </View>
       </CampaignsShell>
@@ -135,7 +140,10 @@ export default function CampaignsScreen() {
         style={styles.list}
         data={filteredCampaigns}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingHorizontal: grimoire.spacing.screen },
+        ]}
         showsVerticalScrollIndicator={false}
         refreshing={isFetching}
         onRefresh={refetch}
@@ -155,6 +163,10 @@ export default function CampaignsScreen() {
                     onPress={handleCreatePress}
                     style={({ pressed }) => [
                       styles.createBtn,
+                      {
+                        backgroundColor: grimoire.colors.gold,
+                        shadowColor: grimoire.colors.gold,
+                      },
                       pressed && { transform: [{ scale: 0.95 }] },
                     ]}
                   >
@@ -167,7 +179,7 @@ export default function CampaignsScreen() {
               <CampaignSearchBar value={searchQuery} onChangeText={setSearchQuery} />
             </View>
             {filteredCampaigns.length === 0 ? (
-              <Text style={styles.emptySearchText}>
+              <Text style={[styles.emptySearchText, { color: grimoire.colors.ivoryDim }]}>
                 Nenhuma crônica encontrada para "{searchQuery}".
               </Text>
             ) : null}
@@ -210,7 +222,6 @@ const styles = StyleSheet.create({
   },
   emptyRoot: {
     flex: 1,
-    paddingHorizontal: grimoire.spacing.screen,
   },
   centered: {
     flex: 1,
@@ -226,28 +237,23 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontFamily: fontFamily.inter.semibold,
     fontSize: 18,
-    color: grimoire.colors.ivory,
     textAlign: 'center',
     marginBottom: 8,
   },
   errorBody: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 15,
-    color: grimoire.colors.ivoryDim,
     textAlign: 'center',
   },
   listContent: {
-    paddingHorizontal: grimoire.spacing.screen,
     paddingBottom: CURVED_TAB_BAR_FOOTPRINT + 16,
   },
   createBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: grimoire.colors.gold,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: grimoire.colors.gold,
     shadowOpacity: 0.35,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
@@ -263,7 +269,6 @@ const styles = StyleSheet.create({
   emptySearchText: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 14,
-    color: grimoire.colors.ivoryDim,
     textAlign: 'center',
     paddingVertical: 24,
   },

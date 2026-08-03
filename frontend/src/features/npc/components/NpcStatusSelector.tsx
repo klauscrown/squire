@@ -1,17 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import { STATUS_LABELS, type NpcStatus } from '../types';
 
 const STATUS_OPTIONS: NpcStatus[] = ['alive', 'dead', 'missing'];
-
-const DOT_COLORS: Record<NpcStatus, string> = {
-  alive: grimoire.colors.success,
-  dead: grimoire.colors.ivoryDim,
-  missing: '#7B5EA7',
-};
 
 interface NpcStatusSelectorProps {
   value: NpcStatus;
@@ -19,9 +13,28 @@ interface NpcStatusSelectorProps {
 }
 
 export function NpcStatusSelector({ value, onChange }: NpcStatusSelectorProps) {
+  const grimoire = useGrimoire();
+
+  const dotColors: Record<NpcStatus, string> = {
+    alive: grimoire.colors.success,
+    dead: grimoire.colors.ivoryDim,
+    missing: '#7B5EA7',
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Status</Text>
+      <Text
+        style={[
+          styles.label,
+          {
+            fontSize: grimoire.typography.label.fontSize,
+            letterSpacing: grimoire.typography.label.letterSpacing,
+            color: grimoire.colors.goldMuted,
+          },
+        ]}
+      >
+        Status
+      </Text>
       <View style={styles.row}>
         {STATUS_OPTIONS.map((status) => {
           const isSelected = value === status;
@@ -31,10 +44,30 @@ export function NpcStatusSelector({ value, onChange }: NpcStatusSelectorProps) {
               onPress={() => onChange(status)}
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected }}
-              style={[styles.chip, isSelected ? styles.chipSelected : styles.chipIdle]}
+              style={[
+                styles.chip,
+                isSelected
+                  ? {
+                      borderColor: grimoire.colors.glassGoldBorder,
+                      backgroundColor: grimoire.colors.glassGold,
+                    }
+                  : {
+                      borderColor: grimoire.colors.cardBorder,
+                      backgroundColor: grimoire.colors.glass,
+                    },
+              ]}
             >
-              <View style={[styles.dot, { backgroundColor: DOT_COLORS[status] }]} />
-              <Text style={[styles.chipLabel, isSelected && styles.chipLabelSelected]}>
+              <View style={[styles.dot, { backgroundColor: dotColors[status] }]} />
+              <Text
+                style={[
+                  styles.chipLabel,
+                  { color: grimoire.colors.ivoryDim },
+                  isSelected && {
+                    fontFamily: fontFamily.inter.semibold,
+                    color: grimoire.colors.gold,
+                  },
+                ]}
+              >
                 {STATUS_LABELS[status]}
               </Text>
             </Pressable>
@@ -51,10 +84,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: fontFamily.inter.semibold,
-    fontSize: grimoire.typography.label.fontSize,
-    letterSpacing: grimoire.typography.label.letterSpacing,
     textTransform: 'uppercase',
-    color: grimoire.colors.goldMuted,
     marginBottom: 8,
   },
   row: {
@@ -71,14 +101,6 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderWidth: 1,
   },
-  chipIdle: {
-    borderColor: grimoire.colors.cardBorder,
-    backgroundColor: grimoire.colors.glass,
-  },
-  chipSelected: {
-    borderColor: grimoire.colors.glassGoldBorder,
-    backgroundColor: grimoire.colors.glassGold,
-  },
   dot: {
     width: 7,
     height: 7,
@@ -87,10 +109,5 @@ const styles = StyleSheet.create({
   chipLabel: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 12,
-    color: grimoire.colors.ivoryDim,
-  },
-  chipLabelSelected: {
-    fontFamily: fontFamily.inter.semibold,
-    color: grimoire.colors.gold,
   },
 });

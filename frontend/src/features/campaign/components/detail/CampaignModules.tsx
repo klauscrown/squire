@@ -11,7 +11,7 @@ import {
   type CampaignModuleStats,
   type ModuleKey,
 } from '@/features/campaign/constants/modules';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import { ModuleCard } from './ModuleCard';
@@ -33,6 +33,7 @@ function estimateProgress(stats: CampaignModuleStats): number {
 
 export function CampaignModules({ campaignId, stats, lastSessionRelative }: CampaignModulesProps) {
   const router = useRouter();
+  const grimoire = useGrimoire();
   const progress = estimateProgress(stats);
   const [gridWidth, setGridWidth] = useState(0);
 
@@ -57,20 +58,36 @@ export function CampaignModules({ campaignId, stats, lastSessionRelative }: Camp
     <View style={styles.container}>
       <LinearGradient
         colors={[`${grimoire.colors.purpleMid}66`, grimoire.colors.card, grimoire.colors.card]}
-        style={styles.journeyCard}
+        style={[
+          styles.journeyCard,
+          {
+            borderRadius: grimoire.radius.xl,
+            borderColor: grimoire.colors.glassGoldBorder,
+            shadowColor: grimoire.colors.gold,
+          },
+        ]}
       >
         <View style={styles.journeyHeader}>
           <View>
-            <Text style={styles.journeyEyebrow}>Próxima sessão</Text>
-            <Text style={styles.journeyTitle}>
+            <Text style={[styles.journeyEyebrow, { color: grimoire.colors.gold }]}>
+              Próxima sessão
+            </Text>
+            <Text style={[styles.journeyTitle, { color: grimoire.colors.ivory }]}>
               {stats.sessions > 0 ? lastSessionRelative : 'A definir'}
             </Text>
           </View>
           <Pressable
             onPress={handleStartJourney}
-            style={({ pressed }) => [styles.journeyButton, pressed && { opacity: 0.9 }]}
+            style={({ pressed }) => [
+              styles.journeyButton,
+              {
+                borderRadius: grimoire.radius.md,
+                backgroundColor: grimoire.colors.gold,
+              },
+              pressed && { opacity: 0.9 },
+            ]}
           >
-            <Text style={styles.journeyButtonText}>
+            <Text style={[styles.journeyButtonText, { color: grimoire.colors.purpleDeep }]}>
               {stats.sessions > 0 ? 'Continuar' : 'Iniciar Jornada'}
             </Text>
           </Pressable>
@@ -111,11 +128,8 @@ const styles = StyleSheet.create({
     marginTop: -16,
   },
   journeyCard: {
-    borderRadius: grimoire.radius.xl,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
     padding: 20,
-    shadowColor: grimoire.colors.gold,
     shadowOpacity: 0.15,
     shadowRadius: 24,
     shadowOffset: { width: 0, height: 12 },
@@ -133,17 +147,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 2.5,
     textTransform: 'uppercase',
-    color: grimoire.colors.gold,
   },
   journeyTitle: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 22,
-    color: grimoire.colors.ivory,
     marginTop: 4,
   },
   journeyButton: {
-    borderRadius: grimoire.radius.md,
-    backgroundColor: grimoire.colors.gold,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -152,7 +162,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: grimoire.colors.purpleDeep,
   },
   modulesSection: {
     marginTop: 32,

@@ -15,7 +15,7 @@ import {
 import { GrimoireGoldButton } from '@/features/auth/components';
 import { useDeleteNote, useGetNote, useUpdateNote } from '@/features/notes/hooks';
 import { updateNoteSchema, type UpdateNoteInput } from '@/features/notes/types';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 function formatDateTime(date: Date): string {
@@ -32,6 +32,7 @@ export default function NoteDetailScreen() {
   const { id: campaignId, noteId } = useLocalSearchParams<{ id: string; noteId: string }>();
   const router = useRouter();
   const navigation = useNavigation();
+  const grimoire = useGrimoire();
   const [isEditing, setIsEditing] = useState(false);
 
   const { data: note, isLoading } = useGetNote(noteId ?? '');
@@ -141,9 +142,11 @@ export default function NoteDetailScreen() {
     <GrimoireDetailScreen>
       <GrimoireDetailSection title="Registro do grimório" icon={Feather} quote>
         {note.content ? (
-          <Text style={styles.bodyText}>{note.content}</Text>
+          <Text style={[styles.bodyText, { color: `${grimoire.colors.ivory}E6` }]}>
+            {note.content}
+          </Text>
         ) : (
-          <Text style={styles.mutedText}>Sem conteúdo</Text>
+          <Text style={[styles.mutedText, { color: grimoire.colors.ivoryDim }]}>Sem conteúdo</Text>
         )}
       </GrimoireDetailSection>
 
@@ -166,13 +169,11 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.regular,
     fontSize: 15,
     lineHeight: 24,
-    color: `${grimoire.colors.ivory}E6`,
   },
   mutedText: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 14,
     lineHeight: 22,
-    color: grimoire.colors.ivoryDim,
   },
   contentField: {
     marginBottom: 20,

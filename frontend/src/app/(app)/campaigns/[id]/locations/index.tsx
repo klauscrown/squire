@@ -6,10 +6,11 @@ import { GrimoireEmptyState, GrimoireModuleScreen, ModuleListHeader } from '@/co
 import { CreateLocationSheet, LocationCard } from '@/features/location/components';
 import { useGetLocations } from '@/features/location/hooks';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 
 export default function LocationsListScreen() {
   const { id: campaignId } = useLocalSearchParams<{ id: string }>();
+  const grimoire = useGrimoire();
   const breakpoint = useBreakpoint();
   const [showCreate, setShowCreate] = useState(false);
 
@@ -50,7 +51,7 @@ export default function LocationsListScreen() {
           data={locations}
           numColumns={numColumns}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, { paddingHorizontal: grimoire.spacing.screen }]}
           renderItem={({ item }) => (
             <View style={isDesktopGrid ? styles.gridItem : undefined}>
               <LocationCard location={item} campaignId={campaignId ?? ''} />
@@ -74,7 +75,6 @@ export default function LocationsListScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    paddingHorizontal: grimoire.spacing.screen,
     paddingBottom: 32,
   },
   gridItem: {

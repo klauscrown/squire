@@ -3,7 +3,7 @@ import { User } from 'lucide-react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { GrimoireImage, GrimoireListCard } from '@/components/grimoire';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import type { Npc } from '../types';
@@ -25,13 +25,23 @@ function buildMetaLine(npc: Npc): string | null {
 
 export function NpcCard({ npc, campaignId }: NpcCardProps) {
   const router = useRouter();
+  const grimoire = useGrimoire();
   const metaLine = buildMetaLine(npc);
   const hasPortrait = Boolean(npc.portraitUrl?.trim());
 
   return (
     <GrimoireListCard onPress={() => router.push(`/(app)/campaigns/${campaignId}/npcs/${npc.id}`)}>
       <View style={styles.row}>
-        <View style={styles.portraitWrap}>
+        <View
+          style={[
+            styles.portraitWrap,
+            {
+              borderRadius: grimoire.radius.md,
+              borderColor: grimoire.colors.glassGoldBorder,
+              backgroundColor: grimoire.colors.glass,
+            },
+          ]}
+        >
           {hasPortrait ? (
             <GrimoireImage
               source={{ uri: npc.portraitUrl! }}
@@ -39,7 +49,12 @@ export function NpcCard({ npc, campaignId }: NpcCardProps) {
               recyclingKey={npc.id}
             />
           ) : (
-            <View style={styles.portraitFallback}>
+            <View
+              style={[
+                styles.portraitFallback,
+                { backgroundColor: `${grimoire.colors.purpleMid}44` },
+              ]}
+            >
               <User size={22} color={grimoire.colors.goldMuted} strokeWidth={1.5} />
             </View>
           )}
@@ -47,7 +62,7 @@ export function NpcCard({ npc, campaignId }: NpcCardProps) {
 
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.name} numberOfLines={1}>
+            <Text style={[styles.name, { color: grimoire.colors.ivory }]} numberOfLines={1}>
               {npc.name}
             </Text>
             <View style={styles.badges}>
@@ -57,13 +72,16 @@ export function NpcCard({ npc, campaignId }: NpcCardProps) {
           </View>
 
           {metaLine ? (
-            <Text style={styles.meta} numberOfLines={1}>
+            <Text style={[styles.meta, { color: grimoire.colors.gold }]} numberOfLines={1}>
               {metaLine}
             </Text>
           ) : null}
 
           {npc.description ? (
-            <Text style={styles.description} numberOfLines={2}>
+            <Text
+              style={[styles.description, { color: `${grimoire.colors.ivoryDim}CC` }]}
+              numberOfLines={2}
+            >
               {npc.description}
             </Text>
           ) : null}
@@ -81,11 +99,8 @@ const styles = StyleSheet.create({
   portraitWrap: {
     width: 64,
     height: 64,
-    borderRadius: grimoire.radius.md,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
-    backgroundColor: grimoire.colors.glass,
   },
   portrait: {
     width: '100%',
@@ -95,7 +110,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: `${grimoire.colors.purpleMid}44`,
   },
   content: {
     flex: 1,
@@ -112,7 +126,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 20,
-    color: grimoire.colors.ivory,
   },
   badges: {
     flexDirection: 'row',
@@ -122,13 +135,11 @@ const styles = StyleSheet.create({
   meta: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 12,
-    color: grimoire.colors.gold,
     marginBottom: 4,
   },
   description: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 13,
     lineHeight: 18,
-    color: `${grimoire.colors.ivoryDim}CC`,
   },
 });

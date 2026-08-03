@@ -1,8 +1,10 @@
 import { Stack } from 'expo-router';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 
 export default function NotesLayout() {
+  const grimoire = useGrimoire();
+
   return (
     <Stack
       screenOptions={{

@@ -6,10 +6,11 @@ import { GrimoireEmptyState, GrimoireModuleScreen, ModuleListHeader } from '@/co
 import { CreateSessionSheet, SessionCard } from '@/features/session/components';
 import { useGetSessions } from '@/features/session/hooks';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 
 export default function SessionsListScreen() {
   const { id: campaignId } = useLocalSearchParams<{ id: string }>();
+  const grimoire = useGrimoire();
   const breakpoint = useBreakpoint();
   const [showCreate, setShowCreate] = useState(false);
 
@@ -51,7 +52,7 @@ export default function SessionsListScreen() {
           data={sessions}
           numColumns={numColumns}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, { paddingHorizontal: grimoire.spacing.screen }]}
           ItemSeparatorComponent={
             isDesktopGrid ? undefined : () => <View style={styles.separator} />
           }
@@ -78,7 +79,6 @@ export default function SessionsListScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    paddingHorizontal: grimoire.spacing.screen,
     paddingBottom: 40,
     paddingTop: 4,
   },

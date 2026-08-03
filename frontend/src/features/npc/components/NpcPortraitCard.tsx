@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { GrimoireImage } from '@/components/grimoire';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 interface NpcPortraitCardProps {
@@ -19,6 +19,7 @@ export function NpcPortraitCard({
   loading = false,
   disabled = false,
 }: NpcPortraitCardProps) {
+  const grimoire = useGrimoire();
   const hasImage = Boolean(portraitUrl?.trim());
   const isInteractive = Boolean(onPress) && !disabled && !loading;
 
@@ -26,7 +27,15 @@ export function NpcPortraitCard({
     <Pressable
       onPress={onPress}
       disabled={!isInteractive}
-      style={({ pressed }) => [styles.card, pressed && isInteractive && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        {
+          borderRadius: grimoire.radius.lg,
+          backgroundColor: grimoire.colors.glass,
+          borderColor: grimoire.colors.glassGoldBorder,
+        },
+        pressed && isInteractive && styles.pressed,
+      ]}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={hasImage ? 'Alterar retrato do NPC' : 'Adicionar retrato do NPC'}
     >
@@ -38,12 +47,16 @@ export function NpcPortraitCard({
             style={styles.gradient}
             pointerEvents="none"
           />
-          <Text style={styles.changeLabel}>TOCAR PARA ALTERAR</Text>
+          <Text style={[styles.changeLabel, { color: `${grimoire.colors.ivory}BF` }]}>
+            TOCAR PARA ALTERAR
+          </Text>
         </>
       ) : (
-        <View style={styles.empty}>
+        <View style={[styles.empty, { backgroundColor: `${grimoire.colors.purpleMid}33` }]}>
           <ImageIcon size={32} color={grimoire.colors.goldMuted} strokeWidth={1.5} />
-          <Text style={styles.emptyLabel}>ADICIONAR RETRATO</Text>
+          <Text style={[styles.emptyLabel, { color: grimoire.colors.ivoryDim }]}>
+            ADICIONAR RETRATO
+          </Text>
         </View>
       )}
 
@@ -60,10 +73,7 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     height: 200,
-    borderRadius: grimoire.radius.lg,
-    backgroundColor: grimoire.colors.glass,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
     overflow: 'hidden',
     marginBottom: 16,
   },
@@ -90,19 +100,16 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.semibold,
     fontSize: 10,
     letterSpacing: 1,
-    color: `${grimoire.colors.ivory}BF`,
   },
   empty: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: `${grimoire.colors.purpleMid}33`,
   },
   emptyLabel: {
     fontFamily: fontFamily.inter.semibold,
     fontSize: 10,
     letterSpacing: 1,
-    color: grimoire.colors.ivoryDim,
     marginTop: 8,
   },
   loadingOverlay: {

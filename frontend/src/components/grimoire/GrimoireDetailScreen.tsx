@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import { AmbientGlow, type GlowVariant } from './AmbientGlow';
@@ -29,6 +29,8 @@ export function GrimoireDetailScreen({
   notFoundMessage,
   onBack,
 }: GrimoireDetailScreenProps) {
+  const grimoire = useGrimoire();
+
   if (loading) {
     return (
       <GrimoireAtmosphereShell>
@@ -48,15 +50,38 @@ export function GrimoireDetailScreen({
         <SafeAreaView style={styles.root} edges={['top']}>
           <AmbientGlow variant={glow} />
           <View style={styles.centered}>
-            <Text style={styles.message}>{notFoundMessage ?? errorMessage}</Text>
+            <Text style={[styles.message, { color: grimoire.colors.ivoryDim }]}>
+              {notFoundMessage ?? errorMessage}
+            </Text>
             {onRetry ? (
-              <Pressable onPress={onRetry} style={styles.retryButton}>
-                <Text style={styles.retryText}>Tentar novamente</Text>
+              <Pressable
+                onPress={onRetry}
+                style={[
+                  styles.retryButton,
+                  {
+                    borderRadius: grimoire.radius.md,
+                    borderColor: grimoire.colors.glassGoldBorder,
+                  },
+                ]}
+              >
+                <Text style={[styles.retryText, { color: grimoire.colors.gold }]}>
+                  Tentar novamente
+                </Text>
               </Pressable>
             ) : null}
             {onBack ? (
-              <Pressable onPress={onBack} style={[styles.retryButton, { marginTop: 8 }]}>
-                <Text style={styles.retryText}>Voltar</Text>
+              <Pressable
+                onPress={onBack}
+                style={[
+                  styles.retryButton,
+                  {
+                    marginTop: 8,
+                    borderRadius: grimoire.radius.md,
+                    borderColor: grimoire.colors.glassGoldBorder,
+                  },
+                ]}
+              >
+                <Text style={[styles.retryText, { color: grimoire.colors.gold }]}>Voltar</Text>
               </Pressable>
             ) : null}
           </View>
@@ -71,7 +96,10 @@ export function GrimoireDetailScreen({
         <AmbientGlow variant={glow} />
         <ScrollView
           style={styles.scroll}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[
+            styles.content,
+            { paddingHorizontal: grimoire.spacing.screen },
+          ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -98,27 +126,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   content: {
-    paddingHorizontal: grimoire.spacing.screen,
     paddingTop: 8,
     paddingBottom: 40,
   },
   message: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 16,
-    color: grimoire.colors.ivoryDim,
     textAlign: 'center',
     marginBottom: 16,
   },
   retryButton: {
-    borderRadius: grimoire.radius.md,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
   retryText: {
     fontFamily: fontFamily.inter.medium,
     fontSize: 14,
-    color: grimoire.colors.gold,
   },
 });

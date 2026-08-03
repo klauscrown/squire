@@ -7,7 +7,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 
 import { getGrimoireBannerFallback } from '@/assets/grimoire';
 import { GrimoireImage } from '@/components/grimoire';
-import { premium } from '@/theme/premium';
+import { usePremium } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import type { Campaign } from '../types';
@@ -48,6 +48,7 @@ function nextSessionLabel(updatedAt: Date): string {
 }
 
 export function CampaignCard({ campaign, index, onPress, onLongPress, style }: CampaignCardProps) {
+  const premium = usePremium();
   const scale = useSharedValue(1);
   const progress = estimateProgress(campaign);
   const progressPct = Math.round(progress * 100);
@@ -84,7 +85,16 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
           scale.value = withSpring(1, SPRING);
         }}
       >
-        <Animated.View style={[styles.card, animatedStyle]}>
+        <Animated.View
+          style={[
+            styles.card,
+            {
+              borderRadius: premium.radius.xl,
+              borderColor: premium.surface.cardBorder,
+            },
+            animatedStyle,
+          ]}
+        >
           <GrimoireImage
             source={
               campaign.coverImageUrl
@@ -108,8 +118,11 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
 
           <View style={styles.top}>
             {campaign.system ? (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText} numberOfLines={1}>
+              <View style={[styles.badge, { borderRadius: premium.radius.pill }]}>
+                <Text
+                  style={[styles.badgeText, { color: premium.accentLight }]}
+                  numberOfLines={1}
+                >
                   {campaign.system}
                 </Text>
               </View>
@@ -128,7 +141,7 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.title} numberOfLines={2}>
+            <Text style={[styles.title, { color: premium.text.primary }]} numberOfLines={2}>
               {campaign.title}
             </Text>
             {meta ? (
@@ -136,18 +149,30 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
                 {meta}
               </Text>
             ) : null}
-            <Text style={styles.nextSession}>{nextSessionLabel(campaign.updatedAt)}</Text>
+            <Text style={[styles.nextSession, { color: premium.accentSoft }]}>
+              {nextSessionLabel(campaign.updatedAt)}
+            </Text>
 
             <View style={styles.progressRow}>
-              <View style={styles.track}>
+              <View
+                style={[
+                  styles.track,
+                  { borderRadius: premium.radius.pill },
+                ]}
+              >
                 <LinearGradient
                   colors={[...premium.gradient]}
                   start={{ x: 0, y: 0.5 }}
                   end={{ x: 1, y: 0.5 }}
-                  style={[styles.fill, { width: `${progressPct}%` }]}
+                  style={[
+                    styles.fill,
+                    { width: `${progressPct}%`, borderRadius: premium.radius.pill },
+                  ]}
                 />
               </View>
-              <Text style={styles.progressPct}>{progressPct}%</Text>
+              <Text style={[styles.progressPct, { color: premium.accentLight }]}>
+                {progressPct}%
+              </Text>
             </View>
           </View>
         </Animated.View>
@@ -159,10 +184,8 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
 const styles = StyleSheet.create({
   card: {
     height: HEIGHT,
-    borderRadius: premium.radius.xl,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: premium.surface.cardBorder,
   },
   cover: {
     ...StyleSheet.absoluteFill,
@@ -181,7 +204,6 @@ const styles = StyleSheet.create({
     maxWidth: '68%',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: premium.radius.pill,
     backgroundColor: 'rgba(59, 130, 246, 0.28)',
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'rgba(96, 165, 250, 0.4)',
@@ -190,7 +212,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.semibold,
     fontSize: 11,
     letterSpacing: 0.6,
-    color: premium.accentLight,
   },
   trophy: {
     width: 40,
@@ -219,7 +240,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 28,
     letterSpacing: -0.3,
-    color: premium.text.primary,
   },
   meta: {
     fontFamily: fontFamily.inter.regular,
@@ -229,7 +249,6 @@ const styles = StyleSheet.create({
   nextSession: {
     fontFamily: fontFamily.inter.medium,
     fontSize: 13,
-    color: premium.accentSoft,
     marginTop: 2,
   },
   progressRow: {
@@ -241,18 +260,15 @@ const styles = StyleSheet.create({
   track: {
     flex: 1,
     height: 4,
-    borderRadius: premium.radius.pill,
     overflow: 'hidden',
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
   },
   fill: {
     height: '100%',
-    borderRadius: premium.radius.pill,
   },
   progressPct: {
     fontFamily: fontFamily.inter.semibold,
     fontSize: 12,
-    color: premium.accentLight,
     minWidth: 34,
     textAlign: 'right',
   },

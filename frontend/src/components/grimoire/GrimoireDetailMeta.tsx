@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 interface GrimoireDetailMetaProps {
@@ -9,7 +9,11 @@ interface GrimoireDetailMetaProps {
 }
 
 export function GrimoireDetailMeta({ children }: GrimoireDetailMetaProps) {
-  return <Text style={styles.meta}>{children}</Text>;
+  const grimoire = useGrimoire();
+
+  return (
+    <Text style={[styles.meta, { color: `${grimoire.colors.ivoryDim}99` }]}>{children}</Text>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -17,7 +21,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.regular,
     fontSize: 11,
     lineHeight: 17,
-    color: `${grimoire.colors.ivoryDim}99`,
     marginBottom: 20,
     marginTop: 4,
   },

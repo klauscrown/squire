@@ -27,7 +27,7 @@ import {
   type LocationType,
   type UpdateLocationInput,
 } from '@/features/location/types';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 function formatDateTime(date: Date): string {
@@ -47,6 +47,7 @@ export default function LocationDetailScreen() {
   }>();
   const router = useRouter();
   const navigation = useNavigation();
+  const grimoire = useGrimoire();
   const [isEditing, setIsEditing] = useState(false);
 
   const { data: location, isLoading } = useGetLocation(locationId ?? '');
@@ -201,7 +202,11 @@ export default function LocationDetailScreen() {
     <GrimoireDetailScreen glow="petrol-left">
       <View style={styles.badgesRow}>
         <LocationTypeBadge type={location.type} />
-        {location.region ? <Text style={styles.region}>{location.region}</Text> : null}
+        {location.region ? (
+          <Text style={[styles.region, { color: grimoire.colors.goldMuted }]}>
+            {location.region}
+          </Text>
+        ) : null}
       </View>
 
       <LocationImageCard
@@ -212,9 +217,13 @@ export default function LocationDetailScreen() {
 
       <GrimoireDetailSection title="Descrição" icon={FileText} quote>
         {location.description ? (
-          <Text style={styles.bodyText}>{location.description}</Text>
+          <Text style={[styles.bodyText, { color: `${grimoire.colors.ivory}E6` }]}>
+            {location.description}
+          </Text>
         ) : (
-          <Text style={styles.mutedText}>Sem descrição</Text>
+          <Text style={[styles.mutedText, { color: grimoire.colors.ivoryDim }]}>
+            Sem descrição
+          </Text>
         )}
       </GrimoireDetailSection>
 
@@ -246,19 +255,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: grimoire.colors.goldMuted,
   },
   bodyText: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 15,
     lineHeight: 24,
-    color: `${grimoire.colors.ivory}E6`,
   },
   mutedText: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 14,
     lineHeight: 22,
-    color: grimoire.colors.ivoryDim,
   },
   descriptionField: {
     marginBottom: 20,

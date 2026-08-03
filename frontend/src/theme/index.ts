@@ -19,7 +19,10 @@ export interface Theme {
   opacity: ThemeOpacity;
 }
 
-export function createTheme(scheme: ColorScheme, visual: VisualThemePack = defaultVisualTheme): Theme {
+export function createTheme(
+  scheme: ColorScheme,
+  visual: VisualThemePack = defaultVisualTheme,
+): Theme {
   return {
     colors: colors[scheme],
     spacing,
@@ -35,7 +38,18 @@ export function createTheme(scheme: ColorScheme, visual: VisualThemePack = defau
 export const lightTheme = createTheme('light');
 export const darkTheme = createTheme('dark');
 
-export { animation, colors, components, elevation, fontFamily, opacity, palette, radius, spacing, typography };
+export {
+  animation,
+  colors,
+  components,
+  elevation,
+  fontFamily,
+  opacity,
+  palette,
+  radius,
+  spacing,
+  typography,
+};
 export type {
   ColorScheme,
   FontFamily,
@@ -69,3 +83,14 @@ export {
   type VisualThemeId,
   type VisualThemePack,
 } from './visual';
+
+export const premiumColors = {
+  background: '#0B1120',
+  surface: '#111827',
+  surface2: '#1F2937',
+  primary: '#4F46E5',
+  secondary: '#7C3AED',
+  accent: '#D4AF37',
+  text: '#F8FAFC',
+  textSecondary: '#94A3B8',
+} as const;

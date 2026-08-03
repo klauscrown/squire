@@ -23,7 +23,7 @@ import {
   type SessionStatus,
   type UpdateSessionInput,
 } from '@/features/session/types';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 function formatDateTime(date: Date): string {
@@ -45,6 +45,7 @@ export default function SessionDetailScreen() {
   }>();
   const router = useRouter();
   const navigation = useNavigation();
+  const grimoire = useGrimoire();
   const [isEditing, setIsEditing] = useState(false);
 
   const { data: session, isLoading } = useGetSession(sessionId ?? '');
@@ -214,16 +215,22 @@ export default function SessionDetailScreen() {
     <GrimoireDetailScreen>
       <View style={styles.badgesRow}>
         {session.sessionNumber != null ? (
-          <Text style={styles.sessionNumber}>Sessão #{session.sessionNumber}</Text>
+          <Text style={[styles.sessionNumber, { color: grimoire.colors.goldMuted }]}>
+            Sessão #{session.sessionNumber}
+          </Text>
         ) : null}
         <SessionStatusBadge status={session.status} />
       </View>
 
       <GrimoireDetailSection title="Resumo da jornada" icon={BookOpen} quote>
         {session.summary ? (
-          <Text style={styles.bodyText}>{session.summary}</Text>
+          <Text style={[styles.bodyText, { color: `${grimoire.colors.ivory}E6` }]}>
+            {session.summary}
+          </Text>
         ) : (
-          <Text style={styles.mutedText}>Sem resumo registrado</Text>
+          <Text style={[styles.mutedText, { color: grimoire.colors.ivoryDim }]}>
+            Sem resumo registrado
+          </Text>
         )}
       </GrimoireDetailSection>
 
@@ -256,19 +263,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    color: grimoire.colors.goldMuted,
   },
   bodyText: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 15,
     lineHeight: 24,
-    color: `${grimoire.colors.ivory}E6`,
   },
   mutedText: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 14,
     lineHeight: 22,
-    color: grimoire.colors.ivoryDim,
   },
   summaryField: {
     marginBottom: 20,

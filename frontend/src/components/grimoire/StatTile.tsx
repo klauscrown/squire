@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import { GlassCard } from './GlassCard';
@@ -14,20 +14,35 @@ interface StatTileProps {
 }
 
 export function StatTile({ label, value, variant = 'default' }: StatTileProps) {
+  const grimoire = useGrimoire();
+
   if (variant === 'softGlass') {
     const isZero = String(value) === '0' || String(value) === '00';
     return (
       <View style={styles.softTile}>
         <Text style={styles.softLabel}>{label}</Text>
-        <Text style={[styles.softValue, isZero && styles.softValueMuted]}>{value}</Text>
+        <Text
+          style={[
+            styles.softValue,
+            { color: grimoire.softGlass.gold },
+            isZero && styles.softValueMuted,
+          ]}
+        >
+          {value}
+        </Text>
       </View>
     );
   }
 
   return (
-    <GlassCard style={styles.tile}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value}</Text>
+    <GlassCard
+      style={StyleSheet.flatten([
+        styles.tile,
+        { borderRadius: grimoire.radius.lg, ...grimoire.elevation.goldSoft },
+      ])}
+    >
+      <Text style={[styles.label, { color: `${grimoire.colors.ivoryDim}99` }]}>{label}</Text>
+      <Text style={[styles.value, { color: grimoire.colors.goldBright }]}>{value}</Text>
     </GlassCard>
   );
 }
@@ -35,8 +50,6 @@ export function StatTile({ label, value, variant = 'default' }: StatTileProps) {
 const styles = StyleSheet.create({
   tile: {
     flex: 1,
-    borderRadius: grimoire.radius.lg,
-    ...grimoire.elevation.goldSoft,
   },
   softTile: {
     flex: 1,
@@ -54,7 +67,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: `${grimoire.colors.ivoryDim}99`,
   },
   softLabel: {
     fontFamily: fontFamily.inter.medium,
@@ -65,14 +77,12 @@ const styles = StyleSheet.create({
   value: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 24,
-    color: grimoire.colors.goldBright,
     marginTop: 4,
   },
   softValue: {
     fontFamily: fontFamily.inter.semibold,
     fontSize: 20,
     fontVariant: ['tabular-nums'],
-    color: grimoire.softGlass.gold,
     marginTop: 6,
   },
   softValueMuted: {

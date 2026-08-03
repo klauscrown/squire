@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 interface GrimoireDetailActionsProps {
@@ -16,13 +16,23 @@ export function GrimoireDetailActions({
   deleteLabel = 'Excluir',
   deleting,
 }: GrimoireDetailActionsProps) {
+  const grimoire = useGrimoire();
+
   return (
     <View style={styles.row}>
       <Pressable
         onPress={onEdit}
-        style={({ pressed }) => [styles.editButton, pressed && { opacity: 0.8 }]}
+        style={({ pressed }) => [
+          styles.editButton,
+          {
+            borderRadius: grimoire.radius.md,
+            borderColor: grimoire.colors.glassGoldBorder,
+            backgroundColor: grimoire.colors.glassGold,
+          },
+          pressed && { opacity: 0.8 },
+        ]}
       >
-        <Text style={styles.editText}>Editar</Text>
+        <Text style={[styles.editText, { color: grimoire.colors.gold }]}>Editar</Text>
       </Pressable>
 
       <Pressable
@@ -37,7 +47,9 @@ export function GrimoireDetailActions({
         {deleting ? (
           <ActivityIndicator size="small" color={grimoire.colors.destructive} />
         ) : (
-          <Text style={styles.deleteText}>{deleteLabel}</Text>
+          <Text style={[styles.deleteText, { color: grimoire.colors.destructive }]}>
+            {deleteLabel}
+          </Text>
         )}
       </Pressable>
     </View>
@@ -54,17 +66,13 @@ const styles = StyleSheet.create({
   },
   editButton: {
     flex: 1,
-    borderRadius: grimoire.radius.md,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
-    backgroundColor: grimoire.colors.glassGold,
     paddingVertical: 14,
     alignItems: 'center',
   },
   editText: {
     fontFamily: fontFamily.inter.semibold,
     fontSize: 14,
-    color: grimoire.colors.gold,
   },
   deleteButton: {
     paddingVertical: 14,
@@ -76,6 +84,5 @@ const styles = StyleSheet.create({
   deleteText: {
     fontFamily: fontFamily.inter.medium,
     fontSize: 14,
-    color: grimoire.colors.destructive,
   },
 });

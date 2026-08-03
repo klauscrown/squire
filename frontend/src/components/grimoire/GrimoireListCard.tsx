@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 
 import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 
 import { GrimoireSurface } from './GrimoireSurface';
 
@@ -21,6 +21,8 @@ export function GrimoireListCard({
   gold = false,
   accentLeft = false,
 }: GrimoireListCardProps) {
+  const grimoire = useGrimoire();
+
   return (
     <GrimoireSurface
       gold={gold}

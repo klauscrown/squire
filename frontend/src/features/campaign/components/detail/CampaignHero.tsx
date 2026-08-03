@@ -7,7 +7,7 @@ import { getGrimoireBannerFallback } from '@/assets/grimoire';
 import { GrimoireImage } from '@/components/grimoire';
 import type { Campaign } from '@/features/campaign/types';
 import { STATUS_LABELS } from '@/features/campaign/types';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import { AnimatedPressable } from './AnimatedPressable';
@@ -24,6 +24,7 @@ export function CampaignHero({
   bannerIndex = 0,
 }: CampaignHeroProps) {
   const router = useRouter();
+  const grimoire = useGrimoire();
 
   const metaParts: string[] = [];
   if (campaign.playersCount) {
@@ -58,24 +59,43 @@ export function CampaignHero({
           <AnimatedPressable
             onPress={() => router.back()}
             accessibilityLabel="Voltar"
-            style={styles.backButton}
+            style={[
+              styles.backButton,
+              { borderColor: grimoire.colors.glassBorder },
+            ]}
           >
             <ArrowLeft size={16} color={grimoire.colors.ivory} strokeWidth={1.5} />
           </AnimatedPressable>
-          <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>{STATUS_LABELS[campaign.status]}</Text>
+          <View
+            style={[
+              styles.statusBadge,
+              { borderColor: grimoire.colors.glassGoldBorder },
+            ]}
+          >
+            <Text style={[styles.statusText, { color: grimoire.colors.gold }]}>
+              {STATUS_LABELS[campaign.status]}
+            </Text>
           </View>
         </View>
 
         <View style={styles.titleBlock}>
-          {campaign.system ? <Text style={styles.system}>{campaign.system}</Text> : null}
-          <Text style={styles.title}>{campaign.title}</Text>
+          {campaign.system ? (
+            <Text style={[styles.system, { color: `${grimoire.colors.gold}CC` }]}>
+              {campaign.system}
+            </Text>
+          ) : null}
+          <Text style={[styles.title, { color: grimoire.colors.ivory }]}>{campaign.title}</Text>
           {campaign.description ? (
-            <Text style={styles.chapter} numberOfLines={2}>
+            <Text
+              style={[styles.chapter, { color: `${grimoire.colors.ivoryDim}CC` }]}
+              numberOfLines={2}
+            >
               {campaign.description}
             </Text>
           ) : (
-            <Text style={styles.chapter}>{metaParts.join(' · ')}</Text>
+            <Text style={[styles.chapter, { color: `${grimoire.colors.ivoryDim}CC` }]}>
+              {metaParts.join(' · ')}
+            </Text>
           )}
         </View>
       </View>
@@ -111,7 +131,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassBorder,
     backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -119,7 +138,6 @@ const styles = StyleSheet.create({
   statusBadge: {
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
     backgroundColor: 'rgba(0,0,0,0.4)',
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -129,7 +147,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: grimoire.colors.gold,
   },
   titleBlock: {
     gap: 4,
@@ -139,18 +156,15 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 3,
     textTransform: 'uppercase',
-    color: `${grimoire.colors.gold}CC`,
   },
   title: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 36,
     lineHeight: 40,
-    color: grimoire.colors.ivory,
   },
   chapter: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 12,
-    color: `${grimoire.colors.ivoryDim}CC`,
     marginTop: 4,
   },
 });

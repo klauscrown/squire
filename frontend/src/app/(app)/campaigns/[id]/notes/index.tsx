@@ -6,10 +6,11 @@ import { GrimoireEmptyState, GrimoireModuleScreen, ModuleListHeader } from '@/co
 import { CreateNoteSheet, NoteCard } from '@/features/notes/components';
 import { useGetNotes } from '@/features/notes/hooks';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 
 export default function NotesListScreen() {
   const { id: campaignId } = useLocalSearchParams<{ id: string }>();
+  const grimoire = useGrimoire();
   const breakpoint = useBreakpoint();
   const [showCreate, setShowCreate] = useState(false);
 
@@ -44,7 +45,7 @@ export default function NotesListScreen() {
           data={notes}
           numColumns={numColumns}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, { paddingHorizontal: grimoire.spacing.screen }]}
           renderItem={({ item }) => (
             <View style={isDesktopGrid ? styles.gridItem : undefined}>
               <NoteCard note={item} campaignId={campaignId ?? ''} />
@@ -68,7 +69,6 @@ export default function NotesListScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    paddingHorizontal: grimoire.spacing.screen,
     paddingBottom: 32,
   },
   gridItem: {

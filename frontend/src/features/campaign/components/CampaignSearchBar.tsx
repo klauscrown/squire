@@ -3,9 +3,7 @@ import { MagnifyingGlass } from 'phosphor-react-native';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { GlassSurface } from '@/components/ui/GlassSurface';
-import { components } from '@/theme/components';
-import { grimoire } from '@/theme/grimoire';
-import { premium } from '@/theme/premium';
+import { useComponents, useGrimoire, usePremium } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 interface CampaignSearchBarProps {
@@ -14,6 +12,10 @@ interface CampaignSearchBarProps {
 }
 
 export function CampaignSearchBar({ value, onChangeText }: CampaignSearchBarProps) {
+  const components = useComponents();
+  const grimoire = useGrimoire();
+  const premium = usePremium();
+
   return (
     <MotiView
       from={{ opacity: 0, translateY: 6 }}
@@ -29,7 +31,7 @@ export function CampaignSearchBar({ value, onChangeText }: CampaignSearchBarProp
             onChangeText={onChangeText}
             placeholder="Buscar por nome ou sistema..."
             placeholderTextColor={premium.text.faint}
-            style={styles.input}
+            style={[styles.input, { color: grimoire.colors.ivory }]}
             returnKeyType="search"
           />
         </View>
@@ -54,7 +56,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.regular,
     fontSize: 15,
     lineHeight: 20,
-    color: grimoire.colors.ivory,
     padding: 0,
   },
 });

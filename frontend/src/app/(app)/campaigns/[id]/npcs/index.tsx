@@ -6,10 +6,11 @@ import { GrimoireEmptyState, GrimoireModuleScreen, ModuleListHeader } from '@/co
 import { CreateNpcSheet, NpcCard } from '@/features/npc/components';
 import { useGetNpcs } from '@/features/npc/hooks';
 import { useBreakpoint } from '@/hooks/useBreakpoint';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 
 export default function NpcsListScreen() {
   const { id: campaignId } = useLocalSearchParams<{ id: string }>();
+  const grimoire = useGrimoire();
   const breakpoint = useBreakpoint();
   const [showCreate, setShowCreate] = useState(false);
 
@@ -40,7 +41,7 @@ export default function NpcsListScreen() {
           data={npcs}
           numColumns={numColumns}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, { paddingHorizontal: grimoire.spacing.screen }]}
           renderItem={({ item }) => (
             <View style={isDesktopGrid ? styles.gridItem : undefined}>
               <NpcCard npc={item} campaignId={campaignId ?? ''} />
@@ -64,7 +65,6 @@ export default function NpcsListScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    paddingHorizontal: grimoire.spacing.screen,
     paddingBottom: 32,
   },
   gridItem: {
