@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 interface ProgressBarProps {
@@ -11,6 +11,7 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ progress, label, showPercent = true }: ProgressBarProps) {
+  const grimoire = useGrimoire();
   const clamped = Math.max(0, Math.min(1, progress));
   const percent = Math.round(clamped * 100);
 
@@ -18,16 +19,22 @@ export function ProgressBar({ progress, label, showPercent = true }: ProgressBar
     <View>
       {(label || showPercent) && (
         <View style={styles.header}>
-          {label ? <Text style={styles.label}>{label}</Text> : <View />}
-          {showPercent ? <Text style={styles.percent}>{percent}%</Text> : null}
+          {label ? (
+            <Text style={[styles.label, { color: `${grimoire.colors.ivoryDim}99` }]}>{label}</Text>
+          ) : (
+            <View />
+          )}
+          {showPercent ? (
+            <Text style={[styles.percent, { color: grimoire.colors.gold }]}>{percent}%</Text>
+          ) : null}
         </View>
       )}
-      <View style={styles.track}>
+      <View style={[styles.track, { backgroundColor: grimoire.colors.glass }]}>
         <LinearGradient
           colors={[`${grimoire.colors.gold}80`, grimoire.colors.gold]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
-          style={[styles.fill, { width: `${percent}%` }]}
+          style={[styles.fill, { width: `${percent}%` }, grimoire.elevation.goldSoft]}
         />
       </View>
     </View>
@@ -46,24 +53,20 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: `${grimoire.colors.ivoryDim}99`,
   },
   percent: {
     fontFamily: fontFamily.inter.medium,
     fontSize: 10,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: grimoire.colors.gold,
   },
   track: {
     height: 4,
     borderRadius: 999,
-    backgroundColor: grimoire.colors.glass,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
     borderRadius: 999,
-    ...grimoire.elevation.goldSoft,
   },
 });

@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft, Plus } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import { GrimoireFadeIn } from './GrimoireFadeIn';
@@ -25,14 +25,26 @@ export function ModuleListHeader({
   showBack = true,
 }: ModuleListHeaderProps) {
   const router = useRouter();
+  const grimoire = useGrimoire();
 
   return (
-    <GrimoireFadeIn style={styles.container}>
+    <GrimoireFadeIn
+      style={{
+        ...styles.container,
+        paddingHorizontal: grimoire.spacing.screen,
+      }}
+    >
       {showBack ? (
         <Pressable
           onPress={() => router.back()}
           accessibilityLabel="Voltar"
-          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
+          style={({ pressed }) => [
+            styles.backButton,
+            {
+              borderColor: grimoire.colors.glassBorder,
+            },
+            pressed && { opacity: 0.7 },
+          ]}
         >
           <ArrowLeft size={16} color={grimoire.colors.ivory} strokeWidth={1.5} />
         </Pressable>
@@ -40,9 +52,13 @@ export function ModuleListHeader({
 
       <View style={styles.row}>
         <View style={styles.textBlock}>
-          <Text style={styles.eyebrow}>{eyebrow}</Text>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+          <Text style={[styles.eyebrow, { color: grimoire.colors.goldMuted }]}>{eyebrow}</Text>
+          <Text style={[styles.title, { color: grimoire.colors.ivory }]}>{title}</Text>
+          {subtitle ? (
+            <Text style={[styles.subtitle, { color: `${grimoire.colors.ivoryDim}B3` }]}>
+              {subtitle}
+            </Text>
+          ) : null}
         </View>
 
         {onCreatePress ? (
@@ -51,6 +67,10 @@ export function ModuleListHeader({
             accessibilityLabel={createLabel}
             style={({ pressed }) => [
               styles.createButton,
+              {
+                backgroundColor: grimoire.colors.gold,
+                ...grimoire.elevation.goldGlow,
+              },
               pressed && { transform: [{ scale: 0.95 }] },
             ]}
           >
@@ -64,7 +84,6 @@ export function ModuleListHeader({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: grimoire.spacing.screen,
     paddingTop: 8,
     paddingBottom: 20,
   },
@@ -73,7 +92,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassBorder,
     backgroundColor: 'rgba(0,0,0,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -93,30 +111,25 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 3,
     textTransform: 'uppercase',
-    color: grimoire.colors.goldMuted,
   },
   title: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 32,
     lineHeight: 36,
-    color: grimoire.colors.ivory,
     marginTop: 4,
   },
   subtitle: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 12,
     lineHeight: 18,
-    color: `${grimoire.colors.ivoryDim}B3`,
     marginTop: 4,
   },
   createButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: grimoire.colors.gold,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
-    ...grimoire.elevation.goldGlow,
   },
 });

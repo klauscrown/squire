@@ -10,11 +10,12 @@ import {
   SectionLabel,
   SquireHint,
 } from '@/components/grimoire';
+import { ThemePickerCards } from '@/components/ui';
 import { ROUTES } from '@/constants';
 import { useDataMode } from '@/hooks/useAuthUserId';
+import { useGrimoire } from '@/hooks/useTheme';
 import { useAppStore } from '@/store/appStore';
 import type { ThemeMode } from '@/types';
-import { grimoire } from '@/theme/grimoire';
 import { fontFamily } from '@/theme/typography';
 
 const THEME_OPTIONS: ThemeMode[] = ['dark', 'light'];
@@ -25,6 +26,8 @@ const THEME_LABELS: Record<ThemeMode, string> = {
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const grimoire = useGrimoire();
+  const soft = grimoire.softGlass;
   const { session, hasEmailAccount, email, displayName, signOut } = useAuth();
   const dataMode = useDataMode();
   const themeMode = useAppStore((state) => state.themeMode);
@@ -62,18 +65,44 @@ export default function SettingsScreen() {
       <GrimoireFadeIn delay={80}>
         <View style={styles.section}>
           <SectionLabel variant="softGlass" title="Aparência" />
-          <View style={styles.card}>
-            <GrimoireOptionPills
-              variant="softGlass"
-              label="Tema"
-              options={THEME_OPTIONS}
-              value={themeMode}
-              onChange={setThemeMode}
-              getLabel={(mode) => THEME_LABELS[mode]}
-            />
-            <Text style={styles.hint}>
-              O visual grimório usa o tema escuro. O modo claro afeta telas legadas.
+          <View
+            style={[
+              styles.card,
+              {
+                borderRadius: soft.settingsCard.borderRadius,
+                backgroundColor: soft.settingsCard.backgroundColor,
+                borderColor: soft.settingsCard.borderColor,
+                padding: soft.settingsCard.padding,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.pickerLabel,
+                {
+                  fontSize: grimoire.typography.label.fontSize,
+                  letterSpacing: grimoire.typography.label.letterSpacing,
+                  color: soft.muted,
+                },
+              ]}
+            >
+              Paleta visual
             </Text>
+            <ThemePickerCards />
+
+            <View style={styles.modeBlock}>
+              <GrimoireOptionPills
+                variant="softGlass"
+                label="Modo"
+                options={THEME_OPTIONS}
+                value={themeMode}
+                onChange={setThemeMode}
+                getLabel={(mode) => THEME_LABELS[mode] ?? mode}
+              />
+              <Text style={[styles.hint, { color: soft.muted }]}>
+                O visual grimório usa o tema escuro. O modo claro afeta telas legadas.
+              </Text>
+            </View>
           </View>
         </View>
       </GrimoireFadeIn>
@@ -81,14 +110,33 @@ export default function SettingsScreen() {
       <GrimoireFadeIn delay={160}>
         <View style={styles.section}>
           <SectionLabel variant="softGlass" title="Armazenamento" />
-          <View style={styles.card}>
+          <View
+            style={[
+              styles.card,
+              {
+                borderRadius: soft.settingsCard.borderRadius,
+                backgroundColor: soft.settingsCard.backgroundColor,
+                borderColor: soft.settingsCard.borderColor,
+                padding: soft.settingsCard.padding,
+              },
+            ]}
+          >
             <Text style={styles.body}>
               {dataMode === 'cloud'
                 ? 'Campanhas, sessões, NPCs, notas e imagens ficam no Supabase. Rebuilds do app não apagam esses dados enquanto a sessão for mantida.'
                 : 'Modo local: tudo fica só na memória do app. Ao fechar, reinstalar ou fazer build limpo, os dados podem ser perdidos.'}
             </Text>
-            <View style={styles.modeBadge}>
-              <Text style={styles.modeBadgeText}>{modeBadgeLabel}</Text>
+            <View
+              style={[
+                styles.modeBadge,
+                {
+                  borderRadius: soft.localModeBadge.borderRadius,
+                  backgroundColor: soft.localModeBadge.backgroundColor,
+                  borderColor: soft.localModeBadge.borderColor,
+                },
+              ]}
+            >
+              <Text style={[styles.modeBadgeText, { color: soft.gold }]}>{modeBadgeLabel}</Text>
             </View>
           </View>
         </View>
@@ -97,7 +145,17 @@ export default function SettingsScreen() {
       <GrimoireFadeIn delay={240}>
         <View style={styles.section}>
           <SectionLabel variant="softGlass" title="Conta" />
-          <View style={styles.card}>
+          <View
+            style={[
+              styles.card,
+              {
+                borderRadius: soft.settingsCard.borderRadius,
+                backgroundColor: soft.settingsCard.backgroundColor,
+                borderColor: soft.settingsCard.borderColor,
+                padding: soft.settingsCard.padding,
+              },
+            ]}
+          >
             <Text style={styles.body}>
               {hasEmailAccount
                 ? `Conectado como ${email ?? displayName ?? 'sua conta'}.`
@@ -107,9 +165,18 @@ export default function SettingsScreen() {
             </Text>
             <Pressable
               onPress={handleSignOut}
-              style={({ pressed }) => [styles.signOutBtn, pressed && styles.signOutPressed]}
+              style={({ pressed }) => [
+                styles.signOutBtn,
+                {
+                  backgroundColor: soft.signOutPill.backgroundColor,
+                  borderColor: soft.signOutPill.borderColor,
+                },
+                pressed && styles.signOutPressed,
+              ]}
             >
-              <Text style={styles.signOutText}>Encerrar sessão</Text>
+              <Text style={[styles.signOutText, { color: soft.signOutPill.color }]}>
+                Encerrar sessão
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -127,26 +194,28 @@ export default function SettingsScreen() {
   );
 }
 
-const soft = grimoire.softGlass;
-
 const styles = StyleSheet.create({
   section: {
     marginTop: 28,
   },
   card: {
-    borderRadius: soft.settingsCard.borderRadius,
-    backgroundColor: soft.settingsCard.backgroundColor,
     borderWidth: 1,
-    borderColor: soft.settingsCard.borderColor,
-    padding: soft.settingsCard.padding,
     marginBottom: 16,
+  },
+  pickerLabel: {
+    fontFamily: fontFamily.inter.semibold,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  modeBlock: {
+    marginTop: 18,
   },
   hint: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 12,
     lineHeight: 18,
-    color: soft.muted,
     marginTop: -8,
+    marginBottom: 8,
   },
   body: {
     fontFamily: fontFamily.inter.regular,
@@ -156,10 +225,7 @@ const styles = StyleSheet.create({
   },
   modeBadge: {
     alignSelf: 'flex-start',
-    borderRadius: soft.localModeBadge.borderRadius,
-    backgroundColor: soft.localModeBadge.backgroundColor,
     borderWidth: 1,
-    borderColor: soft.localModeBadge.borderColor,
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginTop: 16,
@@ -170,7 +236,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: soft.gold,
   },
   signOutBtn: {
     alignSelf: 'flex-start',
@@ -178,9 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 9,
-    backgroundColor: soft.signOutPill.backgroundColor,
     borderWidth: 1,
-    borderColor: soft.signOutPill.borderColor,
   },
   signOutPressed: {
     opacity: 0.78,
@@ -189,7 +252,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.semibold,
     fontSize: 13,
     fontWeight: '600',
-    color: soft.signOutPill.color,
   },
   hintWrap: {
     marginTop: 12,

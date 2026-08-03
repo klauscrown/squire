@@ -11,14 +11,19 @@ import {
   SquireHint,
   StatTile,
 } from '@/components/grimoire';
+import { ThemePickerCards } from '@/components/ui';
 import { ROUTES } from '@/constants';
 import { useGetCampaigns } from '@/features/campaign/hooks';
 import { useDataMode } from '@/hooks/useAuthUserId';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
+import { useActivePalette } from '@/store/useThemeStore';
 import { fontFamily } from '@/theme/typography';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const grimoire = useGrimoire();
+  const soft = grimoire.softGlass;
+  const palette = useActivePalette();
   const { session, hasEmailAccount, email, displayName, avatarUrl } = useAuth();
   const dataMode = useDataMode();
   const { data: campaigns } = useGetCampaigns();
@@ -47,7 +52,16 @@ export default function ProfileScreen() {
       </GrimoireFadeIn>
 
       <GrimoireFadeIn delay={80}>
-        <View style={styles.heroCard}>
+        <View
+          style={[
+            styles.heroCard,
+            {
+              borderRadius: soft.heroCard.borderRadius,
+              backgroundColor: soft.heroCard.backgroundColor,
+              borderColor: soft.heroCard.borderColor,
+            },
+          ]}
+        >
           <View style={styles.profileRow}>
             <GrimoireAvatar
               variant="softGlass"
@@ -57,17 +71,27 @@ export default function ProfileScreen() {
             />
             <View style={styles.profileText}>
               <Text style={styles.name}>{resolvedName}</Text>
-              <Text style={styles.roleSubtitle}>{displaySubtitle}</Text>
+              <Text style={[styles.roleSubtitle, { color: soft.muted }]}>{displaySubtitle}</Text>
             </View>
           </View>
 
-          <View style={styles.modeBadge}>
-            <Text style={styles.modeBadgeText}>• {modeLabel}</Text>
+          <View
+            style={[
+              styles.modeBadge,
+              {
+                borderRadius: soft.statusPill.borderRadius,
+                backgroundColor: soft.statusPill.backgroundColor,
+              },
+            ]}
+          >
+            <Text style={[styles.modeBadgeText, { color: soft.gold }]}>• {modeLabel}</Text>
           </View>
 
-          {email ? <Text style={styles.meta}>{email}</Text> : null}
+          {email ? <Text style={[styles.meta, { color: soft.muted }]}>{email}</Text> : null}
           {!email && session?.user.id ? (
-            <Text style={styles.meta}>ID: {session.user.id.slice(0, 8)}…</Text>
+            <Text style={[styles.meta, { color: soft.muted }]}>
+              ID: {session.user.id.slice(0, 8)}…
+            </Text>
           ) : null}
         </View>
       </GrimoireFadeIn>
@@ -87,7 +111,26 @@ export default function ProfileScreen() {
         </View>
       </GrimoireFadeIn>
 
-      <GrimoireFadeIn delay={240}>
+      <GrimoireFadeIn delay={220}>
+        <View style={styles.section}>
+          <SectionLabel variant="softGlass" title="Aparência" />
+          <View
+            style={[
+              styles.themeCard,
+              {
+                backgroundColor: soft.settingsCard.backgroundColor,
+                borderColor: soft.settingsCard.borderColor,
+                borderRadius: soft.settingsCard.borderRadius,
+                padding: soft.settingsCard.padding,
+              },
+            ]}
+          >
+            <ThemePickerCards />
+          </View>
+        </View>
+      </GrimoireFadeIn>
+
+      <GrimoireFadeIn delay={280}>
         <View style={styles.section}>
           <SectionLabel title="Grimório" />
           <SquireHint
@@ -97,27 +140,22 @@ export default function ProfileScreen() {
         </View>
       </GrimoireFadeIn>
 
-      <GrimoireFadeIn delay={320}>
+      <GrimoireFadeIn delay={340}>
         <Pressable
           onPress={() => router.push(ROUTES.app.campaigns)}
           style={({ pressed }) => [styles.linkWrap, pressed && styles.linkPressed]}
         >
-          <Text style={styles.link}>Ir para crônicas →</Text>
+          <Text style={[styles.link, { color: palette.accent }]}>Ir para crônicas →</Text>
         </Pressable>
       </GrimoireFadeIn>
     </GrimoireScreen>
   );
 }
 
-const soft = grimoire.softGlass;
-
 const styles = StyleSheet.create({
   heroCard: {
     marginTop: 24,
-    borderRadius: soft.heroCard.borderRadius,
-    backgroundColor: soft.heroCard.backgroundColor,
     borderWidth: 1,
-    borderColor: soft.heroCard.borderColor,
     padding: 20,
     ...Platform.select({
       ios: {
@@ -147,13 +185,10 @@ const styles = StyleSheet.create({
   roleSubtitle: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 13,
-    color: soft.muted,
     marginTop: 4,
   },
   modeBadge: {
     alignSelf: 'flex-start',
-    borderRadius: soft.statusPill.borderRadius,
-    backgroundColor: soft.statusPill.backgroundColor,
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginTop: 16,
@@ -163,12 +198,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: soft.gold,
   },
   meta: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 12,
-    color: soft.muted,
     marginTop: 12,
   },
   statsRow: {
@@ -178,6 +211,9 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: 32,
+  },
+  themeCard: {
+    borderWidth: 1,
   },
   linkWrap: {
     marginTop: 24,
@@ -191,6 +227,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     letterSpacing: 0.5,
-    color: soft.gold,
   },
 });

@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 interface GrimoireEmptyStateProps {
@@ -17,18 +17,40 @@ export function GrimoireEmptyState({
   actionLabel,
   onAction,
 }: GrimoireEmptyStateProps) {
+  const grimoire = useGrimoire();
+
   return (
-    <View style={styles.wrap}>
-      <View style={styles.card}>
+    <View style={[styles.wrap, { paddingHorizontal: grimoire.spacing.screen }]}>
+      <View
+        style={[
+          styles.card,
+          {
+            borderRadius: grimoire.radius.hero,
+            borderColor: grimoire.colors.glassGoldBorder,
+          },
+        ]}
+      >
         <LinearGradient
           colors={[`${grimoire.colors.purpleMid}40`, grimoire.colors.card]}
           style={StyleSheet.absoluteFill}
         />
         <View style={styles.inner}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.body}>{description}</Text>
-          <TouchableOpacity onPress={onAction} activeOpacity={0.85} style={styles.button}>
-            <Text style={styles.buttonText}>{actionLabel}</Text>
+          <Text style={[styles.title, { color: grimoire.colors.ivory }]}>{title}</Text>
+          <Text style={[styles.body, { color: grimoire.colors.ivoryDim }]}>{description}</Text>
+          <TouchableOpacity
+            onPress={onAction}
+            activeOpacity={0.85}
+            style={[
+              styles.button,
+              {
+                backgroundColor: grimoire.colors.gold,
+                borderRadius: grimoire.radius.md,
+              },
+            ]}
+          >
+            <Text style={[styles.buttonText, { color: grimoire.colors.purpleDeep }]}>
+              {actionLabel}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -40,13 +62,10 @@ const styles = StyleSheet.create({
   wrap: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: grimoire.spacing.screen,
     paddingBottom: 32,
   },
   card: {
-    borderRadius: grimoire.radius.hero,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
     overflow: 'hidden',
   },
   inner: {
@@ -56,7 +75,6 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 24,
-    color: grimoire.colors.ivory,
     textAlign: 'center',
     marginBottom: 10,
   },
@@ -64,20 +82,16 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.regular,
     fontSize: 14,
     lineHeight: 22,
-    color: grimoire.colors.ivoryDim,
     textAlign: 'center',
     marginBottom: 24,
   },
   button: {
     alignSelf: 'stretch',
-    backgroundColor: grimoire.colors.gold,
-    borderRadius: grimoire.radius.md,
     paddingVertical: 14,
     alignItems: 'center',
   },
   buttonText: {
     fontFamily: fontFamily.inter.bold,
     fontSize: 15,
-    color: grimoire.colors.purpleDeep,
   },
 });

@@ -9,7 +9,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 
 interface GrimoireSurfaceProps {
   children: ReactNode;
@@ -28,10 +28,12 @@ export function GrimoireSurface({
   style,
   contentStyle,
   padding = 16,
-  borderRadius = grimoire.radius.lg,
+  borderRadius,
   onPress,
   accentLeft = false,
 }: GrimoireSurfaceProps) {
+  const grimoire = useGrimoire();
+  const resolvedRadius = borderRadius ?? grimoire.radius.lg;
   const borderColor = gold ? grimoire.colors.glassGoldBorder : grimoire.colors.glassBorder;
   const backgroundColor = gold ? grimoire.colors.glassGold : grimoire.colors.glass;
 
@@ -41,7 +43,7 @@ export function GrimoireSurface({
         styles.base,
         {
           borderColor,
-          borderRadius,
+          borderRadius: resolvedRadius,
           borderLeftWidth: accentLeft ? 2 : 1,
           borderLeftColor: accentLeft ? `${grimoire.colors.gold}66` : borderColor,
         },

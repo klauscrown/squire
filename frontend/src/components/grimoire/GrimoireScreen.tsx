@@ -19,6 +19,8 @@ interface GrimoireScreenProps {
 
   glow?: GlowVariant | GlowVariant[] | 'none';
 
+  backgroundOverlay?: ReactNode;
+
   contentStyle?: ViewStyle;
 
   bottomInset?: number;
@@ -30,6 +32,8 @@ export function GrimoireScreen({
   scrollable = true,
 
   glow = 'none',
+
+  backgroundOverlay,
 
   contentStyle,
 
@@ -44,6 +48,8 @@ export function GrimoireScreen({
   return (
     <GrimoireAtmosphereShell>
       <SafeAreaView style={styles.root} edges={['top']}>
+        {backgroundOverlay}
+
         {glows.map((variant) => (
           <AmbientGlow key={variant} variant={variant} />
         ))}

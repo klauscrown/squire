@@ -1,0 +1,45 @@
+---
+description: Cores de tema no frontend — useActivePalette() obrigatório
+globs: frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Tema visual — `useActivePalette()`
+
+Em qualquer componente **novo** ou refatoração visual (Home, Campanhas, NPCs, Locais, etc.), cores de tema vêm **somente** de `useActivePalette()`.
+
+```tsx
+import { useActivePalette } from '@/store/useThemeStore';
+
+const palette = useActivePalette();
+
+// ✅ Gradiente, primary, accent, surface, texto
+<LinearGradient colors={[palette.gradientStart, palette.gradientEnd]} />
+<Text style={{ color: palette.textSecondary }} />
+<View style={{ borderColor: palette.surfaceBorder, backgroundColor: palette.surface }} />
+```
+
+## Calibração Tormenta (status)
+
+O tema **Tormenta** está calibrado e pronto para replicar o padrão de dois temas nas próximas telas.
+
+- **Não alterar `palettes.default`** ao ajustar Tormenta ou ao portar telas.
+- Mudanças de cor de marca / contraste / CTA / FAB / `iconVariants` quentes vão **somente** em `palettes.tormenta`.
+- Chaves novas na API da paleta (ex.: `fabShadow`) podem existir no `default` só como alias dos valores já usados pelo Grimório — sem mudar a aparência do tema padrão.
+
+## Proibido
+
+- Hex/rgba de marca hardcoded no JSX/`StyleSheet` (`#7C3AED`, `#C9A962`, `#B91C1C`, etc.)
+- Importar `grimoire` / `premium` / `components` **estáticos** de `@/theme/*` para **cor** (congelam no tema default)
+- Assumir dourado/roxo fixo em ícones — usar `palette.accent` / `palette.iconVariants`
+- Mexer em valores de `palettes.default` “por simetria” com Tormenta
+
+## Permitido além da paleta
+
+- Layout: `useComponents()` para radius/spacing/tamanhos (não cor)
+- Neutros não-marca: `transparent`, branco em label sobre gradiente, preto em sombra
+- Tokens derivados via hooks dinâmicos (`useGrimoire`, `usePremium`) só quando a paleta semântica não cobre o caso — preferir `palette.*` primeiro
+
+## Troca de tema
+
+`useThemeStore().setTheme('default' | 'tormenta')` — a UI deve reagir na hora; não cachear cores em `StyleSheet.create` no nível do módulo.

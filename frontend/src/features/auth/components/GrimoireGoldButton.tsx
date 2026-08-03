@@ -1,7 +1,7 @@
 import { ActivityIndicator, Platform, Pressable, StyleSheet, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 import { AuthText } from './AuthText';
@@ -23,6 +23,7 @@ export function GrimoireGoldButton({
   variant = 'solid',
   style,
 }: GrimoireGoldButtonProps) {
+  const grimoire = useGrimoire();
   const isOutline = variant === 'outline';
 
   return (
@@ -31,7 +32,19 @@ export function GrimoireGoldButton({
       disabled={disabled || loading}
       style={({ pressed }) => [
         styles.base,
-        isOutline ? styles.outline : styles.solid,
+        {
+          borderRadius: grimoire.radius.lg,
+        },
+        isOutline
+          ? {
+              backgroundColor: grimoire.colors.glass,
+              borderWidth: 1,
+              borderColor: grimoire.colors.glassGoldBorder,
+            }
+          : {
+              backgroundColor: grimoire.colors.gold,
+              ...grimoire.elevation.goldGlow,
+            },
         pressed && styles.pressed,
         (disabled || loading) && styles.disabled,
         style,
@@ -43,7 +56,15 @@ export function GrimoireGoldButton({
       {loading ? (
         <ActivityIndicator color={isOutline ? grimoire.colors.gold : grimoire.colors.purpleDeep} />
       ) : (
-        <AuthText style={[styles.label, isOutline && styles.outlineLabel]}>{title}</AuthText>
+        <AuthText
+          style={[
+            styles.label,
+            { color: grimoire.colors.purpleDeep },
+            isOutline && { color: grimoire.colors.ivory, fontFamily: fontFamily.inter.medium },
+          ]}
+        >
+          {title}
+        </AuthText>
       )}
     </Pressable>
   );
@@ -53,40 +74,21 @@ const styles = StyleSheet.create({
   base: {
     width: '100%',
     minHeight: 56,
-    borderRadius: grimoire.radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
     overflow: 'hidden',
-  },
-  solid: {
-    backgroundColor: grimoire.colors.gold,
-    ...grimoire.elevation.goldGlow,
-  },
-  outline: {
-    backgroundColor: grimoire.colors.glass,
-    borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
   },
   label: {
     fontFamily: fontFamily.inter.bold,
     fontSize: 13,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: grimoire.colors.purpleDeep,
-  },
-  outlineLabel: {
-    color: grimoire.colors.ivory,
-    fontFamily: fontFamily.inter.medium,
-    letterSpacing: 1,
-    textTransform: 'none',
-    fontSize: 14,
   },
   pressed: {
-    opacity: 0.92,
-    transform: [{ scale: 0.985 }],
+    opacity: 0.88,
   },
   disabled: {
-    opacity: 0.55,
+    opacity: 0.5,
   },
 });

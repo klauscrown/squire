@@ -3,7 +3,8 @@ import { Bell } from 'lucide-react-native';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useAuth } from '@/components/providers/AuthProvider';
-import { premium } from '@/theme/premium';
+import { useActivePalette } from '@/store/useThemeStore';
+import { useComponents } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 interface HomeHeaderProps {
@@ -22,28 +23,51 @@ function resolveMasterName(
 
 export function HomeHeader({ subtitle }: HomeHeaderProps) {
   const { displayName, email } = useAuth();
+  const palette = useActivePalette();
+  const components = useComponents();
   const masterName = resolveMasterName(displayName, email);
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { gap: components.spacing.stack }]}>
       <View style={styles.copy}>
-        <Text style={styles.greeting} numberOfLines={2}>
-          Bem-vindo de volta, {masterName}! ✨
+        <Text style={[styles.greeting, { color: palette.textPrimary }]} numberOfLines={2}>
+          Bem-vindo de volta,{' '}
+          <Text style={{ color: palette.primaryLight }}>{masterName}</Text>
+          ! ✨
         </Text>
-        <Text style={styles.subtitle} numberOfLines={2}>
+        <Text style={[styles.subtitle, { color: palette.textSecondary }]} numberOfLines={2}>
           {subtitle}
         </Text>
       </View>
 
       <Pressable
         onPress={() => Platform.OS !== 'web' && Haptics.selectionAsync()}
-        style={({ pressed }) => [styles.bell, pressed && styles.bellPressed]}
+        style={({ pressed }) => [
+          styles.bell,
+          {
+            borderColor: palette.surfaceBorder,
+            backgroundColor: palette.surface,
+          },
+          pressed && {
+            opacity: 0.75,
+            backgroundColor: palette.accentSoft,
+            borderColor: palette.accent,
+          },
+        ]}
         accessibilityRole="button"
         accessibilityLabel="Notificações"
         hitSlop={8}
       >
-        <Bell size={20} color={premium.text.secondary} strokeWidth={1.6} />
-        <View style={styles.bellDot} />
+        <Bell size={20} color={palette.textSecondary} strokeWidth={1.6} />
+        <View
+          style={[
+            styles.bellDot,
+            {
+              backgroundColor: palette.primary,
+              borderColor: palette.gradientEnd,
+            },
+          ]}
+        />
       </Pressable>
     </View>
   );
@@ -53,7 +77,6 @@ const styles = StyleSheet.create({
   root: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: premium.spacing.stack,
   },
   copy: {
     flex: 1,
@@ -65,13 +88,11 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 23,
     letterSpacing: -0.3,
-    color: premium.text.primary,
   },
   subtitle: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 14,
     lineHeight: 20,
-    color: premium.text.secondary,
   },
   bell: {
     width: 42,
@@ -80,12 +101,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: premium.surface.cardBorder,
-    backgroundColor: premium.surface.card,
-  },
-  bellPressed: {
-    opacity: 0.75,
-    backgroundColor: premium.surface.icon,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.18,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 3,
+      },
+      default: {},
+    }),
   },
   bellDot: {
     position: 'absolute',
@@ -94,8 +121,6 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: premium.accent,
     borderWidth: 1.5,
-    borderColor: premium.glass.fillStrong,
   },
 });

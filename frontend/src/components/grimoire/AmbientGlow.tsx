@@ -2,18 +2,9 @@ import { BlurView } from 'expo-blur';
 import { MotiView } from 'moti';
 import { Platform, StyleSheet, View, type ViewStyle } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 
 export type GlowVariant = 'purple-right' | 'purple-left' | 'petrol-left';
-
-const GLOW_CONFIG: Record<
-  GlowVariant,
-  { top: number; left?: number; right?: number; color: string; size: number }
-> = {
-  'purple-right': { top: -96, right: -96, color: grimoire.colors.purpleMid, size: 384 },
-  'purple-left': { top: -96, left: -80, color: grimoire.colors.purpleMid, size: 384 },
-  'petrol-left': { top: -96, left: -80, color: grimoire.colors.petrol, size: 384 },
-};
 
 interface AmbientGlowProps {
   variant?: GlowVariant;
@@ -22,8 +13,18 @@ interface AmbientGlowProps {
 }
 
 export function AmbientGlow({ variant = 'purple-right', style, animate = true }: AmbientGlowProps) {
-  const config = GLOW_CONFIG[variant];
-  const half = config.size / 2;
+  const grimoire = useGrimoire();
+
+  const configMap: Record<
+    GlowVariant,
+    { top: number; left?: number; right?: number; color: string; size: number }
+  > = {
+    'purple-right': { top: -96, right: -96, color: grimoire.colors.purpleMid, size: 384 },
+    'purple-left': { top: -96, left: -80, color: grimoire.colors.purpleMid, size: 384 },
+    'petrol-left': { top: -96, left: -80, color: grimoire.colors.petrol, size: 384 },
+  };
+
+  const config = configMap[variant];
 
   const glowCluster = (
     <View

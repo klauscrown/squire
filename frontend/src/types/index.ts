@@ -1,5 +1,7 @@
 export type ThemeMode = 'light' | 'dark';
 
+export type { ThemeName as VisualThemeId, ThemeName } from '@/theme/palettes';
+
 export interface BaseEntity {
   id: string;
   createdAt: Date;

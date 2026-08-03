@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 interface FormSheetProps {
@@ -22,15 +22,37 @@ interface FormSheetProps {
 }
 
 export function FormSheet({ visible, onClose, children, title }: FormSheetProps) {
+  const grimoire = useGrimoire();
   const isWeb = Platform.OS === 'web';
 
   const header = (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingHorizontal: grimoire.spacing.screen, paddingBottom: grimoire.spacing.sm }]}>
       <View style={styles.titleWrap}>
-        <Text style={styles.eyebrow}>Grimório</Text>
-        <Text style={styles.title}>{title}</Text>
+        <Text
+          style={[
+            styles.eyebrow,
+            {
+              fontSize: grimoire.typography.eyebrow.fontSize,
+              letterSpacing: grimoire.typography.eyebrow.letterSpacing,
+              color: grimoire.colors.goldMuted,
+            },
+          ]}
+        >
+          Grimório
+        </Text>
+        <Text style={[styles.title, { color: grimoire.colors.ivory }]}>{title}</Text>
       </View>
-      <Pressable onPress={onClose} hitSlop={8} style={styles.closeBtn}>
+      <Pressable
+        onPress={onClose}
+        hitSlop={8}
+        style={[
+          styles.closeBtn,
+          {
+            borderColor: grimoire.colors.glassBorder,
+            backgroundColor: grimoire.colors.glass,
+          },
+        ]}
+      >
         <X size={20} color={grimoire.colors.ivoryDim} weight="bold" />
       </Pressable>
     </View>
@@ -39,7 +61,10 @@ export function FormSheet({ visible, onClose, children, title }: FormSheetProps)
   const body = (
     <ScrollView
       style={{ flex: isWeb ? undefined : 1 }}
-      contentContainerStyle={styles.bodyContent}
+      contentContainerStyle={{
+        paddingHorizontal: grimoire.spacing.screen,
+        paddingBottom: grimoire.spacing.lg,
+      }}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
@@ -50,8 +75,22 @@ export function FormSheet({ visible, onClose, children, title }: FormSheetProps)
   if (isWeb) {
     return (
       <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-        <Pressable style={styles.webBackdrop} onPress={onClose}>
-          <Pressable style={styles.webSheet} onPress={(e) => e.stopPropagation()}>
+        <Pressable
+          style={[styles.webBackdrop, { padding: grimoire.spacing.screen }]}
+          onPress={onClose}
+        >
+          <Pressable
+            style={[
+              styles.webSheet,
+              {
+                backgroundColor: grimoire.colors.background,
+                borderRadius: grimoire.radius.xl,
+                borderColor: grimoire.colors.glassBorder,
+                paddingTop: grimoire.spacing.md,
+              },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
             {header}
             {body}
           </Pressable>
@@ -69,10 +108,18 @@ export function FormSheet({ visible, onClose, children, title }: FormSheetProps)
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.nativeRoot}
+        style={[styles.nativeRoot, { backgroundColor: grimoire.colors.background }]}
       >
         <View style={styles.handleWrap}>
-          <View style={styles.handle} />
+          <View
+            style={[
+              styles.handle,
+              {
+                borderRadius: grimoire.radius.full,
+                backgroundColor: grimoire.colors.glassGoldBorder,
+              },
+            ]}
+          />
         </View>
         {header}
         {body}
@@ -84,7 +131,6 @@ export function FormSheet({ visible, onClose, children, title }: FormSheetProps)
 const styles = StyleSheet.create({
   nativeRoot: {
     flex: 1,
-    backgroundColor: grimoire.colors.background,
   },
   handleWrap: {
     alignItems: 'center',
@@ -93,15 +139,11 @@ const styles = StyleSheet.create({
   handle: {
     width: 40,
     height: 4,
-    borderRadius: grimoire.radius.full,
-    backgroundColor: grimoire.colors.glassGoldBorder,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    paddingHorizontal: grimoire.spacing.screen,
-    paddingBottom: grimoire.spacing.sm,
     gap: 12,
   },
   titleWrap: {
@@ -109,48 +151,33 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     fontFamily: fontFamily.inter.semibold,
-    fontSize: grimoire.typography.eyebrow.fontSize,
-    letterSpacing: grimoire.typography.eyebrow.letterSpacing,
     textTransform: 'uppercase',
-    color: grimoire.colors.goldMuted,
     marginBottom: 4,
   },
   title: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 28,
     lineHeight: 32,
-    color: grimoire.colors.ivory,
   },
   closeBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassBorder,
-    backgroundColor: grimoire.colors.glass,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  bodyContent: {
-    paddingHorizontal: grimoire.spacing.screen,
-    paddingBottom: grimoire.spacing.lg,
   },
   webBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.65)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: grimoire.spacing.screen,
   },
   webSheet: {
     width: '100%',
     maxWidth: 520,
     maxHeight: '90vh' as unknown as number,
-    backgroundColor: grimoire.colors.background,
-    borderRadius: grimoire.radius.xl,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassBorder,
     overflow: 'hidden',
-    paddingTop: grimoire.spacing.md,
   },
 });

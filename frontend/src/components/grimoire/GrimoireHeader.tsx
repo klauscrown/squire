@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { StyleSheet, Text, type TextStyle, View } from 'react-native';
 
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 type GrimoireHeaderVariant = 'default' | 'softGlass' | 'profile';
@@ -25,6 +25,8 @@ export function GrimoireHeader({
   variant = 'default',
   titleStyle,
 }: GrimoireHeaderProps) {
+  const grimoire = useGrimoire();
+  const soft = grimoire.softGlass;
   const isSoftGlass = variant === 'softGlass';
   const isProfile = variant === 'profile';
 
@@ -32,13 +34,26 @@ export function GrimoireHeader({
     <View style={[styles.row, isSoftGlass && styles.rowSoft]}>
       <View style={styles.textBlock}>
         {eyebrow ? (
-          <Text style={[styles.eyebrow, (isSoftGlass || isProfile) && styles.eyebrowSoft]}>
+          <Text
+            style={[
+              styles.eyebrow,
+              { color: grimoire.colors.goldMuted },
+              (isSoftGlass || isProfile) && {
+                fontFamily: fontFamily.inter.medium,
+                fontSize: 11,
+                letterSpacing: 1.6,
+                color: soft.gold,
+                opacity: 0.72,
+              },
+            ]}
+          >
             {eyebrow}
           </Text>
         ) : null}
         <Text
           style={[
             styles.title,
+            { color: grimoire.colors.ivory },
             isSoftGlass && styles.titleSoft,
             isProfile && styles.titleProfile,
             !eyebrow && styles.titleNoEyebrow,
@@ -49,7 +64,13 @@ export function GrimoireHeader({
         </Text>
         {subtitle ? (
           typeof subtitle === 'string' ? (
-            <Text style={[styles.subtitle, (isSoftGlass || isProfile) && styles.subtitleSoft]}>
+            <Text
+              style={[
+                styles.subtitle,
+                { color: `${grimoire.colors.ivoryDim}B3` },
+                (isSoftGlass || isProfile) && styles.subtitleSoft,
+              ]}
+            >
               {subtitle}
             </Text>
           ) : (
@@ -82,19 +103,11 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 3,
     textTransform: 'uppercase',
-    color: grimoire.colors.goldMuted,
-  },
-  eyebrowSoft: {
-    fontFamily: fontFamily.inter.medium,
-    fontSize: 11,
-    letterSpacing: 1.6,
-    color: 'rgba(230, 194, 128, 0.72)',
   },
   title: {
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 30,
     lineHeight: 36,
-    color: grimoire.colors.ivory,
     marginTop: 4,
   },
   titleSoft: {
@@ -119,7 +132,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.inter.regular,
     fontSize: 12,
     lineHeight: 18,
-    color: `${grimoire.colors.ivoryDim}B3`,
     marginTop: 4,
   },
   subtitleSoft: {

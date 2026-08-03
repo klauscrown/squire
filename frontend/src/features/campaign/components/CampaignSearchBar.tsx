@@ -2,7 +2,8 @@ import { MotiView } from 'moti';
 import { MagnifyingGlass } from 'phosphor-react-native';
 import { StyleSheet, TextInput, View } from 'react-native';
 
-import { GlassSurface } from '@/features/home/components/ui/GlassSurface';
+import { GlassSurface } from '@/components/ui/GlassSurface';
+import { components } from '@/theme/components';
 import { grimoire } from '@/theme/grimoire';
 import { premium } from '@/theme/premium';
 import { fontFamily } from '@/theme/typography';
@@ -20,7 +21,7 @@ export function CampaignSearchBar({ value, onChangeText }: CampaignSearchBarProp
       transition={{ type: 'timing', duration: 280, delay: 80 }}
       style={styles.wrap}
     >
-      <GlassSurface radius={premium.radius.lg} shadow>
+      <GlassSurface radius={components.radius.lg} shadow>
         <View style={styles.content}>
           <MagnifyingGlass size={22} color={premium.text.muted} weight="regular" />
           <TextInput

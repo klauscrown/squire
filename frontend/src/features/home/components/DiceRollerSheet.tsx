@@ -5,7 +5,7 @@ import { Platform, StyleSheet, Text, View } from 'react-native';
 import { GrimoireOptionPills } from '@/components/grimoire';
 import { FormSheet } from '@/components/ui';
 import { GrimoireGoldButton } from '@/features/auth/components';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
 type RollMode = 'normal' | 'advantage' | 'disadvantage';
@@ -38,6 +38,7 @@ const MODE_LABELS: Record<RollMode, string> = {
 };
 
 export function DiceRollerSheet({ visible, onClose }: DiceRollerSheetProps) {
+  const grimoire = useGrimoire();
   const [mode, setMode] = useState<RollMode>('normal');
   const [result, setResult] = useState<{ primary: number; secondary?: number } | null>(null);
 
@@ -76,23 +77,45 @@ export function DiceRollerSheet({ visible, onClose }: DiceRollerSheetProps) {
         options={MODE_OPTIONS}
         value={mode}
         onChange={setMode}
-        getLabel={(option) => MODE_LABELS[option]}
+        getLabel={(option) => MODE_LABELS[option] ?? option}
       />
 
       <View style={styles.resultWrap}>
         {result ? (
           <>
-            <Text style={[styles.resultValue, isCrit && styles.crit, isFail && styles.fail]}>
+            <Text
+              style={[
+                styles.resultValue,
+                { color: grimoire.colors.gold },
+                isCrit && {
+                  color: grimoire.colors.success,
+                  textShadowColor: `${grimoire.colors.success}66`,
+                  textShadowOffset: { width: 0, height: 0 },
+                  textShadowRadius: 16,
+                },
+                isFail && { color: grimoire.colors.destructive },
+              ]}
+            >
               {result.primary}
             </Text>
             {result.secondary != null ? (
-              <Text style={styles.secondaryRoll}>outro dado: {result.secondary}</Text>
+              <Text style={[styles.secondaryRoll, { color: grimoire.colors.ivoryDim }]}>
+                outro dado: {result.secondary}
+              </Text>
             ) : null}
-            {isCrit ? <Text style={styles.flavor}>Crítico!</Text> : null}
-            {isFail ? <Text style={styles.flavorFail}>Falha crítica</Text> : null}
+            {isCrit ? (
+              <Text style={[styles.flavor, { color: grimoire.colors.success }]}>Crítico!</Text>
+            ) : null}
+            {isFail ? (
+              <Text style={[styles.flavor, { color: grimoire.colors.destructive }]}>
+                Falha crítica
+              </Text>
+            ) : null}
           </>
         ) : (
-          <Text style={styles.placeholder}>Toque abaixo para lançar o dado</Text>
+          <Text style={[styles.placeholder, { color: grimoire.colors.ivoryDim }]}>
+            Toque abaixo para lançar o dado
+          </Text>
         )}
       </View>
 
@@ -113,21 +136,10 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.cormorant.medium,
     fontSize: 72,
     lineHeight: 80,
-    color: grimoire.colors.gold,
-  },
-  crit: {
-    color: grimoire.colors.success,
-    textShadowColor: `${grimoire.colors.success}66`,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 16,
-  },
-  fail: {
-    color: grimoire.colors.destructive,
   },
   secondaryRoll: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 13,
-    color: grimoire.colors.ivoryDim,
     marginTop: 8,
   },
   flavor: {
@@ -135,21 +147,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: grimoire.colors.success,
-    marginTop: 8,
-  },
-  flavorFail: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 12,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    color: grimoire.colors.destructive,
     marginTop: 8,
   },
   placeholder: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 14,
-    color: grimoire.colors.ivoryDim,
     textAlign: 'center',
   },
 });

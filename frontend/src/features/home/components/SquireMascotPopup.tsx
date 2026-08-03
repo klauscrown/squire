@@ -6,7 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { grimoireImages } from '@/assets/grimoire';
 import { CURVED_TAB_BAR_FOOTPRINT } from '@/components/layout/AppTabBar';
 import { GlowPulse, GrimoireImage } from '@/components/grimoire';
-import { grimoire } from '@/theme/grimoire';
+import { useGrimoire } from '@/hooks/useTheme';
+import { useActivePalette } from '@/store/useThemeStore';
 import { fontFamily } from '@/theme/typography';
 
 const TIPS = [
@@ -28,6 +29,8 @@ interface SquireMascotPopupProps {
 
 export function SquireMascotPopup({ visible, onClose }: SquireMascotPopupProps) {
   const insets = useSafeAreaInsets();
+  const palette = useActivePalette();
+  const grimoire = useGrimoire();
   const [tipIndex, setTipIndex] = useState(randomTipIndex);
   const bottom = CURVED_TAB_BAR_FOOTPRINT + Math.max(insets.bottom, 8) + 74;
 
@@ -37,23 +40,56 @@ export function SquireMascotPopup({ visible, onClose }: SquireMascotPopupProps) 
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Fechar popup">
+      <Pressable
+        style={[styles.backdrop, { backgroundColor: grimoire.colors.overlay }]}
+        onPress={onClose}
+        accessibilityLabel="Fechar popup"
+      >
         <Pressable
-          style={[styles.popup, { bottom, left: grimoire.spacing.screen }]}
+          style={[
+            styles.popup,
+            {
+              bottom,
+              left: grimoire.spacing.screen,
+              right: grimoire.spacing.screen,
+              borderRadius: grimoire.radius.xl,
+              backgroundColor: grimoire.colors.popupFill,
+              borderColor: palette.surfaceBorder,
+              ...Platform.select({
+                ios: {
+                  shadowColor: palette.accent,
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.22,
+                  shadowRadius: 20,
+                },
+                android: {
+                  elevation: 12,
+                },
+                default: {},
+              }),
+            },
+          ]}
           onPress={(event) => event.stopPropagation()}
         >
+          <View style={[styles.popupAccent, { backgroundColor: palette.surfaceBorder }]} />
           <Pressable
             onPress={onClose}
             hitSlop={8}
-            style={styles.closeBtn}
+            style={({ pressed }) => [
+              styles.closeBtn,
+              {
+                borderColor: grimoire.colors.glassBorder,
+                backgroundColor: pressed ? palette.accentSoft : grimoire.colors.glass,
+              },
+            ]}
             accessibilityRole="button"
             accessibilityLabel="Fechar"
           >
-            <X size={18} color={grimoire.colors.ivoryDim} weight="bold" />
+            <X size={18} color={palette.textSecondary} weight="bold" />
           </Pressable>
 
           <View style={styles.mascotWrap}>
-            <GlowPulse color={`${grimoire.colors.gold}88`} size={56} style={styles.mascotGlow} />
+            <GlowPulse color={palette.accentSoft} size={56} style={styles.mascotGlow} />
             <GrimoireImage
               source={grimoireImages.mascot}
               style={styles.mascot}
@@ -61,15 +97,22 @@ export function SquireMascotPopup({ visible, onClose }: SquireMascotPopupProps) 
             />
           </View>
 
-          <Text style={styles.label}>Conselho do Escudeiro</Text>
-          <Text style={styles.message}>{TIPS[tipIndex]}</Text>
+          <Text style={[styles.label, { color: palette.accent }]}>Conselho do Escudeiro</Text>
+          <Text style={[styles.message, { color: palette.textPrimary }]}>{TIPS[tipIndex]}</Text>
 
           <Pressable
             onPress={onClose}
-            style={({ pressed }) => [styles.actionBtn, pressed && styles.actionBtnPressed]}
+            style={({ pressed }) => [
+              styles.actionBtn,
+              {
+                borderRadius: grimoire.radius.lg,
+                borderColor: palette.surfaceBorder,
+                backgroundColor: pressed ? palette.accentSoft : palette.surface,
+              },
+            ]}
             accessibilityRole="button"
           >
-            <Text style={styles.actionLabel}>Entendi!</Text>
+            <Text style={[styles.actionLabel, { color: palette.accent }]}>Entendi!</Text>
           </Pressable>
         </Pressable>
       </Pressable>
@@ -80,31 +123,22 @@ export function SquireMascotPopup({ visible, onClose }: SquireMascotPopupProps) 
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
   },
   popup: {
     position: 'absolute',
-    right: grimoire.spacing.screen,
-    borderRadius: grimoire.radius.xl,
-    backgroundColor: 'rgba(14, 12, 28, 0.98)',
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
     paddingTop: 20,
     paddingHorizontal: 18,
     paddingBottom: 16,
     gap: 10,
-    ...Platform.select({
-      ios: {
-        shadowColor: grimoire.colors.gold,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.22,
-        shadowRadius: 20,
-      },
-      android: {
-        elevation: 12,
-      },
-      default: {},
-    }),
+    overflow: 'hidden',
+  },
+  popupAccent: {
+    position: 'absolute',
+    top: 0,
+    left: 24,
+    right: 24,
+    height: 1,
   },
   closeBtn: {
     position: 'absolute',
@@ -114,8 +148,6 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassBorder,
-    backgroundColor: grimoire.colors.glass,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
@@ -143,30 +175,22 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textTransform: 'uppercase',
     textAlign: 'center',
-    color: grimoire.colors.gold,
   },
   message: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 15,
     lineHeight: 22,
     textAlign: 'center',
-    color: `${grimoire.colors.ivory}D9`,
+    opacity: 0.9,
   },
   actionBtn: {
     marginTop: 4,
-    borderRadius: grimoire.radius.lg,
     borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
-    backgroundColor: 'rgba(201, 169, 98, 0.12)',
     paddingVertical: 12,
     alignItems: 'center',
-  },
-  actionBtnPressed: {
-    opacity: 0.85,
   },
   actionLabel: {
     fontFamily: fontFamily.inter.semibold,
     fontSize: 14,
-    color: grimoire.colors.gold,
   },
 });
