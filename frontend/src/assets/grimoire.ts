@@ -5,6 +5,8 @@ export const grimoireImages = {
   campaignZaun: require('../../assets/images/grimoire/campaign-zaun.jpg'),
   campaignVoid: require('../../assets/images/grimoire/campaign-void.jpg'),
   loginHero: require('../../assets/images/grimoire/login-hero.jpg'),
+  /** Atmosfera full-bleed (design de referência do grimório) */
+  atmosphereBg: require('../../assets/images/grimoire/atmosphere-bg.jpg'),
 } as const;
 
 export const grimoireBannerFallbacks = [

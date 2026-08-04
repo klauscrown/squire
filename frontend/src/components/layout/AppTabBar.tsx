@@ -1,6 +1,5 @@
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus } from 'lucide-react-native';
 import { useEffect } from 'react';
@@ -17,11 +16,12 @@ import { ROUTES } from '@/constants';
 import {
   TabCampaignsIcon,
   TabHomeIcon,
-  TabLibraryIcon,
   TabProfileIcon,
+  TabSettingsIcon,
 } from '@/components/layout/TabBarIcons';
-import { useComponents, usePremium } from '@/hooks/useTheme';
+import { useComponents } from '@/hooks/useTheme';
 import { useActivePalette } from '@/store/useThemeStore';
+import { MIN_TOUCH_TARGET } from '@/theme/accessibility';
 import { fontFamily } from '@/theme/typography';
 
 type SideTab = 'home' | 'campaigns' | 'settings' | 'profile';
@@ -31,13 +31,10 @@ type TabIconComponent = typeof TabHomeIcon;
 const LEFT_TABS: SideTab[] = ['home', 'campaigns'];
 const RIGHT_TABS: SideTab[] = ['settings', 'profile'];
 
-const TAB_META: Record<
-  SideTab,
-  { label: string; icon: TabIconComponent; activeWidth: number }
-> = {
+const TAB_META: Record<SideTab, { label: string; icon: TabIconComponent; activeWidth: number }> = {
   home: { label: 'Início', icon: TabHomeIcon, activeWidth: 82 },
   campaigns: { label: 'Campanhas', icon: TabCampaignsIcon, activeWidth: 108 },
-  settings: { label: 'Biblioteca', icon: TabLibraryIcon, activeWidth: 102 },
+  settings: { label: 'Ajustes', icon: TabSettingsIcon, activeWidth: 88 },
   profile: { label: 'Perfil', icon: TabProfileIcon, activeWidth: 82 },
 };
 
@@ -66,14 +63,7 @@ interface TabBarItemProps {
   onLongPress: () => void;
 }
 
-function TabBarItem({
-  focused,
-  label,
-  activeWidth,
-  Icon,
-  onPress,
-  onLongPress,
-}: TabBarItemProps) {
+function TabBarItem({ focused, label, activeWidth, Icon, onPress, onLongPress }: TabBarItemProps) {
   const palette = useActivePalette();
   const components = useComponents();
   const pill = components.pill;
@@ -84,7 +74,12 @@ function TabBarItem({
   }, [focused, progress, pill.spring]);
 
   const pillStyle = useAnimatedStyle(() => ({
-    width: interpolate(progress.value, [0, 1], [pill.inactiveSize, activeWidth], Extrapolation.CLAMP),
+    width: interpolate(
+      progress.value,
+      [0, 1],
+      [pill.inactiveSize, activeWidth],
+      Extrapolation.CLAMP,
+    ),
     height: pill.height,
     borderRadius: pill.radius,
   }));
@@ -106,12 +101,7 @@ function TabBarItem({
       [0, pill.shadow.opacity],
       Extrapolation.CLAMP,
     ),
-    elevation: interpolate(
-      progress.value,
-      [0, 1],
-      [0, pill.shadow.elevation],
-      Extrapolation.CLAMP,
-    ),
+    elevation: interpolate(progress.value, [0, 1], [0, pill.shadow.elevation], Extrapolation.CLAMP),
   }));
 
   const iconColor = focused ? pill.activeIcon : palette.textSecondary;
@@ -137,14 +127,14 @@ function TabBarItem({
           },
         ]}
       >
-        <Animated.View style={[StyleSheet.absoluteFill, gradientStyle]}>
-          <LinearGradient
-            colors={[palette.primary, palette.primaryLight, palette.accent]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={StyleSheet.absoluteFill}
-          />
-        </Animated.View>
+        {/* Fundo sólido do tab ativo — sem gradiente azul→ouro */}
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFill,
+            gradientStyle,
+            { backgroundColor: palette.primary },
+          ]}
+        />
 
         <Icon size={20} color={iconColor} />
 
@@ -167,7 +157,6 @@ export function AppTabBar({ state, descriptors, navigation, insets }: BottomTabB
   const router = useRouter();
   const palette = useActivePalette();
   const components = useComponents();
-  const premium = usePremium();
   const pill = components.pill;
   const tabBar = components.tabBar;
   const bottom = Math.max(insets.bottom, 8);
@@ -210,46 +199,29 @@ export function AppTabBar({ state, descriptors, navigation, insets }: BottomTabB
             bottom,
             height: tabBar.height,
             borderRadius: tabBar.shellRadius,
-            borderColor: palette.surfaceBorder,
+            borderColor: tabBar.shellBorder,
+            backgroundColor: tabBar.shellFill,
           },
         ]}
-      >
-        {Platform.OS === 'ios' ? (
-          <BlurView
-            intensity={premium.glass.blurStrong}
-            tint="dark"
-            style={StyleSheet.absoluteFill}
-          />
-        ) : Platform.OS !== 'web' ? (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: tabBar.shellAndroid }]} />
-        ) : null}
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              backgroundColor:
-                Platform.OS === 'web'
-                  ? premium.glass.fillWeb
-                  : Platform.OS === 'ios'
-                    ? premium.glass.fill
-                    : palette.surface,
-            },
-          ]}
-        />
-      </View>
+      />
 
       <View style={[styles.barRow, { bottom, height: tabBar.height }]}>
         <View style={styles.sideGroup}>{LEFT_TABS.map(renderTab)}</View>
 
-        <View style={[styles.fabSlot, { width: FAB + FAB_RING * 2 + 12, marginTop: -(FAB / 2 + 6) }]}>
+        <View
+          style={[styles.fabSlot, { width: FAB + FAB_RING * 2 + 12, marginTop: -(FAB / 2 + 6) }]}
+        >
           <Animated.View style={[styles.fabWrap, fabAnim]}>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Nova campanha"
               onPressIn={() => {
+                // SharedValue do Reanimated é mutável por definição.
+                // eslint-disable-next-line react-hooks/immutability
                 fabScale.value = withSpring(0.94, pill.spring);
               }}
               onPressOut={() => {
+                // eslint-disable-next-line react-hooks/immutability
                 fabScale.value = withSpring(1, pill.spring);
               }}
               onPress={() => router.push(ROUTES.app.campaignCreate)}
@@ -340,6 +312,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   tabPressable: {
+    minWidth: MIN_TOUCH_TARGET,
+    minHeight: MIN_TOUCH_TARGET,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -359,6 +333,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fabPressable: {
+    minWidth: MIN_TOUCH_TARGET,
+    minHeight: MIN_TOUCH_TARGET,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,5 +1,6 @@
 /**
  * Expansão das paletas semânticas (`theme/palettes`) em tokens visuais completos.
+ * Mesma arquitetura para Grimório e Tormenta — só os materiais mudam via paleta.
  */
 
 import {
@@ -25,8 +26,13 @@ export interface VisualPalette {
   id: VisualThemeId;
   label: string;
   description: string;
-  /** Paleta semântica de origem */
   semantic: ThemePalette;
+
+  backgroundAtmosphericTop: string;
+  backgroundAtmosphericMiddle: string;
+  backgroundAtmosphericBottom: string;
+  ambientPrimary: string;
+  ambientSecondary: string;
 
   atmosphere: {
     top: string;
@@ -41,9 +47,19 @@ export interface VisualPalette {
     ambientPrimaryCore: string;
     ambientSecondary: string;
     ambientSecondaryCore: string;
+    topWash: string;
+    topWashCore: string;
+    sideLeft: string;
+    sideRight: string;
   };
 
   atmosphereAmbient: readonly [string, string, string, string];
+
+  starDust: {
+    dim: string;
+    mid: string;
+    bright: string;
+  };
 
   colors: {
     background: string;
@@ -181,47 +197,97 @@ function lighten(hex: string, amount: number): string {
   return `#${[nr, ng, nb].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 }
 
+function mixColors(a: string, b: string, amount: number): string {
+  const [r1, g1, b1] = hexToRgbChannel(a).split(',').map((n) => Number(n.trim()));
+  const [r2, g2, b2] = hexToRgbChannel(b).split(',').map((n) => Number(n.trim()));
+  const t = Math.min(1, Math.max(0, amount));
+  const nr = Math.round((r1 ?? 0) + ((r2 ?? 0) - (r1 ?? 0)) * t);
+  const ng = Math.round((g1 ?? 0) + ((g2 ?? 0) - (g1 ?? 0)) * t);
+  const nb = Math.round((b1 ?? 0) + ((b2 ?? 0) - (b1 ?? 0)) * t);
+  return `#${[nr, ng, nb].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+}
+
 function expandVisualPalette(id: ThemeName): VisualPalette {
   const semantic = getPalette(id);
   const primaryRgb = hexToRgbChannel(semantic.primary);
   const accentRgb = hexToRgbChannel(semantic.accent);
   const lightRgb = hexToRgbChannel(semantic.primaryLight);
+  const secondaryRgb = hexToRgbChannel(semantic.textSecondary);
+  const topRgb = hexToRgbChannel(semantic.gradientStart);
+  const baseRgb = hexToRgbChannel(semantic.gradientEnd);
   const isTormenta = id === 'tormenta';
 
-  const softHex = isTormenta ? '#FECACA' : '#E9D5FF';
-  const softTextHex = isTormenta ? '#FECACA' : '#D8B4FE';
-  const coolHex = isTormenta ? semantic.primaryLight : '#3B82F6';
-  const coolSoftHex = isTormenta ? lighten(semantic.primaryLight, 0.25) : '#60A5FA';
+  const softHex = isTormenta
+    ? lighten(semantic.primaryLight, 0.42)
+    : lighten(semantic.primaryLight, 0.32);
+  const softTextHex = isTormenta ? softHex : lighten(semantic.primaryLight, 0.2);
+  const coolHex = isTormenta ? semantic.primaryLight : lighten(semantic.primary, 0.16);
+  const coolSoftHex = isTormenta
+    ? lighten(semantic.primaryLight, 0.18)
+    : lighten(semantic.primaryLight, 0.12);
+
+  /** Luz ambiente secundária — azul-violeta só no Grimório (baixa opacidade). */
+  const ambientVioletRgb = isTormenta ? primaryRgb : '96, 110, 168';
+
+  /** Mid/lower puxam mais para o escuro — curva cinematográfica (topo vivo, base quase preta). */
+  const middle = isTormenta
+    ? mixTowardBlack(semantic.gradientStart, 0.45)
+    : mixColors(semantic.gradientStart, semantic.gradientEnd, 0.58);
+  const upper = isTormenta
+    ? mixTowardBlack(semantic.gradientStart, 0.22)
+    : mixColors(semantic.gradientStart, semantic.gradientEnd, 0.28);
+  const lower = isTormenta
+    ? mixTowardBlack(semantic.gradientStart, 0.62)
+    : mixColors(semantic.gradientStart, semantic.gradientEnd, 0.82);
+  const deep = isTormenta
+    ? mixTowardBlack(semantic.gradientEnd, 0.08)
+    : mixTowardBlack(semantic.gradientEnd, 0.04);
 
   return {
     id,
     label: semantic.name,
     description: isTormenta
-      ? 'Vermelho e preto — inspirado em Tormenta20.'
-      : 'Roxo e dourado — grimório clássico do Squire.',
+      ? 'Vermelho e carvão — mesma hierarquia do Grimório.'
+      : 'Azul profundo e dourado envelhecido — grimório premium.',
     semantic,
+
+    backgroundAtmosphericTop: semantic.gradientStart,
+    backgroundAtmosphericMiddle: middle,
+    backgroundAtmosphericBottom: semantic.gradientEnd,
+    ambientPrimary: rgba(lightRgb, isTormenta ? 0.14 : 0.14),
+    ambientSecondary: rgba(ambientVioletRgb, isTormenta ? 0.09 : 0.07),
 
     atmosphere: {
       top: semantic.gradientStart,
-      upper: mixTowardBlack(semantic.gradientStart, 0.18),
-      mid: mixTowardBlack(semantic.gradientStart, 0.36),
-      lower: mixTowardBlack(semantic.gradientStart, 0.55),
-      deep: mixTowardBlack(semantic.gradientEnd, 0.15),
+      upper,
+      mid: middle,
+      lower,
+      deep,
       base: semantic.gradientEnd,
-      glow: rgba(primaryRgb, 0.32),
-      accent: lighten(semantic.primaryLight, 0.2),
-      ambientPrimary: rgba(primaryRgb, 0.14),
-      ambientPrimaryCore: rgba(primaryRgb, 0.09),
-      ambientSecondary: rgba(accentRgb, 0.12),
-      ambientSecondaryCore: rgba(accentRgb, 0.08),
+      glow: rgba(lightRgb, isTormenta ? 0.18 : 0.12),
+      accent: lighten(semantic.primaryLight, 0.12),
+      ambientPrimary: rgba(lightRgb, isTormenta ? 0.11 : 0.1),
+      ambientPrimaryCore: rgba(lightRgb, isTormenta ? 0.06 : 0.05),
+      ambientSecondary: rgba(ambientVioletRgb, isTormenta ? 0.08 : 0.06),
+      ambientSecondaryCore: rgba(ambientVioletRgb, isTormenta ? 0.04 : 0.035),
+      topWash: rgba(lightRgb, isTormenta ? 0.11 : 0.1),
+      topWashCore: rgba(lightRgb, isTormenta ? 0.05 : 0.045),
+      sideLeft: rgba(primaryRgb, isTormenta ? 0.09 : 0.07),
+      sideRight: rgba(ambientVioletRgb, isTormenta ? 0.07 : 0.05),
     },
 
     atmosphereAmbient: [
-      rgba(primaryRgb, 0.22),
-      rgba(primaryRgb, 0.11),
-      rgba(primaryRgb, 0.04),
+      rgba(lightRgb, isTormenta ? 0.12 : 0.11),
+      rgba(primaryRgb, isTormenta ? 0.06 : 0.05),
+      rgba(baseRgb, 0.02),
       'transparent',
     ],
+
+    starDust: {
+      dim: rgba(hexToRgbChannel(semantic.textPrimary), 0.09),
+      mid: rgba(lightRgb, 0.14),
+      bright: rgba(accentRgb, 0.12),
+    },
 
     colors: {
       background: semantic.gradientEnd,
@@ -229,104 +295,111 @@ function expandVisualPalette(id: ThemeName): VisualPalette {
       ivory: semantic.textPrimary,
       ivoryDim: semantic.textSecondary,
       gold: semantic.accent,
-      goldBright: lighten(semantic.accent, 0.28),
-      goldMuted: rgba(accentRgb, 0.7),
-      purpleDeep: mixTowardBlack(semantic.gradientEnd, 0.35),
-      purpleMid: mixTowardBlack(semantic.gradientStart, 0.25),
-      petrol: isTormenta ? '#1A1012' : '#1a2838',
-      card: isTormenta ? '#140A0C' : '#14121c',
-      cardBorder: 'rgba(255, 255, 255, 0.08)',
-      glass: 'rgba(255, 255, 255, 0.05)',
-      glassBorder: 'rgba(255, 255, 255, 0.08)',
+      goldBright: lighten(semantic.accent, 0.2),
+      goldMuted: rgba(accentRgb, 0.62),
+      purpleDeep: mixTowardBlack(semantic.gradientEnd, 0.18),
+      purpleMid: mixColors(semantic.gradientStart, semantic.gradientEnd, 0.35),
+      petrol: isTormenta
+        ? mixColors(semantic.surface, semantic.gradientEnd, 0.35)
+        : mixColors(semantic.surface, semantic.gradientEnd, 0.4),
+      card: semantic.surface,
+      cardBorder: rgba(secondaryRgb, 0.15),
+      glass: rgba(topRgb, 0.2),
+      glassBorder: rgba(secondaryRgb, 0.13),
       glassGold: rgba(accentRgb, 0.1),
-      glassGoldBorder: rgba(accentRgb, 0.25),
-      inputBg: 'rgba(255, 255, 255, 0.04)',
-      inputBorder: 'rgba(255, 255, 255, 0.10)',
-      inputBorderFocus: rgba(accentRgb, 0.55),
-      placeholder: rgba(hexToRgbChannel(semantic.textSecondary), 0.45),
+      glassGoldBorder: rgba(accentRgb, 0.2),
+      inputBg: rgba(topRgb, 0.18),
+      inputBorder: rgba(secondaryRgb, 0.16),
+      inputBorderFocus: rgba(accentRgb, 0.42),
+      placeholder: rgba(secondaryRgb, 0.55),
       success: '#34d399',
       destructive: '#ef4444',
-      tabBar: isTormenta ? 'rgba(12, 6, 8, 0.88)' : 'rgba(15, 13, 20, 0.85)',
-      tabInactive: rgba(hexToRgbChannel(semantic.textSecondary), 0.6),
-      overlay: 'rgba(0, 0, 0, 0.55)',
-      popupFill: isTormenta ? 'rgba(14, 6, 8, 0.98)' : 'rgba(14, 12, 28, 0.98)',
+      tabBar: rgba(baseRgb, 0.94),
+      tabInactive: rgba(secondaryRgb, 0.68),
+      overlay: rgba(baseRgb, 0.72),
+      popupFill: rgba(baseRgb, 0.96),
       actionGoldFill: semantic.accentSoft,
       ivoryAlpha85: rgba(hexToRgbChannel(semantic.textPrimary), 0.85),
-      goldAlpha55: rgba(accentRgb, 0.55),
+      goldAlpha55: rgba(accentRgb, 0.52),
     },
 
     brand: {
-      accent: isTormenta ? semantic.primary : '#6366F1',
-      accentSoft: isTormenta ? semantic.primaryLight : '#818CF8',
-      accentBlue: isTormenta ? semantic.primaryLight : '#3B82F6',
-      accentLight: isTormenta ? lighten(semantic.primaryLight, 0.2) : '#93C5FD',
-      accentViolet: semantic.primaryLight,
-      accentFuchsia: isTormenta ? '#FB7185' : '#C084FC',
-      gradient: isTormenta
-        ? [mixTowardBlack(semantic.primary, 0.25), semantic.primary]
-        : ['#2563EB', '#6366F1'],
-      pillGradient: [mixTowardBlack(semantic.primary, 0.2), semantic.primary, semantic.accent],
-      fabGradient: isTormenta
-        ? [mixTowardBlack(semantic.primary, 0.25), semantic.primary, mixTowardBlack(semantic.primary, 0.1)]
-        : ['#3B82F6', '#6366F1', semantic.primary],
-      sectionBar: [semantic.primaryLight, isTormenta ? semantic.primary : '#6366F1'],
+      accent: semantic.primaryLight,
+      accentSoft: lighten(semantic.primaryLight, 0.08),
+      accentBlue: coolHex,
+      accentLight: coolSoftHex,
+      accentViolet: softHex,
+      accentFuchsia: softHex,
+      gradient: [coolHex, semantic.primary] as const,
+      pillGradient: [
+        mixTowardBlack(semantic.primary, 0.12),
+        semantic.primary,
+        lighten(semantic.primary, 0.06),
+      ] as const,
+      fabGradient: [coolHex, semantic.primary, mixTowardBlack(semantic.primary, 0.08)] as const,
+      sectionBar: [semantic.primaryLight, semantic.primary] as const,
+      /** CTA mais escuro (menos amarelo pálido) */
       ctaGradient: isTormenta
-        ? [mixTowardBlack(semantic.primary, 0.25), semantic.primary]
-        : ['#2563EB', '#6366F1'],
+        ? ([mixTowardBlack(semantic.buttonPrimary, 0.1), semantic.buttonPrimary] as const)
+        : ([
+            mixTowardBlack(semantic.accent, 0.06),
+            mixTowardBlack(semantic.accent, 0.22),
+          ] as const),
     },
 
     glass: {
-      fill: isTormenta ? 'rgba(24, 10, 12, 0.42)' : 'rgba(17, 24, 39, 0.38)',
-      fillWeb: isTormenta ? 'rgba(24, 10, 12, 0.78)' : 'rgba(17, 24, 39, 0.72)',
-      fillStrong: isTormenta ? 'rgba(16, 6, 8, 0.48)' : 'rgba(11, 17, 32, 0.42)',
-      fillAndroid: isTormenta ? 'rgba(18, 8, 10, 0.78)' : 'rgba(12, 16, 32, 0.72)',
-      border: 'rgba(255, 255, 255, 0.08)',
+      fill: rgba(topRgb, 0.3),
+      fillWeb: rgba(topRgb, 0.7),
+      fillStrong: rgba(baseRgb, 0.52),
+      fillAndroid: rgba(baseRgb, 0.76),
+      border: rgba(secondaryRgb, 0.13),
       borderStrong: rgba(lightRgb, 0.26),
-      highlight: 'rgba(255, 255, 255, 0.05)',
-      cardBorder: rgba(lightRgb, 0.24),
+      highlight: rgba(hexToRgbChannel(semantic.textPrimary), 0.035),
+      /** Borda dourada sutil em cards filled (hero campanha) */
+      cardBorder: rgba(accentRgb, 0.28),
     },
 
     filledCard: {
-      accentLine: rgba(lightRgb, 0.38),
-      accentGlow: rgba(primaryRgb, 0.12),
+      accentLine: rgba(accentRgb, 0.32),
+      accentGlow: rgba(primaryRgb, 0.07),
       scrim: {
-        start: rgba(hexToRgbChannel(semantic.gradientEnd), 0.98),
-        mid: rgba(hexToRgbChannel(semantic.gradientEnd), 0.88),
-        soft: rgba(hexToRgbChannel(semantic.gradientEnd), 0.52),
+        start: rgba(baseRgb, 0.97),
+        mid: rgba(baseRgb, 0.88),
+        soft: rgba(baseRgb, 0.48),
         end: 'transparent',
       },
     },
 
     illustration: {
-      bookFill: rgba(primaryRgb, 0.32),
-      bookPage: rgba(hexToRgbChannel(semantic.textPrimary), 0.12),
+      bookFill: rgba(primaryRgb, 0.26),
+      bookPage: rgba(hexToRgbChannel(semantic.textPrimary), 0.1),
       bookStroke: semantic.primaryLight,
-      scrollFill: rgba(accentRgb, 0.18),
+      scrollFill: rgba(accentRgb, 0.14),
       scrollStroke: semantic.accent,
-      quillStroke: lighten(semantic.primaryLight, 0.15),
-      shieldFill: rgba(primaryRgb, 0.2),
+      quillStroke: lighten(semantic.primaryLight, 0.08),
+      shieldFill: rgba(primaryRgb, 0.16),
       shieldStroke: semantic.primaryLight,
-      glow: rgba(lightRgb, 0.14),
+      glow: rgba(lightRgb, 0.09),
     },
 
     softGlass: {
-      background: mixTowardBlack(semantic.gradientEnd, 0.4),
-      gold: lighten(semantic.accent, 0.2),
+      background: lighten(semantic.gradientEnd, 0.04),
+      gold: lighten(semantic.accent, 0.14),
       muted: semantic.textSecondary,
-      hintBorder: rgba(accentRgb, 0.25),
-      heroBorder: rgba(accentRgb, 0.2),
-      avatarBorder: lighten(semantic.accent, 0.15),
+      hintBorder: rgba(secondaryRgb, 0.15),
+      heroBorder: rgba(secondaryRgb, 0.13),
+      avatarBorder: rgba(accentRgb, 0.32),
       avatarBg: semantic.accentSoft,
-      statusPillBg: semantic.accentSoft,
-      shortcutBorder: rgba(accentRgb, 0.14),
-      shortcutIconBg: rgba(accentRgb, 0.1),
-      emptyCtaBorder: rgba(accentRgb, 0.22),
-      emptyCtaAccent: rgba(accentRgb, 0.35),
-      localBadgeBg: rgba(accentRgb, 0.12),
-      localBadgeBorder: rgba(accentRgb, 0.3),
-      signOutBg: 'rgba(230, 160, 120, 0.1)',
-      signOutBorder: 'rgba(230, 160, 120, 0.28)',
-      signOutColor: '#E8B48A',
+      statusPillBg: rgba(accentRgb, 0.12),
+      shortcutBorder: rgba(secondaryRgb, 0.12),
+      shortcutIconBg: rgba(primaryRgb, 0.1),
+      emptyCtaBorder: rgba(accentRgb, 0.26),
+      emptyCtaAccent: rgba(accentRgb, 0.32),
+      localBadgeBg: rgba(accentRgb, 0.1),
+      localBadgeBorder: rgba(accentRgb, 0.22),
+      signOutBg: rgba(secondaryRgb, 0.1),
+      signOutBorder: rgba(secondaryRgb, 0.2),
+      signOutColor: semantic.textSecondary,
     },
 
     elevation: {
@@ -358,7 +431,6 @@ export const VISUAL_PALETTES: Record<VisualThemeId, VisualPalette> = {
 
 export const DEFAULT_VISUAL_THEME: VisualThemeId = DEFAULT_THEME_NAME;
 
-/** Aceita id legado `arcane` persistido antes da renomeação. */
 export function resolveVisualThemeId(id: string | null | undefined): VisualThemeId {
   if (id === 'tormenta') return 'tormenta';
   if (id === 'default' || id === 'arcane') return 'default';

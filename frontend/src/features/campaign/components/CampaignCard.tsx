@@ -53,6 +53,7 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
   const progress = estimateProgress(campaign);
   const progressPct = Math.round(progress * 100);
   const meta = buildMeta(campaign);
+  const scrim = premium.surface.scrim;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -91,6 +92,18 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
             {
               borderRadius: premium.radius.xl,
               borderColor: premium.surface.cardBorder,
+              ...Platform.select({
+                ios: {
+                  shadowColor: premium.shadow.color,
+                  shadowOffset: { width: 0, height: 10 },
+                  shadowOpacity: 0.35,
+                  shadowRadius: 16,
+                },
+                android: {
+                  elevation: 6,
+                },
+                default: {},
+              }),
             },
             animatedStyle,
           ]}
@@ -106,19 +119,23 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
           />
 
           <LinearGradient
-            colors={[
-              'transparent',
-              'rgba(11,17,32,0.4)',
-              'rgba(11,17,32,0.92)',
-              'rgba(11,17,32,0.98)',
-            ]}
-            locations={[0, 0.4, 0.78, 1]}
+            colors={['transparent', scrim.soft, scrim.mid, scrim.start]}
+            locations={[0, 0.38, 0.72, 1]}
             style={StyleSheet.absoluteFill}
           />
 
           <View style={styles.top}>
             {campaign.system ? (
-              <View style={[styles.badge, { borderRadius: premium.radius.pill }]}>
+              <View
+                style={[
+                  styles.badge,
+                  {
+                    borderRadius: premium.radius.pill,
+                    backgroundColor: premium.surface.icon,
+                    borderColor: premium.surface.cardBorder,
+                  },
+                ]}
+              >
                 <Text
                   style={[styles.badgeText, { color: premium.accentLight }]}
                   numberOfLines={1}
@@ -132,11 +149,18 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
             <Pressable
               onPress={longPress}
               hitSlop={8}
-              style={({ pressed }) => [styles.trophy, pressed && styles.trophyPressed]}
+              style={({ pressed }) => [
+                styles.trophy,
+                {
+                  backgroundColor: premium.surface.icon,
+                  borderColor: premium.surface.cardBorder,
+                },
+                pressed && styles.trophyPressed,
+              ]}
               accessibilityRole="button"
               accessibilityLabel="Ações da campanha"
             >
-              <Trophy size={18} color="#FFFFFF" strokeWidth={1.75} />
+              <Trophy size={18} color={premium.foregroundOnGradient} strokeWidth={1.75} />
             </Pressable>
           </View>
 
@@ -145,11 +169,11 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
               {campaign.title}
             </Text>
             {meta ? (
-              <Text style={styles.meta} numberOfLines={1}>
+              <Text style={[styles.meta, { color: premium.text.secondary }]} numberOfLines={1}>
                 {meta}
               </Text>
             ) : null}
-            <Text style={[styles.nextSession, { color: premium.accentSoft }]}>
+            <Text style={[styles.nextSession, { color: premium.text.accent }]}>
               {nextSessionLabel(campaign.updatedAt)}
             </Text>
 
@@ -157,7 +181,10 @@ export function CampaignCard({ campaign, index, onPress, onLongPress, style }: C
               <View
                 style={[
                   styles.track,
-                  { borderRadius: premium.radius.pill },
+                  {
+                    borderRadius: premium.radius.pill,
+                    backgroundColor: premium.surface.divider,
+                  },
                 ]}
               >
                 <LinearGradient
@@ -204,14 +231,13 @@ const styles = StyleSheet.create({
     maxWidth: '68%',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: 'rgba(59, 130, 246, 0.28)',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(96, 165, 250, 0.4)',
   },
   badgeText: {
     fontFamily: fontFamily.inter.semibold,
-    fontSize: 11,
-    letterSpacing: 0.6,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.5,
   },
   trophy: {
     width: 40,
@@ -219,7 +245,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(99, 102, 241, 0.65)',
+    borderWidth: StyleSheet.hairlineWidth,
   },
   trophyPressed: {
     opacity: 0.85,
@@ -236,19 +262,20 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   title: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 22,
+    fontFamily: fontFamily.cinzel.semibold,
+    fontSize: 20,
     lineHeight: 28,
-    letterSpacing: -0.3,
+    letterSpacing: 0.15,
   },
   meta: {
     fontFamily: fontFamily.inter.regular,
     fontSize: 13,
-    color: 'rgba(244, 241, 234, 0.72)',
+    lineHeight: 19,
   },
   nextSession: {
     fontFamily: fontFamily.inter.medium,
     fontSize: 13,
+    lineHeight: 18,
     marginTop: 2,
   },
   progressRow: {
@@ -261,7 +288,6 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 4,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
   },
   fill: {
     height: '100%',

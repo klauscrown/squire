@@ -11,5 +11,12 @@ export { Input } from './Input';
 export { PageHeader } from './PageHeader';
 export { ScreenWrapper } from './ScreenWrapper';
 export { SectionHeader } from './SectionHeader';
+export { SurfaceCard, useSurfaceCardTokens } from './SurfaceCard';
+export type {
+  SurfaceCardPadding,
+  SurfaceCardProps,
+  SurfaceCardRadius,
+  SurfaceCardVariant,
+} from './SurfaceCard';
 export { Text } from './Text';
 export { ThemePickerCards } from './ThemePickerCards';

@@ -1,198 +1,187 @@
 import * as Haptics from 'expo-haptics';
-import { MotiView } from 'moti';
-import { useState, type ComponentType } from 'react';
-import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-
-import { SectionHeader } from '@/components/ui';
-import type { QuickActionIconProps } from '@/components/illustrations/QuickActionIcons';
+import { useRouter } from 'expo-router';
 import {
-  GenerateEncounterIcon,
-  GenerateItemsIcon,
-  GenerateNamesIcon,
-  QuickNotesIcon,
-} from '@/components/illustrations/QuickActionIcons';
-import { useComponents } from '@/hooks/useTheme';
+  BookOpen,
+  MapPin,
+  NotebookPen,
+  Users,
+  type LucideIcon,
+} from 'lucide-react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+
+import { GrimoireFadeIn } from '@/components/grimoire';
+import { SurfaceCard } from '@/components/ui';
+import { ROUTES } from '@/constants';
+import { getModuleRoute, type ModuleKey } from '@/features/campaign/constants/modules';
+import { useComponents, useGrimoire, useOpacity } from '@/hooks/useTheme';
 import { useActivePalette } from '@/store/useThemeStore';
-import {
-  ICON_VARIANT_KEYS,
-  iconVariantBorder,
-  iconVariantSoft,
-  type IconVariantKey,
-} from '@/theme/palettes';
-import { spacing } from '@/theme/spacing';
-import { fontFamily } from '@/theme/typography';
+import { MIN_TOUCH_TARGET } from '@/theme/accessibility';
+import { motion } from '@/theme/motion';
+import { typeRoles } from '@/theme/typography';
 
-import { DiceRollerSheet } from './DiceRollerSheet';
+type ShortcutId = 'npcs' | 'locations' | 'sessions' | 'notes';
 
-type QuickActionId = 'names' | 'items' | 'notes' | 'encounter';
+interface ShortcutDef {
+  id: ShortcutId;
+  moduleKey: ModuleKey;
+  title: string;
+  helper?: string;
+  Icon: LucideIcon;
+}
 
-/** Mesmo mapeamento em ambos os temas — só os hex em `iconVariants` mudam. */
-const ACTION_ICON_VARIANT: Record<QuickActionId, IconVariantKey> = {
-  names: 'a',
-  items: 'b',
-  notes: 'c',
-  encounter: 'd',
-};
-
-const QUICK_ACTIONS: {
-  id: QuickActionId;
-  label: string;
-  Icon: ComponentType<QuickActionIconProps>;
-}[] = [
-  { id: 'names', label: 'Gerar nomes', Icon: GenerateNamesIcon },
-  { id: 'items', label: 'Gerar itens', Icon: GenerateItemsIcon },
-  { id: 'notes', label: 'Notas Rápidas', Icon: QuickNotesIcon },
-  { id: 'encounter', label: 'Gerar Encontro', Icon: GenerateEncounterIcon },
+const SHORTCUTS: readonly ShortcutDef[] = [
+  { id: 'npcs', moduleKey: 'npcs', title: 'NPCs', helper: 'Personagens', Icon: Users },
+  { id: 'locations', moduleKey: 'locations', title: 'Locais', helper: 'Mapas', Icon: MapPin },
+  { id: 'sessions', moduleKey: 'sessions', title: 'Sessões', Icon: BookOpen },
+  { id: 'notes', moduleKey: 'notes', title: 'Anotações', Icon: NotebookPen },
 ];
 
-function comingSoon(label: string) {
-  if (Platform.OS !== 'web') {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-  }
-
-  Alert.alert('Em breve', `${label} estará disponível em breve.`);
-}
-
 interface ShortcutTileProps {
-  label: string;
-  iconVariant: IconVariantKey;
-  Icon: ComponentType<QuickActionIconProps>;
-  index: number;
-  onPress: () => void;
+  item: ShortcutDef;
+  campaignId?: string | null;
 }
 
-function ShortcutTile({ label, iconVariant, Icon, index, onPress }: ShortcutTileProps) {
-  const [pressed, setPressed] = useState(false);
+function ShortcutTile({ item, campaignId }: ShortcutTileProps) {
+  const router = useRouter();
   const palette = useActivePalette();
+  const grimoire = useGrimoire();
+  const opacity = useOpacity();
   const components = useComponents();
   const tile = components.shortcutTile;
+  const secondary = grimoire.colors.ivoryDim;
 
-  const stroke = palette.iconVariants[iconVariant];
-  const circleFill = iconVariantSoft(stroke);
-  const circleBorder = iconVariantBorder(stroke);
-
-  return (
-    <MotiView
-      from={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: 'timing', duration: 260, delay: 60 + index * 35 }}
-      style={styles.tileSlot}
-    >
-      <Pressable
-        onPress={onPress}
-        onPressIn={() => setPressed(true)}
-        onPressOut={() => setPressed(false)}
-        style={[
-          styles.tile,
-          {
-            borderRadius: tile.radius,
-            borderColor: pressed ? stroke : palette.surfaceBorder,
-            backgroundColor: palette.surface,
-            minHeight: tile.minHeight,
-            opacity: pressed ? tile.pressedOpacity : 1,
-            transform: pressed ? [{ scale: 0.97 }] : undefined,
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={label}
-      >
-        <View
-          style={[
-            styles.iconWrap,
-            {
-              width: tile.iconSize,
-              height: tile.iconSize,
-              borderRadius: tile.iconRadius,
-              backgroundColor: circleFill,
-              borderColor: circleBorder,
-            },
-          ]}
-        >
-          <Icon stroke={stroke} accentFill={circleFill} />
-        </View>
-        <Text
-          style={[
-            styles.label,
-            {
-              fontSize: tile.label.fontSize,
-              lineHeight: tile.label.lineHeight,
-              color: palette.textPrimary,
-            },
-          ]}
-          numberOfLines={2}
-        >
-          {label}
-        </Text>
-      </Pressable>
-    </MotiView>
-  );
-}
-
-export function QuickActionsGrid() {
-  const [showDice, setShowDice] = useState(false);
-  const components = useComponents();
-
-  function handlePress(id: QuickActionId, label: string) {
+  function handlePress() {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
-    if (id === 'encounter') {
-      setShowDice(true);
+    if (!campaignId) {
+      router.push(ROUTES.app.campaigns);
       return;
     }
 
-    comingSoon(label);
+    const route = getModuleRoute(item.moduleKey, campaignId);
+    if (route) {
+      router.push(route as never);
+    }
   }
 
   return (
-    <>
-      <View style={{ marginTop: components.home.sectionGap }}>
-        <SectionHeader title="Atalhos do Mestre" />
-        <View style={[styles.row, { gap: components.spacing.grid }]}>
-          {QUICK_ACTIONS.map((item, index) => (
-            <ShortcutTile
-              key={item.id}
-              index={index}
-              label={item.label}
-              iconVariant={
-                ACTION_ICON_VARIANT[item.id] ??
-                ICON_VARIANT_KEYS[index % ICON_VARIANT_KEYS.length]!
-              }
-              Icon={item.Icon}
-              onPress={() => handlePress(item.id, item.label)}
-            />
-          ))}
-        </View>
+    <SurfaceCard
+      variant="interactive"
+      radius="sm"
+      padding="sm"
+      onPress={handlePress}
+      accessibilityLabel={item.helper ? `${item.title}, ${item.helper}` : item.title}
+      contentStyle={[styles.tile, { minHeight: Math.max(tile.minHeight, MIN_TOUCH_TARGET) }]}
+    >
+      <View
+        style={[
+          styles.iconWrap,
+          {
+            width: tile.iconSize,
+            height: tile.iconSize,
+            borderRadius: tile.iconRadius,
+            backgroundColor: opacity.card.subtle,
+            borderColor: tile.frameBorder,
+          },
+        ]}
+      >
+        <item.Icon size={18} color={palette.accent} strokeWidth={1.75} />
       </View>
 
-      <DiceRollerSheet visible={showDice} onClose={() => setShowDice(false)} />
-    </>
+      <View style={styles.copy}>
+        <Text style={[styles.title, { color: palette.textPrimary }]} numberOfLines={1}>
+          {item.title}
+        </Text>
+        {item.helper ? (
+          <Text style={[styles.helper, { color: secondary }]} numberOfLines={1}>
+            {item.helper}
+          </Text>
+        ) : null}
+      </View>
+    </SurfaceCard>
+  );
+}
+
+export interface QuickActionsGridProps {
+  campaignId?: string | null;
+}
+
+export function QuickActionsGrid({ campaignId }: QuickActionsGridProps) {
+  const components = useComponents();
+  const palette = useActivePalette();
+  const gap = components.spacing.grid;
+
+  const rows: ShortcutDef[][] = [];
+  for (let i = 0; i < SHORTCUTS.length; i += 2) {
+    rows.push(SHORTCUTS.slice(i, i + 2) as ShortcutDef[]);
+  }
+
+  return (
+    <View style={{ marginTop: components.home.shortcutsMarginTop }}>
+      <GrimoireFadeIn delay={motion.home.shortcuts}>
+        <Text style={[styles.sectionLabel, { color: palette.textSecondary }]}>Atalhos rápidos</Text>
+      </GrimoireFadeIn>
+      <View style={[styles.grid, { gap }]}>
+        {rows.map((row, rowIndex) => (
+          <View key={rowIndex} style={[styles.row, { gap }]}>
+            {row.map((item, colIndex) => {
+              const index = rowIndex * 2 + colIndex;
+              return (
+                <GrimoireFadeIn
+                  key={item.id}
+                  delay={motion.home.shortcuts + motion.staggerMs * (index + 1)}
+                  style={styles.tileSlot}
+                >
+                  <ShortcutTile item={item} campaignId={campaignId} />
+                </GrimoireFadeIn>
+              );
+            })}
+            {row.length === 1 ? <View style={styles.tileSlot} /> : null}
+          </View>
+        ))}
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  sectionLabel: {
+    ...typeRoles.caption,
+    marginBottom: 10,
+  },
+  grid: {
+    width: '100%',
+  },
   row: {
     flexDirection: 'row',
+    width: '100%',
   },
   tileSlot: {
     flex: 1,
     minWidth: 0,
   },
   tile: {
-    borderWidth: 1,
-    padding: spacing.smMd,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
+    gap: 10,
+    paddingVertical: 2,
   },
   iconWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
   },
-  label: {
-    fontFamily: fontFamily.inter.semibold,
-    textAlign: 'center',
+  copy: {
+    flex: 1,
+    minWidth: 0,
+    gap: 1,
+  },
+  title: {
+    ...typeRoles.label,
+  },
+  helper: {
+    ...typeRoles.caption,
   },
 });

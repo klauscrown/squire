@@ -15,6 +15,7 @@ export function useUpdateNpcPortrait(campaignId: string, npcId: string) {
   const dataMode = useDataMode();
 
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (): Promise<string> => {
       const picked = await pickImageFromLibrary();
       if (!picked) {

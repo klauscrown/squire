@@ -4,7 +4,11 @@ import { Platform, ScrollView, StyleSheet, View, type ViewStyle } from 'react-na
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { CURVED_TAB_BAR_FOOTPRINT } from '@/components/layout/AppTabBar';
+import {
+  useContentGutter,
+  useContentMaxWidth,
+  useTabBarClearance,
+} from '@/hooks/useLayoutMetrics';
 import { useGrimoire } from '@/hooks/useTheme';
 
 import { AmbientGlow, type GlowVariant } from './AmbientGlow';
@@ -16,7 +20,20 @@ interface GrimoireScreenProps {
   glow?: GlowVariant | GlowVariant[] | 'none';
   backgroundOverlay?: ReactNode;
   contentStyle?: ViewStyle;
+  /**
+   * Padding inferior absoluto. Se omitido, usa clearance da tab bar + safe area.
+   * Prefira `tabBarExtraPadding` em telas com bottom nav.
+   */
   bottomInset?: number;
+  /**
+   * Espaço extra além da tab bar (ex.: respiro da Home).
+   * Ignorado se `bottomInset` for passado.
+   */
+  tabBarExtraPadding?: number;
+  /** false desativa reserva da tab (ex.: fluxo full-screen sem bottom nav). */
+  reserveTabBar?: boolean;
+  /** maxWidth wide (1200) em vez do default (960) em tablet/web. */
+  wide?: boolean;
 }
 
 export function GrimoireScreen({
@@ -25,16 +42,30 @@ export function GrimoireScreen({
   glow = 'none',
   backgroundOverlay,
   contentStyle,
-  bottomInset = CURVED_TAB_BAR_FOOTPRINT,
+  bottomInset,
+  tabBarExtraPadding = 0,
+  reserveTabBar = true,
+  wide = false,
 }: GrimoireScreenProps) {
   const grimoire = useGrimoire();
+  const gutter = useContentGutter(grimoire.spacing.screen);
+  const contentMaxWidth = useContentMaxWidth(wide);
+  const tabClearance = useTabBarClearance(tabBarExtraPadding);
+  const paddingBottom = bottomInset ?? (reserveTabBar ? tabClearance : tabBarExtraPadding);
+
   const glows = glow === 'none' ? [] : Array.isArray(glow) ? glow : [glow];
 
   const content = (
     <View
       style={[
         styles.content,
-        { paddingHorizontal: grimoire.spacing.screen, paddingBottom: bottomInset },
+        {
+          paddingHorizontal: gutter,
+          paddingBottom,
+          maxWidth: contentMaxWidth,
+          width: '100%',
+          alignSelf: contentMaxWidth != null ? 'center' : undefined,
+        },
         contentStyle,
       ]}
     >
@@ -57,6 +88,7 @@ export function GrimoireScreen({
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
+            // Home e listas não usam campos de texto inline — KAV só em forms
           >
             {content}
           </ScrollView>
@@ -81,7 +113,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     paddingTop: Platform.OS === 'android' ? 8 : 0,
     zIndex: 1,
   },

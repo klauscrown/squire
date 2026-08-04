@@ -1,4 +1,5 @@
 import type { Session } from '@supabase/supabase-js';
+import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, type ReactNode, useEffect, useMemo, useState } from 'react';
 
 import {
@@ -54,6 +55,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const queryClient = useQueryClient();
   const supabaseReady = isSupabaseConfigured();
   const googleReady = isGoogleSignInConfigured();
   const [session, setSession] = useState<Session | null>(null);
@@ -66,7 +68,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, 8_000);
 
     if (!supabaseReady) {
-      setIsLoading(false);
       clearTimeout(authTimeout);
       return;
     }
@@ -82,7 +83,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const supabase = tryGetSupabaseClient();
     const supabaseSub = supabase
-      ? supabase.auth.onAuthStateChange((_event, nextSession) => {
+      ? supabase.auth.onAuthStateChange((event, nextSession) => {
+          if (event === 'SIGNED_OUT') {
+            queryClient.clear();
+          }
           if (mounted) setSession(nextSession);
         }).data.subscription
       : null;
@@ -92,7 +96,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       clearTimeout(authTimeout);
       supabaseSub?.unsubscribe();
     };
-  }, [supabaseReady]);
+  }, [queryClient, supabaseReady]);
 
   const value = useMemo<AuthContextValue>(() => {
     const user = session?.user ?? null;
@@ -146,10 +150,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           supabaseReady ? supabaseSignOut() : Promise.resolve(),
           signOutGoogleViaFirebase(),
         ]);
+        queryClient.clear();
         setSession(null);
       },
     };
-  }, [supabaseReady, googleReady, isLoading, session]);
+  }, [supabaseReady, googleReady, isLoading, queryClient, session]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

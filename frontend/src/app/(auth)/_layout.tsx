@@ -1,6 +1,17 @@
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
+
+import { useAuth } from '@/components/providers/AuthProvider';
+import { ROUTES } from '@/constants';
+import { useAppStore } from '@/store/appStore';
 
 export default function AuthLayout() {
+  const { isLoading, session } = useAuth();
+  const isExplorerMode = useAppStore((state) => state.isExplorerMode);
+
+  if (!isLoading && (session || isExplorerMode)) {
+    return <Redirect href={ROUTES.app.home} />;
+  }
+
   return (
     <Stack
       screenOptions={{

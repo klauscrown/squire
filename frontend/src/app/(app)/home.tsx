@@ -1,43 +1,51 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { ROUTES } from '@/constants';
 import { GrimoireFadeIn, GrimoireScreen } from '@/components/grimoire';
-import { CURVED_TAB_BAR_FOOTPRINT } from '@/components/layout/AppTabBar';
+import { ROUTES } from '@/constants';
 import { useGetCampaigns } from '@/features/campaign/hooks';
-import { HomeAmbientGlow } from '@/features/home/components/HomeAmbientGlow';
-import { HomeCampaignsCarousel } from '@/features/home/components/HomeCampaignsCarousel';
-import { HomeCreateCampaignCard } from '@/features/home/components/HomeCreateCampaignCard';
-import { HomeHeader } from '@/features/home/components/HomeHeader';
-import { HomeSearchBar } from '@/features/home/components/HomeSearchBar';
-import { MasterShortcutsSection } from '@/features/home/components/MasterShortcutsSection';
-import { SquireMascotFab } from '@/features/home/components/SquireMascotFab';
-import { SquireMascotPopup } from '@/features/home/components/SquireMascotPopup';
+import {
+  HomeActiveCampaign,
+  HomeCampaignError,
+  HomeCreateCampaignCard,
+  HomeHeader,
+  HomeNextSessionSection,
+  QuickActionsGrid,
+  resolveHomeFeaturedCampaign,
+} from '@/features/home';
 import { useComponents } from '@/hooks/useTheme';
+import { motion } from '@/theme/motion';
 
+/**
+ * Home — orquestra seções. UI e dados ficam em `features/home`.
+ *
+ * 1. Cabeçalho
+ * 2. Campanha ativa
+ * 3. Próxima sessão
+ * 4. Atalhos rápidos
+ *
+ * Atmosfera/scroll/tab clearance: GrimoireScreen.
+ * SurfaceCard, AtmosphericBackground: packages compartilhados (não duplicados).
+ */
 export default function HomeScreen() {
   const router = useRouter();
   const { create } = useLocalSearchParams<{ create?: string }>();
-  const { data: campaigns } = useGetCampaigns();
-  const components = useComponents();
-  const fab = components.mascotFab;
-  const [search, setSearch] = useState('');
-  const [showSquirePopup, setShowSquirePopup] = useState(false);
+  const { data: campaigns, isLoading, isError, refetch } = useGetCampaigns();
+  const home = useComponents().home;
 
-  const carouselCampaigns = useMemo(() => {
-    if (!campaigns?.length) return [];
-    const active = campaigns.filter((c) => c.status === 'active');
-    const pool = active.length ? active : campaigns;
-    return [...pool].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()).slice(0, 8);
-  }, [campaigns]);
+  const featured = useMemo(() => resolveHomeFeaturedCampaign(campaigns), [campaigns]);
 
   function openCreate() {
     router.push(ROUTES.app.campaignCreate);
   }
 
-  function openSquirePopup() {
-    setShowSquirePopup(true);
+  function openCampaign(id: string) {
+    router.push(`/(app)/campaigns/${id}`);
+  }
+
+  function openCampaignsList() {
+    router.push('/(app)/campaigns');
   }
 
   useEffect(() => {
@@ -50,44 +58,41 @@ export default function HomeScreen() {
     <View style={styles.root}>
       <GrimoireScreen
         glow="none"
-        backgroundOverlay={<HomeAmbientGlow />}
-        bottomInset={CURVED_TAB_BAR_FOOTPRINT - 8}
+        scrollable
+        tabBarExtraPadding={home.tabBarExtraPad + home.bottomSpacer}
       >
-        <GrimoireFadeIn>
-          <HomeHeader subtitle="Pronto para criar histórias épicas?" />
+        <GrimoireFadeIn delay={motion.home.header}>
+          <HomeHeader />
         </GrimoireFadeIn>
 
-        <GrimoireFadeIn delay={40}>
-          <HomeSearchBar value={search} onChangeText={setSearch} />
-        </GrimoireFadeIn>
-
-        {carouselCampaigns.length > 0 ? (
-          <GrimoireFadeIn delay={80}>
-            <HomeCampaignsCarousel campaigns={carouselCampaigns} />
+        {isError ? (
+          <HomeCampaignError onRetry={() => void refetch()} />
+        ) : isLoading ? (
+          <GrimoireFadeIn delay={motion.home.campaign}>
+            <HomeActiveCampaign loading onPress={() => undefined} />
+          </GrimoireFadeIn>
+        ) : featured ? (
+          <GrimoireFadeIn delay={motion.home.campaign}>
+            <HomeActiveCampaign
+              campaign={featured}
+              onPress={(c) => openCampaign(c.id)}
+              onViewAll={openCampaignsList}
+            />
           </GrimoireFadeIn>
         ) : (
-          <GrimoireFadeIn delay={80}>
+          <GrimoireFadeIn delay={motion.home.campaign}>
             <HomeCreateCampaignCard onPress={openCreate} />
           </GrimoireFadeIn>
         )}
 
-        <MasterShortcutsSection />
+        {featured ? (
+          <GrimoireFadeIn delay={motion.home.nextSession}>
+            <HomeNextSessionSection campaign={featured} />
+          </GrimoireFadeIn>
+        ) : null}
 
-        <View
-          style={[
-            styles.mascotRow,
-            {
-              marginTop: fab.rowMarginTop,
-              marginBottom: -fab.rowPullDown,
-            },
-          ]}
-          pointerEvents="box-none"
-        >
-          <SquireMascotFab onPress={openSquirePopup} />
-        </View>
+        <QuickActionsGrid campaignId={featured?.id} />
       </GrimoireScreen>
-
-      <SquireMascotPopup visible={showSquirePopup} onClose={() => setShowSquirePopup(false)} />
     </View>
   );
 }
@@ -95,9 +100,5 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-  },
-  mascotRow: {
-    alignSelf: 'flex-start',
-    zIndex: 10,
   },
 });

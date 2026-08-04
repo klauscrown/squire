@@ -1,5 +1,7 @@
 export { AmbientGlow } from './AmbientGlow';
 export { AmbientRadialGlow } from './AmbientRadialGlow';
+export { AtmosphereStarDust } from './AtmosphereStarDust';
+export { AtmosphericBackground } from './AtmosphericBackground';
 export { GlowPulse } from './GlowPulse';
 export { GrimoireAtmosphereShell } from './GrimoireAtmosphere';
 export { GrimoireAvatar } from './GrimoireAvatar';

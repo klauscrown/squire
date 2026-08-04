@@ -26,7 +26,7 @@ export function createPremium(
     accentFuchsia: brand.accentFuchsia,
     gradient: brand.gradient,
 
-    foregroundOnGradient: '#FFFFFF',
+    foregroundOnGradient: palette.semantic.textPrimary,
 
     opacity,
 
@@ -40,19 +40,21 @@ export function createPremium(
 
     glass: components.glass,
     surface: {
-      card: 'rgba(255, 255, 255, 0.06)',
+      card: `rgba(${hexToRgbChannel(palette.semantic.gradientStart)}, 0.28)`,
       cardBorder: components.glass.cardBorder,
-      cardBorderSubtle: 'rgba(255, 255, 255, 0.10)',
-      icon: rgba(palette.rgb.primary, 0.14),
-      divider: 'rgba(255, 255, 255, 0.07)',
+      cardBorderSubtle: `rgba(${hexToRgbChannel(palette.semantic.textSecondary)}, 0.12)`,
+      icon: `rgba(${palette.rgb.primary}, 0.12)`,
+      divider: `rgba(${hexToRgbChannel(palette.semantic.textSecondary)}, 0.1)`,
+      elevated: palette.colors.card,
+      scrim: palette.filledCard.scrim,
     },
 
     overlay: {
-      backdrop: 'rgba(0, 0, 0, 0.55)',
+      backdrop: `rgba(${hexToRgbChannel(palette.semantic.gradientEnd)}, 0.72)`,
     },
 
     shadow: {
-      color: '#000000',
+      color: palette.semantic.gradientEnd,
       card: components.glass.shadow,
       cta: components.cta.shadow,
     },

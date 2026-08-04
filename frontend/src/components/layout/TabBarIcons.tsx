@@ -8,10 +8,7 @@ interface TabBarIconProps {
 
 const STROKE = 1.5;
 
-function IconFrame({
-  size = 22,
-  children,
-}: TabBarIconProps & { children: ReactNode }) {
+function IconFrame({ size = 22, children }: TabBarIconProps & { children: ReactNode }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {children}
@@ -97,6 +94,22 @@ export function TabLibraryIcon({ size = 22, color = '#F4F1EA' }: TabBarIconProps
         strokeLinecap="round"
         opacity={0.6}
       />
+    </IconFrame>
+  );
+}
+
+/** Engrenagem — Ajustes */
+export function TabSettingsIcon({ size = 22, color = '#F4F1EA' }: TabBarIconProps) {
+  return (
+    <IconFrame size={size} color={color}>
+      <Circle cx="12" cy="12" r="3" stroke={color} strokeWidth={STROKE} />
+      <Path
+        d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.4 1.4M16.6 16.6 18 18M18 6l-1.4 1.4M7.4 16.6 6 18"
+        stroke={color}
+        strokeWidth={STROKE}
+        strokeLinecap="round"
+      />
+      <Circle cx="12" cy="12" r="6.5" stroke={color} strokeWidth={1.1} opacity={0.55} />
     </IconFrame>
   );
 }

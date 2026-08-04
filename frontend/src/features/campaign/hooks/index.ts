@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
 
 import { QUERY_KEYS } from '@/constants';
 import { useAuthUserId, useDataMode } from '@/hooks/useAuthUserId';
-import { uploadMediaImage } from '@/services/supabase';
+import { removeMediaByPublicUrl, uploadMediaImage } from '@/services/supabase';
 
 import {
   createCampaign,
@@ -64,16 +65,33 @@ export function useCreateCampaign() {
         throw new Error('Sessão necessária para enviar imagens à nuvem.');
       }
 
-      const uploadedCoverUrl = await uploadMediaImage({
-        localUri: coverLocalUri,
-        userId,
-        folder: 'campaigns',
-        entityId: campaign.id,
-      });
+      let uploadedCoverUrl: string | null = null;
 
-      await updateCampaign(campaign.id, { coverImageUrl: uploadedCoverUrl });
+      try {
+        uploadedCoverUrl = await uploadMediaImage({
+          localUri: coverLocalUri,
+          userId,
+          folder: 'campaigns',
+          entityId: campaign.id,
+        });
 
-      return { ...campaign, coverImageUrl: uploadedCoverUrl };
+        await updateCampaign(campaign.id, { coverImageUrl: uploadedCoverUrl });
+        return { ...campaign, coverImageUrl: uploadedCoverUrl };
+      } catch (error) {
+        if (uploadedCoverUrl) {
+          await removeMediaByPublicUrl(uploadedCoverUrl).catch(() => {});
+        }
+
+        Toast.show({
+          type: 'info',
+          text1: 'Campanha criada sem a capa',
+          text2:
+            error instanceof Error
+              ? error.message
+              : 'Você poderá adicionar outra imagem posteriormente.',
+        });
+        return campaign;
+      }
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.campaigns] });

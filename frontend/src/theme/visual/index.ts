@@ -20,6 +20,11 @@ export interface VisualThemePack {
   components: ThemeComponents;
   premium: PremiumTheme;
   atmosphereAmbient: VisualPalette['atmosphereAmbient'];
+  backgroundAtmosphericTop: string;
+  backgroundAtmosphericMiddle: string;
+  backgroundAtmosphericBottom: string;
+  ambientPrimary: string;
+  ambientSecondary: string;
 }
 
 export function createVisualTheme(id: VisualThemeId): VisualThemePack {
@@ -40,6 +45,11 @@ export function createVisualTheme(id: VisualThemeId): VisualThemePack {
     components,
     premium,
     atmosphereAmbient: palette.atmosphereAmbient,
+    backgroundAtmosphericTop: palette.backgroundAtmosphericTop,
+    backgroundAtmosphericMiddle: palette.backgroundAtmosphericMiddle,
+    backgroundAtmosphericBottom: palette.backgroundAtmosphericBottom,
+    ambientPrimary: palette.ambientPrimary,
+    ambientSecondary: palette.ambientSecondary,
   };
 }
 

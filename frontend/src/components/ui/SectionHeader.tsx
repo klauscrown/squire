@@ -43,6 +43,7 @@ export function SectionHeader({
               width: header.accentBar.width,
               height: header.accentBar.height,
               borderRadius: components.radius.pill,
+              opacity: 0.85,
             }}
           />
           <Text
@@ -72,8 +73,9 @@ export function SectionHeader({
             <Text
               style={{
                 fontFamily: fontFamily.inter.medium,
-                fontSize: header.action.fontSize,
-                color: palette.primaryLight,
+                fontSize: Math.max(header.action.fontSize, 12),
+                lineHeight: 18,
+                color: palette.accent,
               }}
             >
               {actionLabel}

@@ -1,73 +1,75 @@
 /**
  * Paletas semânticas multi-tema — fonte de verdade para gradiente, primary, accent, surface e texto.
- * Em componentes: use `useActivePalette()` (único jeito suportado de aplicar cor de tema).
+ * Em componentes: use `useActivePalette()` / `useGrimoire()` / `usePremium()` — nunca hex na UI.
  *
- * Tormenta está calibrado para replicar o padrão de dois temas nas próximas telas.
- * Não alterar valores de `palettes.default` ao calibrar ou estender Tormenta.
+ * Hierarquia (Grimório e Tormenta compartilham a mesma arquitetura):
+ * - Base profunda (navy ou carvão)
+ * - Luz ambiente (azul-violeta / vermelho quente) só em glows, não em grandes áreas
+ * - Accent (dourado envelhecido / bronze) só em destaques
+ * - Texto principal elevado / secundário acinzentado
  *
- * Tokens detalhados (atmosphere, glass, brand…) são derivados em `theme/visual`.
+ * Não alterar valores de `palettes.default` ao calibrar Tormenta.
  */
 
 export const palettes = {
   default: {
     name: 'Grimório',
-    /** Atmosphere top — alinhado a grimoire.atmosphere.top */
-    gradientStart: '#131A2E',
-    /** Atmosphere base — alinhado a grimoire.atmosphere.base */
-    gradientEnd: '#0B1120',
-    /** Roxo principal — tokens.arcanePurple / botões, pill ativa */
-    primary: '#4F46E5',
-    primaryLight: '#818CF8',
-    /** Alias do primary — default não usa CTA separado (só Tormenta diferencia) */
-    buttonPrimary: '#7C3AED',
-    buttonPrimaryShadow: 'rgba(124, 58, 237, 0.42)',
-    /** Glow suave do FAB — mais baixo que o CTA retangular */
-    fabShadow: 'rgba(124, 58, 237, 0.18)',
-    /** Dourado antigo — tokens.ancientGold / chips, ícones, destaques */
-    accent: '#D4AF37',
-    accentSoft: '#F5E7A1',
-    /** Wash de card — opacity.card.subtle */
-    surface: '#111827',
-    surfaceBorder: 'rgba(201, 169, 98, 0.2)',
-    textPrimary: '#F8FAFC',
-    textSecondary: '#94A3B8',
-    /** Diferenciação cíclica dos quick actions (dourado / lilás / violeta / azul) */
+    /**
+     * Tokens alinhados à arte `atmosphere-bg.jpg` (amostra vertical):
+     * #189cf1 → #086fd6 → #01318c → #01021f
+     */
+    gradientStart: '#0F8CE8',
+    gradientEnd: '#01021F',
+    /** Azul estrutural (nav, foco) — mid da atmosfera */
+    primary: '#0351B9',
+    primaryLight: '#1BA7F3',
+    /** CTA / ações importantes — dourado envelhecido */
+    buttonPrimary: '#C4A35A',
+    buttonPrimaryShadow: 'rgba(196, 163, 90, 0.32)',
+    fabShadow: 'rgba(15, 140, 232, 0.2)',
+    /** Dourado envelhecido — apenas destaques */
+    accent: '#C4A35A',
+    accentSoft: '#E2D2A4',
+    /** Superfície de card sobre a base navy profunda */
+    surface: '#0A1528',
+    /** Borda estrutural azul-acinzentada */
+    surfaceBorder: 'rgba(27, 167, 243, 0.14)',
+    /** Branco levemente azulado */
+    textPrimary: '#E8EEF7',
+    /** Azul-acinzentado legível */
+    textSecondary: '#8AAFD0',
     iconVariants: {
-      a: '#C9A962',
-      b: '#E9D5FF',
-      c: '#A78BFA',
-      d: '#93C5FD',
+      a: '#C4A35A',
+      b: '#8BA3C4',
+      c: '#6B8DB8',
+      d: '#7EB0D4',
     },
   },
   tormenta: {
     name: 'Tormenta',
+    /** Base vermelho-carvão (mesma hierarquia: top → base) */
     gradientStart: '#3B0A0A',
-    gradientEnd: '#0A0505',
-    /** Vermelho estrutural — pill de nav, bordas, ícones ativos */
+    gradientEnd: '#100808',
+    /** Vermelho estrutural — nav e foco (grandes áreas usam a base, não o estrutural) */
     primary: '#B91C1C',
     primaryLight: '#EF4444',
-    /** CTA primário — vermelho quente/vibrante (salto sobre o card) */
+    /** CTA primário — vermelho de ação */
     buttonPrimary: '#E11D2E',
-    buttonPrimaryShadow: 'rgba(225, 29, 46, 0.35)',
-    /** Glow do FAB circular — mais contido que o CTA do card */
-    fabShadow: 'rgba(225, 29, 46, 0.18)',
-    /** Bronze/ferrugem no lugar do dourado */
+    buttonPrimaryShadow: 'rgba(225, 29, 46, 0.32)',
+    fabShadow: 'rgba(225, 29, 46, 0.16)',
+    /** Bronze — só destaques (equivalente ao dourado) */
     accent: '#C97A3D',
-    accentSoft: 'rgba(201, 122, 61, 0.15)',
-    surface: 'rgba(185, 28, 28, 0.08)',
-    surfaceBorder: 'rgba(201, 122, 61, 0.2)',
+    accentSoft: 'rgba(201, 122, 61, 0.18)',
+    surface: '#1A0C0C',
+    /** Borda estrutural quente discreta — sem bronze em toda borda */
+    surfaceBorder: 'rgba(232, 196, 180, 0.12)',
     textPrimary: '#F5E9E4',
-    /**
-     * Subtítulos/descrições sobre gradientEnd (#0A0505).
-     * Tormenta exige salto de luminosidade maior que o Grimório (vermelho escurece mais rápido).
-     */
-    textSecondary: '#F0D5C9',
-    /** Variações quentes + 1 contraste frio no ícone de combate/encontro */
+    textSecondary: '#D4B5A8',
     iconVariants: {
-      a: '#C97A3D', // bronze — Gerar nomes
-      b: '#B5502E', // cobre queimado — Gerar Itens
-      c: '#8C6239', // ferrugem/latão escuro — Notas Rápidas
-      d: '#8A9AA8', // cinza-ferro frio — Gerar Encontro (quebra temperatura)
+      a: '#C97A3D',
+      b: '#B5502E',
+      c: '#8C6239',
+      d: '#8A9AA8',
     },
   },
 } as const;

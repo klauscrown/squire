@@ -1,3 +1,4 @@
+export { ActiveCampaignCard, type ActiveCampaignCardProps } from './ActiveCampaignCard';
 export { CampaignActionsSheet } from './CampaignActionsSheet';
 export { CampaignCard } from './CampaignCard';
 export { CampaignEmptyState } from './CampaignEmptyState';

@@ -15,6 +15,7 @@ export function useUpdateLocationImage(campaignId: string, locationId: string) {
   const dataMode = useDataMode();
 
   return useMutation({
+    meta: { suppressGlobalError: true },
     mutationFn: async (): Promise<string> => {
       const picked = await pickImageFromLibrary();
       if (!picked) {
@@ -44,7 +45,9 @@ export function useUpdateLocationImage(campaignId: string, locationId: string) {
         prev ? { ...prev, imageUrl, updatedAt: new Date() } : prev,
       );
       void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.locations, campaignId] });
-      void queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.locations, 'detail', locationId] });
+      void queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.locations, 'detail', locationId],
+      });
       Toast.show({ type: 'success', text1: 'Imagem atualizada' });
     },
     onError: (error: Error) => {

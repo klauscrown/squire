@@ -49,8 +49,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: fontFamily.inter.semibold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
 });

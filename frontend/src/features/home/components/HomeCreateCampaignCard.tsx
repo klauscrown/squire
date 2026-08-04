@@ -3,20 +3,22 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Plus } from 'lucide-react-native';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { FilledCard, SectionHeader } from '@/components/ui';
+import { FilledCard } from '@/components/ui';
 import { GrimoireCardIllustration } from '@/components/illustrations/GrimoireCardIllustration';
 import { useComponents } from '@/hooks/useTheme';
 import { useActivePalette } from '@/store/useThemeStore';
-import { fontFamily } from '@/theme/typography';
+import { typeRoles } from '@/theme/typography';
 
 interface HomeCreateCampaignCardProps {
   onPress: () => void;
 }
 
+/** Empty state no slot do hero — única ênfase quando não há campanha. */
 export function HomeCreateCampaignCard({ onPress }: HomeCreateCampaignCardProps) {
   const palette = useActivePalette();
   const components = useComponents();
   const cta = components.cta;
+  const home = components.home;
 
   function handlePress() {
     if (Platform.OS !== 'web') {
@@ -26,9 +28,10 @@ export function HomeCreateCampaignCard({ onPress }: HomeCreateCampaignCardProps)
   }
 
   return (
-    <View style={{ marginTop: components.home.sectionGap }}>
-      <SectionHeader title="Campanhas" />
+    <View style={{ marginTop: home.heroMarginTop }}>
+      <Text style={[styles.sectionLabel, { color: palette.accent }]}>Campanha ativa</Text>
       <FilledCard
+        style={{ minHeight: home.heroHeight - 24 }}
         illustration={
           <GrimoireCardIllustration
             width={components.filledCard.illustration.defaultWidth}
@@ -36,10 +39,10 @@ export function HomeCreateCampaignCard({ onPress }: HomeCreateCampaignCardProps)
           />
         }
       >
-        <Text style={[styles.title, { color: palette.textPrimary }]}>
+        <Text style={[styles.title, { color: palette.textPrimary }]} numberOfLines={2}>
           Comece sua primeira crônica
         </Text>
-        <Text style={[styles.subtitle, { color: palette.textSecondary }]}>
+        <Text style={[styles.subtitle, { color: palette.textSecondary }]} numberOfLines={3}>
           Crie uma campanha e organize sessões, NPCs e notas em um só lugar.
         </Text>
         <View
@@ -51,7 +54,7 @@ export function HomeCreateCampaignCard({ onPress }: HomeCreateCampaignCardProps)
                 ios: {
                   shadowColor: palette.buttonPrimary,
                   shadowOffset: { width: 0, height: cta.shadow.offsetY },
-                  shadowOpacity: 0.4,
+                  shadowOpacity: 0.38,
                   shadowRadius: cta.shadow.radius + 2,
                 },
                 android: {
@@ -62,7 +65,6 @@ export function HomeCreateCampaignCard({ onPress }: HomeCreateCampaignCardProps)
             },
           ]}
         >
-          {/* Glow atrás do CTA — reforça hierarquia no card escuro */}
           <View
             pointerEvents="none"
             style={[
@@ -84,7 +86,7 @@ export function HomeCreateCampaignCard({ onPress }: HomeCreateCampaignCardProps)
             accessibilityLabel="Criar campanha"
           >
             <LinearGradient
-              colors={[palette.buttonPrimary, palette.primaryLight]}
+              colors={[...cta.gradient]}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
               style={{
@@ -96,8 +98,10 @@ export function HomeCreateCampaignCard({ onPress }: HomeCreateCampaignCardProps)
                 paddingHorizontal: cta.paddingHorizontal,
               }}
             >
-              <Plus size={18} color="#FFFFFF" strokeWidth={2.2} />
-              <Text style={[styles.ctaLabel, { fontSize: cta.label.fontSize }]}>
+              <Plus size={18} color={cta.foreground} strokeWidth={2.2} />
+              <Text
+                style={[styles.ctaLabel, { fontSize: cta.label.fontSize, color: cta.foreground }]}
+              >
                 Nova campanha
               </Text>
             </LinearGradient>
@@ -109,14 +113,17 @@ export function HomeCreateCampaignCard({ onPress }: HomeCreateCampaignCardProps)
 }
 
 const styles = StyleSheet.create({
+  sectionLabel: {
+    ...typeRoles.caption,
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 12,
+  },
   title: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 18,
+    ...typeRoles.title,
   },
   subtitle: {
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 14,
-    lineHeight: 21,
+    ...typeRoles.editorialSm,
   },
   ctaShadow: {
     marginTop: 8,
@@ -124,7 +131,6 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   ctaLabel: {
-    fontFamily: fontFamily.inter.semibold,
-    color: '#FFFFFF',
+    ...typeRoles.button,
   },
 });

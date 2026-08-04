@@ -7,8 +7,8 @@ import { useTheme } from '@/hooks/useTheme';
 
 const NAV_ITEMS = [
   { label: 'Início', href: ROUTES.app.home },
-  { label: 'Crônicas', href: ROUTES.app.campaigns },
-  { label: 'Mestre', href: ROUTES.app.profile },
+  { label: 'Campanhas', href: ROUTES.app.campaigns },
+  { label: 'Perfil', href: ROUTES.app.profile },
   { label: 'Ajustes', href: ROUTES.app.settings },
 ] as const;
 

@@ -1,5 +1,5 @@
 import { X } from 'phosphor-react-native';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -31,12 +31,14 @@ export function SquireMascotPopup({ visible, onClose }: SquireMascotPopupProps) 
   const insets = useSafeAreaInsets();
   const palette = useActivePalette();
   const grimoire = useGrimoire();
-  const [tipIndex, setTipIndex] = useState(randomTipIndex);
+  /** Nova dica a cada abertura (visível true) sem setState em effect. */
+  const tipIndex = useMemo(
+    () => (visible ? randomTipIndex() : 0),
+    // re-roll only when the popup opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
+    [visible],
+  );
   const bottom = CURVED_TAB_BAR_FOOTPRINT + Math.max(insets.bottom, 8) + 74;
-
-  useEffect(() => {
-    if (visible) setTipIndex(randomTipIndex());
-  }, [visible]);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>

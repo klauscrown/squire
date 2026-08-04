@@ -1,4 +1,5 @@
 import type { VisualPalette } from './palettes';
+import { hexToRgbChannel } from '../palettes';
 
 /**
  * Tokens visuais do grimório digital — gerados a partir da paleta ativa.
@@ -8,6 +9,13 @@ export function createGrimoire(palette: VisualPalette) {
   const c = palette.colors;
 
   return {
+    /** Fundo full-screen — AtmosphericBackground */
+    backgroundAtmosphericTop: palette.backgroundAtmosphericTop,
+    backgroundAtmosphericMiddle: palette.backgroundAtmosphericMiddle,
+    backgroundAtmosphericBottom: palette.backgroundAtmosphericBottom,
+    ambientPrimary: palette.ambientPrimary,
+    ambientSecondary: palette.ambientSecondary,
+
     atmosphere: {
       top: palette.atmosphere.top,
       upper: palette.atmosphere.upper,
@@ -21,7 +29,15 @@ export function createGrimoire(palette: VisualPalette) {
       homePurpleCore: palette.atmosphere.ambientPrimaryCore,
       homeGold: palette.atmosphere.ambientSecondary,
       homeGoldCore: palette.atmosphere.ambientSecondaryCore,
+      topWash: palette.atmosphere.topWash,
+      topWashCore: palette.atmosphere.topWashCore,
+      sideLeft: palette.atmosphere.sideLeft,
+      sideRight: palette.atmosphere.sideRight,
+      ambientPrimary: palette.ambientPrimary,
+      ambientSecondary: palette.ambientSecondary,
     },
+
+    starDust: { ...palette.starDust },
 
     colors: { ...c },
 
@@ -71,7 +87,7 @@ export function createGrimoire(palette: VisualPalette) {
 
     elevation: {
       hero: {
-        shadowColor: '#000',
+        shadowColor: palette.colors.background,
         shadowOpacity: 0.45,
         shadowRadius: 24,
         shadowOffset: { width: 0, height: 12 },
@@ -104,14 +120,14 @@ export function createGrimoire(palette: VisualPalette) {
       gold: soft.gold,
       muted: soft.muted,
       hintCard: {
-        backgroundColor: 'rgba(28, 25, 34, 0.85)',
+        backgroundColor: palette.colors.card,
         borderColor: soft.hintBorder,
-        borderRadius: 22,
+        borderRadius: 20,
       },
       heroCard: {
-        backgroundColor: 'rgba(28, 25, 34, 0.85)',
+        backgroundColor: palette.colors.card,
         borderColor: soft.heroBorder,
-        borderRadius: 24,
+        borderRadius: 22,
       },
       avatar: {
         borderColor: soft.avatarBorder,
@@ -123,15 +139,15 @@ export function createGrimoire(palette: VisualPalette) {
         borderRadius: 20,
       },
       statCard: {
-        backgroundColor: 'rgba(22, 20, 27, 0.75)',
-        borderColor: 'rgba(255, 255, 255, 0.08)',
+        backgroundColor: soft.background,
+        borderColor: palette.colors.cardBorder,
         borderRadius: 18,
       },
       shortcutCard: {
-        backgroundColor: 'rgba(24, 22, 30, 0.85)',
+        backgroundColor: soft.background,
         borderColor: soft.shortcutBorder,
-        borderRadius: 22,
-        minHeight: 130,
+        borderRadius: 18,
+        minHeight: 120,
         iconBackground: soft.shortcutIconBg,
       },
       syncPill: {
@@ -143,13 +159,13 @@ export function createGrimoire(palette: VisualPalette) {
         accentLine: soft.emptyCtaAccent,
       },
       settingsCard: {
-        backgroundColor: 'rgba(25, 23, 29, 0.8)',
-        borderColor: 'rgba(255, 255, 255, 0.08)',
-        borderRadius: 24,
+        backgroundColor: soft.background,
+        borderColor: palette.colors.cardBorder,
+        borderRadius: 22,
         padding: 18,
       },
       themeTrack: {
-        backgroundColor: 'rgba(15, 14, 19, 0.6)',
+        backgroundColor: `rgba(${hexToRgbChannel(palette.colors.background)}, 0.55)`,
         borderRadius: 30,
         padding: 4,
         selectedBackground: soft.avatarBg,
