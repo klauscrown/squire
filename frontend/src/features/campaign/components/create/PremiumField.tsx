@@ -1,8 +1,9 @@
 import { ChevronDown } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 
-import { premium } from '@/theme/premium';
-import { fontFamily } from '@/theme/typography';
+import { useComponents } from '@/hooks/useTheme';
+import { useActivePalette } from '@/store/useThemeStore';
+import { typeRoles } from '@/theme/typography';
 
 interface PremiumFieldProps extends TextInputProps {
   label: string;
@@ -20,17 +21,27 @@ export function PremiumField({
   multiline,
   ...props
 }: PremiumFieldProps) {
+  const palette = useActivePalette();
+  const surface = useComponents().surfaceCard;
+  const elevated = surface.variants.elevated;
+
   return (
     <View style={styles.wrap}>
-      <Text style={styles.label}>
+      <Text style={[styles.label, { color: palette.textSecondary }]}>
         {label}
         {required ? <Text style={styles.required}> *</Text> : null}
       </Text>
       <View style={styles.inputShell}>
         <TextInput
-          placeholderTextColor="rgba(148, 163, 184, 0.42)"
+          placeholderTextColor={`${palette.textSecondary}6B`}
           style={[
             styles.input,
+            {
+              backgroundColor: elevated.background,
+              borderColor: elevated.border,
+              borderWidth: surface.borderWidth,
+              color: palette.textPrimary,
+            },
             multiline && styles.inputMultiline,
             counter && styles.inputWithCounter,
             style,
@@ -38,7 +49,9 @@ export function PremiumField({
           multiline={multiline}
           {...props}
         />
-        {counter ? <Text style={styles.counter}>{counter}</Text> : null}
+        {counter ? (
+          <Text style={[styles.counter, { color: palette.textSecondary }]}>{counter}</Text>
+        ) : null}
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
@@ -62,17 +75,37 @@ export function PremiumSelect({
   error,
   onPress,
 }: PremiumSelectProps) {
+  const palette = useActivePalette();
+  const surface = useComponents().surfaceCard;
+  const elevated = surface.variants.elevated;
+
   return (
     <View style={styles.wrap}>
-      <Text style={styles.label}>
+      <Text style={[styles.label, { color: palette.textSecondary }]}>
         {label}
         {required ? <Text style={styles.required}> *</Text> : null}
       </Text>
-      <Pressable onPress={onPress} style={styles.select}>
-        <Text style={[styles.selectText, !value && styles.selectPlaceholder]} numberOfLines={1}>
+      <Pressable
+        onPress={onPress}
+        style={[
+          styles.select,
+          {
+            backgroundColor: elevated.background,
+            borderColor: elevated.border,
+            borderWidth: surface.borderWidth,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.selectText,
+            { color: value ? palette.textPrimary : `${palette.textSecondary}6B` },
+          ]}
+          numberOfLines={1}
+        >
           {value || placeholder}
         </Text>
-        <ChevronDown size={16} color="rgba(148, 163, 184, 0.55)" strokeWidth={2} />
+        <ChevronDown size={16} color={palette.textSecondary} strokeWidth={2} />
       </Pressable>
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
@@ -84,9 +117,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontFamily: fontFamily.inter.medium,
-    fontSize: 13,
-    color: 'rgba(203, 213, 225, 0.72)',
+    ...typeRoles.label,
   },
   required: {
     color: '#F87171',
@@ -95,40 +126,32 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   input: {
-    minHeight: 50,
+    minHeight: 44,
     borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    backgroundColor: 'rgba(15, 23, 42, 0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 14,
-    color: premium.text.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    ...typeRoles.body,
   },
   inputMultiline: {
-    minHeight: 112,
-    paddingTop: 13,
+    minHeight: 120,
+    paddingTop: 14,
     textAlignVertical: 'top',
   },
   inputWithCounter: {
-    paddingBottom: 28,
+    paddingBottom: 22,
+    minHeight: 48,
   },
   counter: {
     position: 'absolute',
-    right: 12,
-    bottom: 10,
-    fontFamily: fontFamily.inter.regular,
+    right: 10,
+    bottom: 6,
+    ...typeRoles.caption,
     fontSize: 11,
-    color: 'rgba(148, 163, 184, 0.45)',
   },
   select: {
-    minHeight: 50,
+    minHeight: 44,
     borderRadius: 12,
-    paddingHorizontal: 14,
-    backgroundColor: 'rgba(15, 23, 42, 0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
+    paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -136,16 +159,10 @@ const styles = StyleSheet.create({
   },
   selectText: {
     flex: 1,
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 14,
-    color: premium.text.primary,
-  },
-  selectPlaceholder: {
-    color: 'rgba(148, 163, 184, 0.42)',
+    ...typeRoles.body,
   },
   error: {
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 12,
+    ...typeRoles.caption,
     color: '#F87171',
   },
 });

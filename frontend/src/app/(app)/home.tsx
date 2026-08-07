@@ -11,6 +11,7 @@ import {
   HomeCreateCampaignCard,
   HomeHeader,
   HomeNextSessionSection,
+  HomePendingSection,
   QuickActionsGrid,
   resolveHomeFeaturedCampaign,
 } from '@/features/home';
@@ -20,13 +21,12 @@ import { motion } from '@/theme/motion';
 /**
  * Home — orquestra seções. UI e dados ficam em `features/home`.
  *
- * 1. Cabeçalho
- * 2. Campanha ativa
- * 3. Próxima sessão
- * 4. Atalhos rápidos
- *
- * Atmosfera/scroll/tab clearance: GrimoireScreen.
- * SurfaceCard, AtmosphericBackground: packages compartilhados (não duplicados).
+ * Hierarquia do painel de preparação do mestre:
+ * 1. Cabeçalho (onboarding | jornada)
+ * 2. Campanha ativa / empty de criar crônica
+ * 3. Pendências (se há campanha)
+ * 4. Próxima sessão (se há sessão real)
+ * 5. Atalhos (só com campanha)
  */
 export default function HomeScreen() {
   const router = useRouter();
@@ -35,6 +35,7 @@ export default function HomeScreen() {
   const home = useComponents().home;
 
   const featured = useMemo(() => resolveHomeFeaturedCampaign(campaigns), [campaigns]);
+  const headerMode = !isError && !isLoading && !featured ? 'onboarding' : 'journey';
 
   function openCreate() {
     router.push(ROUTES.app.campaignCreate);
@@ -62,7 +63,7 @@ export default function HomeScreen() {
         tabBarExtraPadding={home.tabBarExtraPad + home.bottomSpacer}
       >
         <GrimoireFadeIn delay={motion.home.header}>
-          <HomeHeader />
+          <HomeHeader mode={headerMode} />
         </GrimoireFadeIn>
 
         {isError ? (
@@ -86,12 +87,18 @@ export default function HomeScreen() {
         )}
 
         {featured ? (
+          <GrimoireFadeIn delay={motion.home.campaign + motion.staggerMs}>
+            <HomePendingSection campaign={featured} />
+          </GrimoireFadeIn>
+        ) : null}
+
+        {featured ? (
           <GrimoireFadeIn delay={motion.home.nextSession}>
             <HomeNextSessionSection campaign={featured} />
           </GrimoireFadeIn>
         ) : null}
 
-        <QuickActionsGrid campaignId={featured?.id} />
+        {featured ? <QuickActionsGrid campaignId={featured.id} /> : null}
       </GrimoireScreen>
     </View>
   );

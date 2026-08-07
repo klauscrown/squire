@@ -1,78 +1,121 @@
 import { Platform, type TextStyle } from 'react-native';
 
+import { typeRoles } from '@/theme/typography';
+
 import { loginFonts } from './loginFonts';
-import { loginTheme } from './loginTheme';
 
 const androidText: TextStyle = Platform.OS === 'android' ? { includeFontPadding: false } : {};
 
+/**
+ * Papéis tipográficos da auth — derivados de `typeRoles`.
+ * Cores vêm da paleta ativa nos componentes (como na Home).
+ */
 export const loginTypography = {
+  brand: {
+    ...androidText,
+    fontFamily: loginFonts.display,
+    fontSize: 34,
+    lineHeight: 40,
+    letterSpacing: 6,
+  },
+  brandTagline: {
+    ...androidText,
+    ...typeRoles.badge,
+    letterSpacing: 2.2,
+    textTransform: 'uppercase',
+  },
+  welcome: {
+    ...androidText,
+    ...typeRoles.title,
+    textAlign: 'center',
+  },
+  welcomeSupport: {
+    ...androidText,
+    ...typeRoles.editorialSm,
+    textAlign: 'center',
+  },
   title: {
     ...androidText,
-    color: loginTheme.text.title,
     fontFamily: loginFonts.display,
-    fontSize: 38,
-    lineHeight: Math.round(38 * 1.2),
+    fontSize: 34,
+    lineHeight: 40,
     letterSpacing: 0.2,
     textAlign: 'center',
   },
   heading: {
     ...androidText,
-    color: loginTheme.text.title,
-    fontFamily: loginFonts.display,
-    fontSize: 32,
-    lineHeight: Math.round(32 * 1.2),
-    letterSpacing: 0.2,
+    ...typeRoles.display,
     textAlign: 'center',
   },
   subtitle: {
     ...androidText,
-    color: loginTheme.text.subtitle,
-    fontFamily: loginFonts.body,
-    fontSize: 18,
-    lineHeight: Math.round(18 * 1.5),
-    letterSpacing: 0.2,
+    ...typeRoles.editorial,
     textAlign: 'center',
     opacity: 0.94,
     maxWidth: 300,
   },
   noticeLabel: {
     ...androidText,
-    color: loginTheme.gold,
-    fontFamily: loginFonts.label,
-    fontSize: 12,
-    letterSpacing: 0.2,
+    ...typeRoles.badge,
     textTransform: 'uppercase',
   },
   noticeBody: {
     ...androidText,
-    color: loginTheme.text.body,
-    fontFamily: loginFonts.body,
-    fontSize: 16,
-    lineHeight: Math.round(16 * 1.5),
-    letterSpacing: 0.2,
-    opacity: 0.96,
+    ...typeRoles.body,
+  },
+  field: {
+    ...androidText,
+    ...typeRoles.body,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  fieldError: {
+    ...androidText,
+    ...typeRoles.caption,
+    color: '#EF4444',
   },
   buttonLabel: {
     ...androidText,
-    color: '#FFFFFF',
-    fontFamily: loginFonts.button,
+    ...typeRoles.button,
     fontSize: 15,
-    letterSpacing: 0.3,
+    lineHeight: 20,
+    letterSpacing: 0.2,
   },
   link: {
     ...androidText,
-    color: loginTheme.gold,
-    fontFamily: loginFonts.accent,
-    fontSize: 16,
-    letterSpacing: 0.2,
-    opacity: 0.94,
+    ...typeRoles.label,
+  },
+  linkEmphasized: {
+    ...androidText,
+    ...typeRoles.buttonSm,
+  },
+  divider: {
+    ...androidText,
+    ...typeRoles.caption,
+  },
+  socialLabel: {
+    ...androidText,
+    ...typeRoles.label,
+  },
+  registerTitle: {
+    ...androidText,
+    ...typeRoles.label,
+    fontFamily: loginFonts.bodySemibold,
+    textAlign: 'center',
+  },
+  registerSubtitle: {
+    ...androidText,
+    ...typeRoles.caption,
+    textAlign: 'center',
+  },
+  explorer: {
+    ...androidText,
+    ...typeRoles.caption,
   },
   outlineButton: {
     ...androidText,
-    color: loginTheme.text.subtitle,
-    fontFamily: loginFonts.button,
-    fontSize: 14,
-    letterSpacing: 0.2,
+    ...typeRoles.buttonSm,
     textTransform: 'uppercase',
+    letterSpacing: 0.2,
   },
 } as const satisfies Record<string, TextStyle>;

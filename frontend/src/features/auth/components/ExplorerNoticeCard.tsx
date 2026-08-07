@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 
-import { GlassCard } from '@/components/grimoire';
-import { grimoire } from '@/theme/grimoire';
-import { fontFamily } from '@/theme/typography';
+import { SurfaceCard } from '@/components/ui/SurfaceCard';
+import { loginTypography } from '@/features/auth/constants/loginTypography';
+import { useActivePalette } from '@/store/useThemeStore';
 
 import { AuthText } from './AuthText';
 
@@ -11,35 +11,34 @@ interface ExplorerNoticeCardProps {
 }
 
 export function ExplorerNoticeCard({ isSupabaseMode }: ExplorerNoticeCardProps) {
+  const palette = useActivePalette();
+
   return (
-    <GlassCard gold style={styles.card}>
-      <AuthText style={styles.title}>{isSupabaseMode ? 'Modo Explorador' : 'Modo Local'}</AuthText>
-      <AuthText style={styles.body}>
-        {isSupabaseMode
-          ? 'Comece sem conta. Salve suas crônicas neste dispositivo e sincronize quando sentir que o reino cresceu.'
-          : 'Entre com e-mail para conta permanente, ou continue sem conta para explorar localmente.'}
-      </AuthText>
-    </GlassCard>
+    <SurfaceCard variant="subtle" radius="lg" padding="md" style={styles.card}>
+      <View>
+        <AuthText style={[styles.title, { color: palette.accent }]}>
+          {isSupabaseMode ? 'Modo Explorador' : 'Modo Local'}
+        </AuthText>
+        <AuthText style={[styles.body, { color: palette.textSecondary }]}>
+          {isSupabaseMode
+            ? 'Comece sem conta. Salve suas crônicas neste dispositivo e sincronize quando sentir que o reino cresceu.'
+            : 'Entre com e-mail para conta permanente, ou continue sem conta para explorar localmente.'}
+        </AuthText>
+      </View>
+    </SurfaceCard>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: grimoire.radius.xl,
     marginBottom: 24,
+    width: '100%',
   },
   title: {
-    fontFamily: fontFamily.inter.bold,
-    fontSize: 10,
-    letterSpacing: 2.5,
-    textTransform: 'uppercase',
-    color: grimoire.colors.gold,
+    ...loginTypography.noticeLabel,
     marginBottom: 6,
   },
   body: {
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 12,
-    lineHeight: 18,
-    color: `${grimoire.colors.ivory}BF`,
+    ...loginTypography.noticeBody,
   },
 });

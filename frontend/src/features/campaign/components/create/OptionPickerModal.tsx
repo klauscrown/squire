@@ -1,7 +1,8 @@
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { premium } from '@/theme/premium';
-import { fontFamily } from '@/theme/typography';
+import { useComponents } from '@/hooks/useTheme';
+import { useActivePalette } from '@/store/useThemeStore';
+import { typeRoles } from '@/theme/typography';
 
 interface OptionPickerModalProps {
   visible: boolean;
@@ -20,11 +21,27 @@ export function OptionPickerModal({
   onSelect,
   onClose,
 }: OptionPickerModalProps) {
+  const palette = useActivePalette();
+  const surface = useComponents().surfaceCard;
+  const elevated = surface.variants.elevated;
+  const radius = useComponents().radius;
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={(event) => event.stopPropagation()}>
-          <Text style={styles.title}>{title}</Text>
+        <Pressable
+          style={[
+            styles.sheet,
+            {
+              borderTopLeftRadius: radius.lg,
+              borderTopRightRadius: radius.lg,
+              backgroundColor: elevated.background,
+              borderColor: elevated.border,
+            },
+          ]}
+          onPress={(event) => event.stopPropagation()}
+        >
+          <Text style={[styles.title, { color: palette.textPrimary }]}>{title}</Text>
           <ScrollView style={styles.list} keyboardShouldPersistTaps="handled">
             {options.map((option) => {
               const isSelected = option === selected;
@@ -35,9 +52,25 @@ export function OptionPickerModal({
                     onSelect(option);
                     onClose();
                   }}
-                  style={[styles.option, isSelected && styles.optionSelected]}
+                  style={[
+                    styles.option,
+                    {
+                      borderRadius: radius.sm,
+                      backgroundColor: isSelected ? `${palette.accent}22` : 'transparent',
+                    },
+                  ]}
                 >
-                  <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+                  <Text
+                    style={[
+                      styles.optionLabel,
+                      {
+                        color: isSelected ? palette.accent : palette.textSecondary,
+                        fontFamily: isSelected
+                          ? typeRoles.label.fontFamily
+                          : typeRoles.body.fontFamily,
+                      },
+                    ]}
+                  >
                     {option}
                   </Text>
                 </Pressable>
@@ -58,18 +91,12 @@ const styles = StyleSheet.create({
   },
   sheet: {
     maxHeight: '58%',
-    borderTopLeftRadius: premium.radius.lg,
-    borderTopRightRadius: premium.radius.lg,
-    backgroundColor: '#111827',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: premium.glass.border,
     paddingTop: 18,
     paddingBottom: 24,
   },
   title: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 16,
-    color: premium.text.primary,
+    ...typeRoles.titleSm,
     paddingHorizontal: 20,
     marginBottom: 8,
   },
@@ -79,18 +106,9 @@ const styles = StyleSheet.create({
   option: {
     paddingVertical: 14,
     paddingHorizontal: 12,
-    borderRadius: premium.radius.sm,
-  },
-  optionSelected: {
-    backgroundColor: 'rgba(99, 102, 241, 0.16)',
   },
   optionLabel: {
-    fontFamily: fontFamily.inter.regular,
+    ...typeRoles.body,
     fontSize: 15,
-    color: premium.text.secondary,
-  },
-  optionLabelSelected: {
-    color: premium.accentSoft,
-    fontFamily: fontFamily.inter.medium,
   },
 });

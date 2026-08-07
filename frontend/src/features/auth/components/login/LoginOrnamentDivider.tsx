@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 
-import { loginFonts } from '@/features/auth/constants/loginFonts';
 import { loginLayout } from '@/features/auth/constants/loginLayout';
-import { loginTheme } from '@/features/auth/constants/loginTheme';
+import { loginTypography } from '@/features/auth/constants/loginTypography';
+import { useOpacity } from '@/hooks/useTheme';
+import { useActivePalette } from '@/store/useThemeStore';
 
 import { AuthText } from '../AuthText';
 
@@ -11,11 +12,14 @@ interface LoginOrnamentDividerProps {
 }
 
 export function LoginOrnamentDivider({ label }: LoginOrnamentDividerProps) {
+  const palette = useActivePalette();
+  const opacity = useOpacity();
+
   return (
     <View style={styles.row}>
-      <View style={styles.line} />
-      <AuthText style={styles.label}>{label}</AuthText>
-      <View style={styles.line} />
+      <View style={[styles.line, { backgroundColor: opacity.border.lilacSubtle }]} />
+      <AuthText style={[styles.label, { color: palette.textSecondary }]}>{label}</AuthText>
+      <View style={[styles.line, { backgroundColor: opacity.border.lilacSubtle }]} />
     </View>
   );
 }
@@ -30,12 +34,8 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   label: {
-    fontFamily: loginFonts.body,
-    fontSize: loginLayout.divider.fontSize,
-    letterSpacing: 0.2,
-    color: loginTheme.text.subtitle,
+    ...loginTypography.divider,
   },
 });

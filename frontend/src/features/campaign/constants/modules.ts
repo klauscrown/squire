@@ -203,6 +203,22 @@ export const MODULE_DISPLAY_ORDER: ModuleKey[] = [
   'bestiary',
 ];
 
+/** Mesa do Mestre — 2×2 principais da tela de detalhe. */
+export const MASTER_TABLE_MODULES: readonly ModuleKey[] = [
+  'sessions',
+  'npcs',
+  'locations',
+  'notes',
+];
+
+/** Mais do Universo — atalhos compactos (vários em breve). */
+export const UNIVERSE_MODULES: readonly ModuleKey[] = [
+  'quests',
+  'items',
+  'factions',
+  'bestiary',
+];
+
 export function getModuleByKey(key: ModuleKey): CampaignModuleDefinition {
   const mod = MODULES.find((m) => m.key === key);
   if (!mod) throw new Error(`Módulo não encontrado: ${key}`);
@@ -216,13 +232,21 @@ export function getModuleTileLabel(
   if (!mod.enabled) return 'Em breve';
   switch (mod.key) {
     case 'sessions':
-      return stats.sessions > 0 ? `${stats.sessions} registradas` : 'Explorar';
+      return stats.sessions > 0
+        ? `${stats.sessions} ${stats.sessions === 1 ? 'registrada' : 'registradas'}`
+        : 'Nenhuma ainda';
     case 'npcs':
-      return stats.npcs > 0 ? `${stats.npcs} cadastrados` : 'Explorar';
+      return stats.npcs > 0
+        ? `${stats.npcs} ${stats.npcs === 1 ? 'personagem' : 'personagens'}`
+        : 'Nenhum ainda';
     case 'notes':
-      return stats.notes > 0 ? `${stats.notes} documentos` : 'Explorar';
+      return stats.notes > 0
+        ? `${stats.notes} ${stats.notes === 1 ? 'pendente' : 'pendentes'}`
+        : 'Nenhuma ainda';
     case 'locations':
-      return stats.locations > 0 ? `${stats.locations} cadastrados` : 'Explorar';
+      return stats.locations > 0
+        ? `${stats.locations} ${stats.locations === 1 ? 'descoberto' : 'descobertos'}`
+        : 'Nenhum ainda';
     default:
       return 'Explorar';
   }

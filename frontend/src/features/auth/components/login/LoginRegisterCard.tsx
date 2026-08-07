@@ -2,57 +2,58 @@ import { ChevronRight } from 'lucide-react-native';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { SurfaceCard } from '@/components/ui/SurfaceCard';
 import { ROUTES } from '@/constants';
-import { loginFonts } from '@/features/auth/constants/loginFonts';
 import { loginLayout } from '@/features/auth/constants/loginLayout';
-import { loginTheme } from '@/features/auth/constants/loginTheme';
+import { loginTypography } from '@/features/auth/constants/loginTypography';
+import { useActivePalette } from '@/store/useThemeStore';
 
 import { AuthText } from '../AuthText';
 
 export function LoginRegisterCard() {
-  return (
-    <View style={styles.wrap}>
-      <AuthText style={styles.title}>Seu mundo ainda não existe?</AuthText>
-      <AuthText style={styles.subtitle}>
-        Crie sua conta e comece sua primeira aventura.
-      </AuthText>
+  const palette = useActivePalette();
 
-      <Link href={ROUTES.auth.register} asChild>
-        <Pressable style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}>
-          <View style={styles.ctaRow}>
-            <AuthText style={styles.ctaText}>Criar conta</AuthText>
-            <ChevronRight size={14} color={loginTheme.link} strokeWidth={2.2} />
-          </View>
-        </Pressable>
-      </Link>
-    </View>
+  return (
+    <SurfaceCard variant="elevated" radius="md" padding="lg" style={styles.card} shadow>
+      <View style={styles.wrap}>
+        <AuthText style={[styles.title, { color: palette.textPrimary }]}>
+          Seu mundo ainda não existe?
+        </AuthText>
+        <AuthText style={[styles.subtitle, { color: palette.textSecondary }]}>
+          Crie sua conta e comece sua primeira aventura.
+        </AuthText>
+
+        <Link href={ROUTES.auth.register} asChild>
+          <Pressable style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}>
+            <View style={styles.ctaRow}>
+              <AuthText style={[styles.ctaText, { color: palette.accent }]}>Criar conta</AuthText>
+              <ChevronRight size={14} color={palette.accent} strokeWidth={2.2} />
+            </View>
+          </Pressable>
+        </Link>
+      </View>
+    </SurfaceCard>
   );
 }
 
 const styles = StyleSheet.create({
+  card: {
+    marginTop: loginLayout.register.marginTop,
+    width: '100%',
+  },
   wrap: {
     alignItems: 'center',
     gap: loginLayout.register.gap,
-    marginTop: loginLayout.register.marginTop,
-    paddingHorizontal: 8,
   },
   title: {
-    fontFamily: loginFonts.bodySemibold,
-    fontSize: loginLayout.register.titleSize,
-    lineHeight: 18,
-    color: loginTheme.text.title,
-    textAlign: 'center',
+    ...loginTypography.registerTitle,
   },
   subtitle: {
-    fontFamily: loginFonts.body,
-    fontSize: loginLayout.register.subtitleSize,
-    lineHeight: 17,
-    color: loginTheme.text.subtitle,
-    textAlign: 'center',
+    ...loginTypography.registerSubtitle,
     maxWidth: loginLayout.register.maxSubtitleWidth,
   },
   cta: {
-    marginTop: 2,
+    marginTop: 4,
     paddingVertical: 6,
     paddingHorizontal: 8,
   },
@@ -66,9 +67,6 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   ctaText: {
-    fontFamily: loginFonts.bodyMedium,
-    fontSize: loginLayout.register.ctaSize,
-    lineHeight: 18,
-    color: loginTheme.link,
+    ...loginTypography.linkEmphasized,
   },
 });

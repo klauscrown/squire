@@ -12,3 +12,5 @@ export {
   preparationStatusLabel,
   resolveNextSession,
 } from './utils/nextSession';
+export { resolveSquireContext } from './utils/squireContext';
+export type { SquireContextContent, SquireContextKind } from './utils/squireContext';

@@ -1,16 +1,18 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { GrimoireFadeIn, GrimoireScreen, SquireHint } from '@/components/grimoire';
+import { GrimoireScreen } from '@/components/grimoire';
 import {
-  CampaignActions,
-  CampaignHero,
-  CampaignModules,
+  CampaignDetailNav,
+  CampaignModulesSections,
+  CampaignOverviewCard,
+  CampaignPrepareSessionCard,
 } from '@/features/campaign/components/detail';
 import { useCampaignOverview, useDeleteCampaign, useGetCampaign } from '@/features/campaign/hooks';
 import { useGrimoire } from '@/hooks/useTheme';
 import { fontFamily } from '@/theme/typography';
 
+/** Ficha da campanha. */
 export default function CampaignDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -20,10 +22,11 @@ export default function CampaignDetailScreen() {
   const { data: campaign, isLoading } = useGetCampaign(campaignId);
   const {
     stats,
-    lastSessionRelative,
+    nextSession,
+    chronicleProgress,
     isLoading: isOverviewLoading,
   } = useCampaignOverview(campaignId);
-  const { mutate: deleteCampaign, isPending: isDeleting } = useDeleteCampaign();
+  const { mutate: deleteCampaign } = useDeleteCampaign();
 
   function handleDelete() {
     if (!campaign) return;
@@ -41,9 +44,24 @@ export default function CampaignDetailScreen() {
     );
   }
 
+  function handleMore() {
+    Alert.alert(campaign?.title ?? 'Campanha', undefined, [
+      { text: 'Excluir campanha', style: 'destructive', onPress: handleDelete },
+      { text: 'Cancelar', style: 'cancel' },
+    ]);
+  }
+
+  function handlePrepare() {
+    if (nextSession) {
+      router.push(`/(app)/campaigns/${campaignId}/sessions/${nextSession.id}` as never);
+      return;
+    }
+    router.push(`/(app)/campaigns/${campaignId}/sessions` as never);
+  }
+
   if (isLoading || isOverviewLoading) {
     return (
-      <GrimoireScreen scrollable={false} glow="purple-right" contentStyle={styles.centered}>
+      <GrimoireScreen scrollable={false} glow="none" contentStyle={styles.centered}>
         <ActivityIndicator size="large" color={grimoire.colors.gold} />
       </GrimoireScreen>
     );
@@ -51,7 +69,7 @@ export default function CampaignDetailScreen() {
 
   if (!campaign) {
     return (
-      <GrimoireScreen scrollable={false} glow="purple-right" contentStyle={styles.centered}>
+      <GrimoireScreen scrollable={false} glow="none" contentStyle={styles.centered}>
         <Text style={[styles.notFound, { color: grimoire.colors.ivory }]}>
           Campanha não encontrada
         </Text>
@@ -72,35 +90,17 @@ export default function CampaignDetailScreen() {
   }
 
   return (
-    <GrimoireScreen glow="purple-right" contentStyle={styles.screenContent}>
-      <GrimoireFadeIn delay={0}>
-        <CampaignHero campaign={campaign} lastSessionRelative={lastSessionRelative} />
-      </GrimoireFadeIn>
-
-      <GrimoireFadeIn delay={80}>
-        <View style={styles.hintWrap}>
-          <SquireHint
-            label="O Escudeiro sussurra"
-            message={
-              stats.npcs > 0
-                ? `${stats.npcs} habitantes do reino aguardam. Que tal apresentar um novo aliado à party?`
-                : 'Comece registrando NPCs e anotações para dar vida ao seu mundo.'
-            }
-          />
-        </View>
-      </GrimoireFadeIn>
-
-      <GrimoireFadeIn delay={120}>
-        <CampaignModules
-          campaignId={campaign.id}
+    <GrimoireScreen glow="none" contentStyle={styles.screenContent} tabBarExtraPadding={16}>
+      <View>
+        <CampaignDetailNav onMore={handleMore} />
+        <CampaignOverviewCard campaign={campaign} stats={stats} progress={chronicleProgress} />
+        <CampaignPrepareSessionCard
+          nextSession={nextSession}
           stats={stats}
-          lastSessionRelative={lastSessionRelative}
+          onPrepare={handlePrepare}
         />
-      </GrimoireFadeIn>
-
-      <GrimoireFadeIn delay={180}>
-        <CampaignActions onDelete={handleDelete} loading={isDeleting} />
-      </GrimoireFadeIn>
+        <CampaignModulesSections campaignId={campaign.id} stats={stats} />
+      </View>
     </GrimoireScreen>
   );
 }
@@ -130,9 +130,5 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: fontFamily.inter.medium,
     fontSize: 14,
-  },
-  hintWrap: {
-    paddingHorizontal: 24,
-    marginTop: 20,
   },
 });

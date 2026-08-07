@@ -10,9 +10,9 @@ export const motion = {
   },
   /** Pressed — escala leve, duração no intervalo 180–320ms */
   press: {
-    scale: 0.98,
-    durationInMs: 180,
-    durationOutMs: 200,
+    scale: 0.96,
+    durationInMs: 140,
+    durationOutMs: 180,
   },
   /** Atraso entre cards secundários na mesma seção */
   staggerMs: 48,

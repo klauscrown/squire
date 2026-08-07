@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 
 import { AppLogo } from '@/components/ui/AppLogo';
-import { grimoire } from '@/theme/grimoire';
-import { fontFamily } from '@/theme/typography';
+import { loginTypography } from '@/features/auth/constants/loginTypography';
+import { useComponents } from '@/hooks/useTheme';
+import { useActivePalette } from '@/store/useThemeStore';
 
 import { AuthText } from './AuthText';
 
@@ -19,15 +20,32 @@ export function LoginHero({
   title = 'Seu mundo aguarda.',
   subtitle = 'O Escudeiro preparou os pergaminhos. O destino do reino está em suas mãos.',
 }: LoginHeroProps) {
+  const palette = useActivePalette();
+  const surface = useComponents().surfaceCard;
+  const elevated = surface.variants.elevated;
+
   return (
     <View style={[styles.wrap, compact && styles.wrapCompact]}>
-      <View style={styles.logoFrame}>
+      <View
+        style={[
+          styles.logoFrame,
+          {
+            borderColor: elevated.border,
+            backgroundColor: elevated.background,
+            borderWidth: surface.borderWidth,
+          },
+        ]}
+      >
         <AppLogo size="lg" style={styles.logo} imageStyle={styles.logoImage} />
       </View>
 
-      <AuthText style={styles.eyebrow}>{eyebrow}</AuthText>
-      <AuthText style={styles.title}>{title}</AuthText>
-      <AuthText style={[styles.subtitle, compact && styles.subtitleCompact]}>{subtitle}</AuthText>
+      <AuthText style={[styles.eyebrow, { color: palette.accent }]}>{eyebrow}</AuthText>
+      <AuthText style={[styles.title, { color: palette.textPrimary }]}>{title}</AuthText>
+      <AuthText
+        style={[styles.subtitle, compact && styles.subtitleCompact, { color: palette.textSecondary }]}
+      >
+        {subtitle}
+      </AuthText>
     </View>
   );
 }
@@ -43,13 +61,7 @@ const styles = StyleSheet.create({
   logoFrame: {
     marginBottom: 20,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: grimoire.colors.glassGoldBorder,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    shadowColor: grimoire.colors.gold,
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 0 },
+    overflow: 'hidden',
   },
   logo: {
     borderRadius: 18,
@@ -59,27 +71,15 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   eyebrow: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 10,
-    letterSpacing: 4,
-    textTransform: 'uppercase',
-    color: grimoire.colors.goldMuted,
+    ...loginTypography.brandTagline,
     marginBottom: 12,
   },
   title: {
-    fontFamily: fontFamily.cormorant.medium,
-    fontSize: 42,
-    lineHeight: 44,
-    color: grimoire.colors.ivory,
-    textAlign: 'center',
+    ...loginTypography.heading,
     marginBottom: 12,
   },
   subtitle: {
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 14,
-    lineHeight: 22,
-    color: `${grimoire.colors.ivory}99`,
-    textAlign: 'center',
+    ...loginTypography.welcomeSupport,
     maxWidth: 320,
   },
   subtitleCompact: {

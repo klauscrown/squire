@@ -8,7 +8,6 @@ import {
   ImagePlus,
   Paperclip,
   Plus,
-  SlidersHorizontal,
   Sparkles,
   Trash2,
   Users,
@@ -28,16 +27,17 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { grimoireImages } from '@/assets/grimoire';
 import { GrimoireAtmosphereShell } from '@/components/grimoire/GrimoireAtmosphere';
 import { useCreateCampaign } from '@/features/campaign/hooks';
 import { createCampaignSchema, type CreateCampaignInput } from '@/features/campaign/types';
+import { useComponents, useGrimoire, useOpacity } from '@/hooks/useTheme';
 import { pickImageFromLibrary } from '@/services/media/pickImage';
-import { grimoire } from '@/theme/grimoire';
-import { premium } from '@/theme/premium';
-import { fontFamily } from '@/theme/typography';
+import { useActivePalette } from '@/store/useThemeStore';
+import { MIN_TOUCH_TARGET } from '@/theme/accessibility';
+import { typeRoles } from '@/theme/typography';
 
 import {
   CREATE_STEPS,
@@ -66,10 +66,26 @@ function CharacterRow({
   onRemove: (id: string) => void;
   onAttach: (id: string) => void;
 }) {
+  const palette = useActivePalette();
+  const surface = useComponents().surfaceCard;
+  const elevated = surface.variants.elevated;
+  const interactive = surface.variants.interactive;
+
   return (
-    <View style={styles.characterCard}>
+    <View
+      style={[
+        styles.characterCard,
+        {
+          backgroundColor: elevated.background,
+          borderColor: elevated.border,
+          borderWidth: surface.borderWidth,
+        },
+      ]}
+    >
       <View style={styles.characterHeader}>
-        <Text style={styles.characterIndex}>Personagem {index + 1}</Text>
+        <Text style={[styles.characterIndex, { color: palette.textSecondary }]}>
+          Personagem {index + 1}
+        </Text>
         {canRemove ? (
           <Pressable
             onPress={() => onRemove(character.id)}
@@ -84,42 +100,69 @@ function CharacterRow({
 
       <View style={styles.characterFields}>
         <View style={styles.characterField}>
-          <Text style={styles.characterLabel}>Nome (opcional)</Text>
+          <Text style={[styles.characterLabel, { color: palette.textSecondary }]}>
+            Nome (opcional)
+          </Text>
           <TextInput
             value={character.name}
             onChangeText={(text) => onChange(character.id, { name: text })}
             placeholder="Ex: Aelindra"
-            placeholderTextColor="rgba(148, 163, 184, 0.42)"
-            style={styles.characterInput}
+            placeholderTextColor={`${palette.textSecondary}6B`}
+            style={[
+              styles.characterInput,
+              {
+                backgroundColor: interactive.background,
+                borderColor: elevated.border,
+                borderWidth: surface.borderWidth,
+                color: palette.textPrimary,
+              },
+            ]}
           />
         </View>
 
         <View style={styles.characterField}>
-          <Text style={styles.characterLabel}>Classe (opcional)</Text>
+          <Text style={[styles.characterLabel, { color: palette.textSecondary }]}>
+            Classe (opcional)
+          </Text>
           <TextInput
             value={character.className}
             onChangeText={(text) => onChange(character.id, { className: text })}
             placeholder="Ex: Ladina"
-            placeholderTextColor="rgba(148, 163, 184, 0.42)"
-            style={styles.characterInput}
+            placeholderTextColor={`${palette.textSecondary}6B`}
+            style={[
+              styles.characterInput,
+              {
+                backgroundColor: interactive.background,
+                borderColor: elevated.border,
+                borderWidth: surface.borderWidth,
+                color: palette.textPrimary,
+              },
+            ]}
           />
         </View>
 
         <Pressable
           onPress={() => onAttach(character.id)}
-          style={[styles.attachBtn, character.attachmentUri && styles.attachBtnActive]}
+          style={[
+            styles.attachBtn,
+            {
+              backgroundColor: interactive.background,
+              borderColor: character.attachmentUri ? palette.accent : elevated.border,
+              borderWidth: surface.borderWidth,
+            },
+          ]}
           accessibilityLabel="Anexar arquivo"
         >
           <Paperclip
             size={18}
-            color={character.attachmentUri ? premium.accentSoft : 'rgba(148, 163, 184, 0.72)'}
+            color={character.attachmentUri ? palette.accent : palette.textSecondary}
             strokeWidth={1.75}
           />
         </Pressable>
       </View>
 
       {character.attachmentUri ? (
-        <Text style={styles.attachHint} numberOfLines={1}>
+        <Text style={[styles.attachHint, { color: palette.accent }]} numberOfLines={1}>
           Anexo adicionado
         </Text>
       ) : null}
@@ -129,6 +172,20 @@ function CharacterRow({
 
 export function CreateCampaignScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const palette = useActivePalette();
+  const grimoire = useGrimoire();
+  const opacity = useOpacity();
+  const components = useComponents();
+  const surface = components.surfaceCard;
+  const elevated = surface.variants.elevated;
+  const cta = components.cta;
+  const secondary = grimoire.colors.ivoryDim;
+
+  const footerPadBottom = Math.max(insets.bottom, 10);
+  /** Barra do botão ~48 + padding top/bottom — sem “tab strip” cheia de fundo opaco */
+  const footerHeight = 10 + (MIN_TOUCH_TARGET + 4) + footerPadBottom;
+
   const { mutate: createCampaign, isPending } = useCreateCampaign();
   const [step, setStep] = useState(0);
   const [coverUri, setCoverUri] = useState<string | null>(null);
@@ -162,8 +219,6 @@ export function CreateCampaignScreen() {
   const filledCharacters = characters.filter(
     (character) => character.name.trim() || character.className.trim(),
   );
-
-  const progress = ((step + 1) / CREATE_STEPS.length) * 100;
 
   function updateCharacter(id: string, patch: Partial<CharacterDraft>) {
     setCharacters((current) =>
@@ -249,7 +304,7 @@ export function CreateCampaignScreen() {
   function renderStepper() {
     return (
       <View style={styles.stepperWrap}>
-        <View style={styles.stepperTrack} />
+        <View style={[styles.stepperTrack, { backgroundColor: opacity.card.subtle }]} />
         <View style={styles.stepperRow}>
           {CREATE_STEPS.map((item, index) => {
             const isActive = index === step;
@@ -259,12 +314,25 @@ export function CreateCampaignScreen() {
                 <View
                   style={[
                     styles.stepCircle,
-                    isActive && styles.stepCircleActive,
-                    isDone && styles.stepCircleDone,
+                    {
+                      backgroundColor: isActive
+                        ? palette.accent
+                        : isDone
+                          ? `${palette.accent}3D`
+                          : elevated.background,
+                      borderColor: isActive || isDone ? palette.accent : elevated.border,
+                      borderWidth: surface.borderWidth,
+                    },
                   ]}
                 >
                   <Text
-                    style={[styles.stepNumber, (isActive || isDone) && styles.stepNumberActive]}
+                    style={[
+                      styles.stepNumber,
+                      {
+                        color:
+                          isActive || isDone ? cta.foreground : secondary,
+                      },
+                    ]}
                   >
                     {index + 1}
                   </Text>
@@ -272,8 +340,16 @@ export function CreateCampaignScreen() {
                 <Text
                   style={[
                     styles.stepLabel,
-                    isActive && styles.stepLabelActive,
-                    isDone && styles.stepLabelDone,
+                    {
+                      color: isActive
+                        ? palette.accent
+                        : isDone
+                          ? palette.accentSoft
+                          : secondary,
+                      fontFamily: isActive
+                        ? typeRoles.label.fontFamily
+                        : typeRoles.caption.fontFamily,
+                    },
                   ]}
                   numberOfLines={1}
                 >
@@ -290,16 +366,23 @@ export function CreateCampaignScreen() {
   function renderHero() {
     return (
       <View style={styles.hero}>
-        <View style={styles.heroIcon}>
-          <Wand2 size={24} color="#E2E8F0" strokeWidth={1.6} />
+        <View
+          style={[
+            styles.heroIcon,
+            {
+              backgroundColor: opacity.card.subtle,
+              borderColor: elevated.border,
+              borderWidth: surface.borderWidth,
+            },
+          ]}
+        >
+          <Wand2 size={16} color={palette.accent} strokeWidth={1.7} />
         </View>
         <View style={styles.heroCopy}>
-          <Text style={styles.heroTitle}>
-            Crie uma{'\n'}
-            <Text style={styles.heroAccent}>nova campanha</Text>
-            <Text style={styles.heroSpark}> ✨</Text>
+          <Text style={[styles.heroTitle, { color: palette.accent }]} maxFontSizeMultiplier={1.2}>
+            Crie uma nova campanha
           </Text>
-          <Text style={styles.heroSubtitle}>
+          <Text style={[styles.heroSubtitle, { color: secondary }]} maxFontSizeMultiplier={1.25}>
             Dê vida ao seu mundo e guarde todas as memórias da sua história.
           </Text>
         </View>
@@ -311,35 +394,53 @@ export function CreateCampaignScreen() {
     return (
       <>
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionHeading}>Imagem da campanha (opcional)</Text>
-          <Pressable onPress={handlePickImage} style={styles.imageCard}>
+          <Text style={[styles.sectionHeading, { color: palette.textPrimary }]}>
+            Imagem da campanha (opcional)
+          </Text>
+          <Pressable
+            onPress={handlePickImage}
+            style={[
+              styles.imageCard,
+              {
+                borderColor: elevated.border,
+                borderWidth: surface.borderWidth,
+                borderRadius: components.radius.md,
+              },
+            ]}
+          >
             <ImageBackground
               source={coverUri ? { uri: coverUri } : grimoireImages.campaignEldoria}
               style={styles.imageBackground}
-              imageStyle={styles.imageBackgroundInner}
+              imageStyle={{ borderRadius: components.radius.md - 1 }}
             >
               <LinearGradient
-                colors={['rgba(11, 17, 32, 0.15)', 'rgba(11, 17, 32, 0.72)']}
+                colors={['rgba(11, 17, 32, 0.18)', 'rgba(2, 8, 24, 0.78)']}
                 style={styles.imageOverlay}
               >
-                <View style={styles.imageAction}>
-                  <ImagePlus size={20} color="#F8FAFC" strokeWidth={1.75} />
+                <View
+                  style={[
+                    styles.imageAction,
+                    {
+                      backgroundColor: opacity.card.medium,
+                      borderColor: elevated.border,
+                      borderWidth: surface.borderWidth,
+                    },
+                  ]}
+                >
+                  <ImagePlus size={18} color={palette.textPrimary} strokeWidth={1.75} />
                 </View>
-                <Text style={styles.imageTitle}>Adicionar imagem</Text>
-                <Text style={styles.imageHint}>PNG, JPG ou WEBP • Máx. 5MB</Text>
+                <Text style={[styles.imageTitle, { color: palette.textPrimary }]}>
+                  Adicionar imagem
+                </Text>
+                <Text style={[styles.imageHint, { color: secondary }]}>
+                  PNG, JPG ou WEBP • Máx. 5MB
+                </Text>
               </LinearGradient>
             </ImageBackground>
           </Pressable>
         </View>
 
         <View style={styles.sectionBlock}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionIcon}>
-              <SlidersHorizontal size={15} color={premium.accentSoft} strokeWidth={2} />
-            </View>
-            <Text style={styles.sectionTitle}>Informações básicas</Text>
-          </View>
-
           <Controller
             control={control}
             name="title"
@@ -411,12 +512,21 @@ export function CreateCampaignScreen() {
       return (
         <View style={styles.sectionBlock}>
           <View style={styles.sectionHeader}>
-            <View style={styles.sectionIcon}>
-              <Users size={15} color={premium.accentSoft} strokeWidth={2} />
+            <View
+              style={[
+                styles.sectionIcon,
+                {
+                  backgroundColor: `${palette.accent}1F`,
+                  borderColor: elevated.border,
+                  borderWidth: StyleSheet.hairlineWidth,
+                },
+              ]}
+            >
+              <Users size={15} color={palette.accent} strokeWidth={2} />
             </View>
-            <Text style={styles.sectionTitle}>Personagens</Text>
+            <Text style={[styles.sectionTitle, { color: palette.textPrimary }]}>Personagens</Text>
           </View>
-          <Text style={styles.sectionHint}>
+          <Text style={[styles.sectionHint, { color: secondary }]}>
             Adicione os heróis da campanha de forma opcional. Você pode incluir nome, classe e um
             anexo para cada um.
           </Text>
@@ -433,9 +543,21 @@ export function CreateCampaignScreen() {
             />
           ))}
 
-          <Pressable onPress={addCharacter} style={styles.addCharacterBtn}>
-            <Plus size={16} color={premium.accentSoft} strokeWidth={2} />
-            <Text style={styles.addCharacterLabel}>Adicionar personagem</Text>
+          <Pressable
+            onPress={addCharacter}
+            style={[
+              styles.addCharacterBtn,
+              {
+                borderColor: elevated.border,
+                borderWidth: surface.borderWidth,
+                backgroundColor: `${palette.accent}14`,
+              },
+            ]}
+          >
+            <Plus size={16} color={palette.accent} strokeWidth={2} />
+            <Text style={[styles.addCharacterLabel, { color: palette.accent }]}>
+              Adicionar personagem
+            </Text>
           </Pressable>
         </View>
       );
@@ -445,22 +567,47 @@ export function CreateCampaignScreen() {
       return (
         <View style={styles.sectionBlock}>
           <View style={styles.sectionHeader}>
-            <View style={styles.sectionIcon}>
-              <Sparkles size={15} color={premium.accentSoft} strokeWidth={2} />
+            <View
+              style={[
+                styles.sectionIcon,
+                {
+                  backgroundColor: `${palette.accent}1F`,
+                  borderColor: elevated.border,
+                  borderWidth: StyleSheet.hairlineWidth,
+                },
+              ]}
+            >
+              <Sparkles size={15} color={palette.accent} strokeWidth={2} />
             </View>
-            <Text style={styles.sectionTitle}>Revisão final</Text>
+            <Text style={[styles.sectionTitle, { color: palette.textPrimary }]}>Revisão final</Text>
           </View>
-          <View style={styles.reviewCard}>
-            <Text style={styles.reviewLabel}>Campanha</Text>
-            <Text style={styles.reviewValue}>{title}</Text>
-            <Text style={styles.reviewLabel}>Sistema</Text>
-            <Text style={styles.reviewValue}>{system || '—'}</Text>
-            <Text style={styles.reviewLabel}>Nível inicial</Text>
-            <Text style={styles.reviewValue}>{initialLevel || '—'}</Text>
-            <Text style={styles.reviewLabel}>Personagens</Text>
+          <View
+            style={[
+              styles.reviewCard,
+              {
+                backgroundColor: elevated.background,
+                borderColor: elevated.border,
+                borderWidth: surface.borderWidth,
+              },
+            ]}
+          >
+            <Text style={[styles.reviewLabel, { color: secondary }]}>Campanha</Text>
+            <Text style={[styles.reviewValue, { color: palette.textPrimary }]}>{title}</Text>
+            <Text style={[styles.reviewLabel, { color: secondary }]}>Sistema</Text>
+            <Text style={[styles.reviewValue, { color: palette.textPrimary }]}>
+              {system || '—'}
+            </Text>
+            <Text style={[styles.reviewLabel, { color: secondary }]}>Nível inicial</Text>
+            <Text style={[styles.reviewValue, { color: palette.textPrimary }]}>
+              {initialLevel || '—'}
+            </Text>
+            <Text style={[styles.reviewLabel, { color: secondary }]}>Personagens</Text>
             {filledCharacters.length > 0 ? (
               filledCharacters.map((character, index) => (
-                <Text key={character.id} style={styles.reviewValue}>
+                <Text
+                  key={character.id}
+                  style={[styles.reviewValue, { color: palette.textPrimary }]}
+                >
                   {index + 1}.{' '}
                   {[character.name.trim() || 'Sem nome', character.className.trim() || 'Sem classe']
                     .filter(Boolean)
@@ -469,12 +616,16 @@ export function CreateCampaignScreen() {
                 </Text>
               ))
             ) : (
-              <Text style={styles.reviewValue}>Nenhum personagem adicionado</Text>
+              <Text style={[styles.reviewValue, { color: palette.textPrimary }]}>
+                Nenhum personagem adicionado
+              </Text>
             )}
             {description ? (
               <>
-                <Text style={styles.reviewLabel}>Descrição</Text>
-                <Text style={styles.reviewValue}>{description}</Text>
+                <Text style={[styles.reviewLabel, { color: secondary }]}>Descrição</Text>
+                <Text style={[styles.reviewValue, { color: palette.textPrimary }]}>
+                  {description}
+                </Text>
               </>
             ) : null}
           </View>
@@ -485,67 +636,125 @@ export function CreateCampaignScreen() {
     return null;
   }
 
-  const continueLabel = step === CREATE_STEPS.length - 1 ? 'Criar campanha' : 'Continuar';
-  const continueHint =
-    step === CREATE_STEPS.length - 1
-      ? 'Finalizar e abrir a crônica'
-      : `Ir para ${CREATE_STEPS[step + 1]?.label.toLowerCase()}`;
+  const continueLabel =
+    isPending
+      ? 'Criando...'
+      : step === CREATE_STEPS.length - 1
+        ? 'Criar campanha'
+        : 'OK';
 
   return (
     <GrimoireAtmosphereShell>
-      <SafeAreaView style={styles.root} edges={['top', 'bottom']}>
+      <View style={[styles.root, { paddingTop: insets.top }]}>
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
         >
           <View style={styles.header}>
-            <Pressable onPress={handleBack} style={styles.headerBtn} hitSlop={8}>
-              <ArrowLeft size={22} color={premium.text.primary} strokeWidth={1.75} />
+            <Pressable
+              onPress={handleBack}
+              style={[
+                styles.headerBtn,
+                {
+                  backgroundColor: opacity.card.subtle,
+                  borderColor: elevated.border,
+                  borderWidth: surface.borderWidth,
+                },
+              ]}
+              hitSlop={8}
+              accessibilityLabel="Voltar"
+            >
+              <ArrowLeft size={24} color={palette.textPrimary} strokeWidth={1.75} />
             </Pressable>
             <View style={styles.headerCenter}>
-              <Text style={styles.headerTitle}>Nova Campanha</Text>
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${progress}%` }]} />
+              <Text
+                style={[styles.headerTitle, { color: palette.accent }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.85}
+                maxFontSizeMultiplier={1.2}
+              >
+                Nova Campanha
+              </Text>
+              <View style={[styles.progressTrack, { backgroundColor: opacity.card.subtle }]}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${((step + 1) / CREATE_STEPS.length) * 100}%`,
+                      backgroundColor: palette.accent,
+                    },
+                  ]}
+                />
               </View>
             </View>
-            <Pressable onPress={showHelp} style={styles.headerBtn} hitSlop={8}>
-              <HelpCircle size={22} color={premium.text.secondary} strokeWidth={1.75} />
+            <Pressable
+              onPress={showHelp}
+              style={[
+                styles.headerBtn,
+                {
+                  backgroundColor: opacity.card.subtle,
+                  borderColor: elevated.border,
+                  borderWidth: surface.borderWidth,
+                },
+              ]}
+              hitSlop={8}
+              accessibilityLabel="Ajuda"
+            >
+              <HelpCircle size={24} color={palette.textSecondary} strokeWidth={1.75} />
             </Pressable>
           </View>
 
           <ScrollView
+            style={styles.scroll}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { paddingBottom: footerHeight + 28 },
+            ]}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
           >
             {step === 0 ? renderHero() : null}
             {renderStepper()}
             {step === 0 ? renderStepOneSections() : renderStepContent()}
           </ScrollView>
-
-          <View style={styles.footer}>
-            <Pressable
-              onPress={handleContinue}
-              disabled={isPending}
-              style={({ pressed }) => [styles.continueWrap, pressed && styles.continuePressed]}
-            >
-              <LinearGradient
-                colors={['#2563EB', '#6366F1', '#7C3AED']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={styles.continueGradient}
-              >
-                <Sparkles size={17} color="#FFFFFF" strokeWidth={1.75} />
-                <View style={styles.continueCopy}>
-                  <Text style={styles.continueLabel}>
-                    {isPending ? 'Criando...' : continueLabel}
-                  </Text>
-                  <Text style={styles.continueHint}>{continueHint}</Text>
-                </View>
-              </LinearGradient>
-            </Pressable>
-          </View>
         </KeyboardAvoidingView>
+
+        {/* CTA flutuante — sem faixa preta de “tab” embaixo */}
+        <View
+          pointerEvents="box-none"
+          style={[styles.footer, { paddingBottom: footerPadBottom }]}
+        >
+          <Pressable
+            onPress={handleContinue}
+            disabled={isPending}
+            style={({ pressed }) => [
+              styles.continueBtn,
+              {
+                borderRadius: cta.radius,
+                backgroundColor: palette.buttonPrimary,
+                minHeight: MIN_TOUCH_TARGET + 4,
+                opacity: isPending ? 0.72 : pressed ? 0.9 : 1,
+                ...Platform.select({
+                  ios: {
+                    shadowColor: palette.buttonPrimary,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.45,
+                    shadowRadius: 12,
+                  },
+                  android: { elevation: 10 },
+                  default: {},
+                }),
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel={continueLabel}
+          >
+            <Text style={[styles.continueLabel, { color: cta.foreground }]}>{continueLabel}</Text>
+          </Pressable>
+        </View>
 
         <OptionPickerModal
           visible={picker === 'system'}
@@ -564,7 +773,7 @@ export function CreateCampaignScreen() {
           onSelect={setInitialLevel}
           onClose={() => setPicker(null)}
         />
-      </SafeAreaView>
+      </View>
     </GrimoireAtmosphereShell>
   );
 }
@@ -577,108 +786,96 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  scroll: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 14,
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingBottom: 18,
+    flexShrink: 0,
   },
   headerBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   headerCenter: {
     flex: 1,
+    minWidth: 0,
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   headerTitle: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 16,
-    letterSpacing: 0.1,
-    color: '#F8FAFC',
+    ...typeRoles.title,
+    fontSize: 20,
+    lineHeight: 26,
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    width: '100%',
   },
   progressTrack: {
     width: '100%',
-    height: 2,
+    height: 4,
     borderRadius: 999,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: 999,
-    backgroundColor: '#6366F1',
-    shadowColor: '#818CF8',
-    shadowOpacity: 0.9,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 0 },
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    gap: 26,
+    paddingHorizontal: 22,
+    paddingTop: 8,
+    gap: 22,
   },
   hero: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 12,
+    gap: 14,
+    marginBottom: 2,
   },
   heroIcon: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
   },
   heroCopy: {
     flex: 1,
     gap: 6,
-    paddingTop: 1,
+    paddingTop: 2,
   },
   heroTitle: {
-    fontFamily: fontFamily.inter.bold,
-    fontSize: 22,
-    lineHeight: 28,
-    color: '#F8FAFC',
-  },
-  heroAccent: {
-    color: '#818CF8',
-    fontFamily: fontFamily.inter.bold,
-  },
-  heroSpark: {
-    color: '#818CF8',
+    ...typeRoles.titleSm,
+    fontSize: 16,
+    lineHeight: 22,
+    textTransform: 'uppercase',
   },
   heroSubtitle: {
-    fontFamily: fontFamily.inter.regular,
+    ...typeRoles.editorialSm,
     fontSize: 13,
     lineHeight: 19,
-    color: 'rgba(148, 163, 184, 0.72)',
-    maxWidth: 280,
+    fontStyle: 'italic',
+    maxWidth: 300,
   },
   stepperWrap: {
     position: 'relative',
-    paddingTop: 2,
-    paddingBottom: 2,
+    paddingTop: 4,
+    paddingBottom: 6,
   },
   stepperTrack: {
     position: 'absolute',
-    top: 15,
+    top: 19,
     left: '12%',
     right: '12%',
     height: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 999,
   },
   stepperRow: {
@@ -688,7 +885,7 @@ const styles = StyleSheet.create({
   stepCol: {
     flex: 1,
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   stepCircle: {
     width: 30,
@@ -696,132 +893,85 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(30, 41, 59, 0.95)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  stepCircleActive: {
-    backgroundColor: '#6366F1',
-    borderColor: '#818CF8',
-    shadowColor: '#6366F1',
-    shadowOpacity: 0.45,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 0 },
-  },
-  stepCircleDone: {
-    backgroundColor: 'rgba(99, 102, 241, 0.24)',
-    borderColor: 'rgba(129, 140, 248, 0.55)',
   },
   stepNumber: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 12,
-    color: 'rgba(148, 163, 184, 0.55)',
-  },
-  stepNumberActive: {
-    color: '#FFFFFF',
+    ...typeRoles.caption,
+    fontFamily: typeRoles.buttonSm.fontFamily,
   },
   stepLabel: {
-    fontFamily: fontFamily.inter.regular,
+    ...typeRoles.caption,
     fontSize: 10,
-    color: 'rgba(148, 163, 184, 0.45)',
     textAlign: 'center',
   },
-  stepLabelActive: {
-    color: '#818CF8',
-    fontFamily: fontFamily.inter.semibold,
-  },
-  stepLabelDone: {
-    color: 'rgba(129, 140, 248, 0.72)',
-  },
   sectionBlock: {
-    gap: 12,
+    gap: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 2,
+    gap: 10,
+    marginBottom: 4,
   },
   sectionIcon: {
-    width: 24,
-    height: 24,
+    width: 26,
+    height: 26,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(99, 102, 241, 0.12)',
   },
   sectionHeading: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 15,
-    color: '#F8FAFC',
-    marginBottom: 2,
+    ...typeRoles.label,
+    fontFamily: typeRoles.buttonSm.fontFamily,
+    marginBottom: 4,
   },
   sectionTitle: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 15,
-    color: '#F8FAFC',
+    ...typeRoles.label,
+    fontFamily: typeRoles.buttonSm.fontFamily,
   },
   sectionHint: {
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 13,
-    lineHeight: 19,
-    color: premium.text.muted,
+    ...typeRoles.bodySm,
+    marginBottom: 4,
   },
   imageCard: {
-    borderRadius: 14,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   imageBackground: {
-    minHeight: 182,
+    minHeight: 168,
     justifyContent: 'center',
-  },
-  imageBackgroundInner: {
-    borderRadius: 14,
   },
   imageOverlay: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 34,
-    gap: 7,
+    paddingVertical: 28,
+    gap: 8,
   },
   imageAction: {
     width: 48,
     height: 48,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.14)',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   imageTitle: {
-    fontFamily: fontFamily.inter.semibold,
-    fontSize: 14,
-    color: '#F8FAFC',
+    ...typeRoles.label,
+    fontFamily: typeRoles.buttonSm.fontFamily,
   },
   imageHint: {
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 11,
-    color: 'rgba(148, 163, 184, 0.55)',
+    ...typeRoles.caption,
   },
   rowFields: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
   },
   rowField: {
     flex: 1,
     minWidth: 0,
   },
   characterCard: {
-    borderRadius: 12,
-    padding: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    gap: 10,
+    borderRadius: 14,
+    padding: 14,
+    gap: 12,
   },
   characterHeader: {
     flexDirection: 'row',
@@ -829,9 +979,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   characterIndex: {
-    fontFamily: fontFamily.inter.medium,
-    fontSize: 12,
-    color: 'rgba(148, 163, 184, 0.72)',
+    ...typeRoles.caption,
   },
   characterRemove: {
     padding: 4,
@@ -847,21 +995,15 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   characterLabel: {
-    fontFamily: fontFamily.inter.medium,
+    ...typeRoles.label,
     fontSize: 12,
-    color: 'rgba(203, 213, 225, 0.72)',
   },
   characterInput: {
     minHeight: 46,
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 11,
-    backgroundColor: 'rgba(15, 23, 42, 0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 14,
-    color: premium.text.primary,
+    ...typeRoles.body,
   },
   attachBtn: {
     width: 46,
@@ -869,19 +1011,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(15, 23, 42, 0.55)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    marginBottom: 0,
-  },
-  attachBtnActive: {
-    borderColor: 'rgba(99, 102, 241, 0.45)',
-    backgroundColor: 'rgba(99, 102, 241, 0.12)',
   },
   attachHint: {
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 11,
-    color: premium.accentSoft,
+    ...typeRoles.caption,
   },
   addCharacterBtn: {
     flexDirection: 'row',
@@ -890,76 +1022,44 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 12,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(99, 102, 241, 0.28)',
-    backgroundColor: 'rgba(99, 102, 241, 0.08)',
   },
   addCharacterLabel: {
-    fontFamily: fontFamily.inter.medium,
-    fontSize: 13,
-    color: premium.accentSoft,
+    ...typeRoles.buttonSm,
   },
   reviewCard: {
     borderRadius: 14,
     padding: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
     gap: 6,
   },
   reviewLabel: {
-    fontFamily: fontFamily.inter.medium,
-    fontSize: 11,
-    letterSpacing: 0.4,
+    ...typeRoles.badge,
     textTransform: 'uppercase',
-    color: premium.text.faint,
+    letterSpacing: 0.5,
     marginTop: 4,
   },
   reviewValue: {
-    fontFamily: fontFamily.inter.regular,
+    ...typeRoles.body,
     fontSize: 15,
-    color: premium.text.primary,
   },
   footer: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(255, 255, 255, 0.05)',
-    backgroundColor: 'rgba(11, 17, 32, 0.82)',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 50,
+    elevation: 50,
+    paddingHorizontal: 22,
+    paddingTop: 8,
+    backgroundColor: 'transparent',
   },
-  continueWrap: {
-    borderRadius: 999,
-    overflow: 'hidden',
-    shadowColor: '#6366F1',
-    shadowOpacity: 0.35,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
-  },
-  continuePressed: {
-    opacity: 0.94,
-    transform: [{ scale: 0.992 }],
-  },
-  continueGradient: {
-    minHeight: 56,
-    paddingHorizontal: 18,
-    flexDirection: 'row',
+  continueBtn: {
+    width: '100%',
     alignItems: 'center',
-    gap: 10,
-  },
-  continueCopy: {
-    flex: 1,
-    gap: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 18,
   },
   continueLabel: {
-    fontFamily: fontFamily.inter.bold,
-    fontSize: 15,
-    color: '#FFFFFF',
-  },
-  continueHint: {
-    fontFamily: fontFamily.inter.regular,
-    fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.68)',
+    ...typeRoles.button,
+    fontSize: 16,
   },
 });

@@ -15,29 +15,29 @@ export const palettes = {
   default: {
     name: 'Grimório',
     /**
-     * Tokens alinhados à arte `atmosphere-bg.jpg` (amostra vertical):
-     * #189cf1 → #086fd6 → #01318c → #01021f
+     * Atmosfera profunda (padronizada app-wide):
+     * azul navy no topo, quase preto na base — sem cyan vivo.
      */
-    gradientStart: '#0F8CE8',
-    gradientEnd: '#01021F',
-    /** Azul estrutural (nav, foco) — mid da atmosfera */
-    primary: '#0351B9',
-    primaryLight: '#1BA7F3',
+    gradientStart: '#0A2A55',
+    gradientEnd: '#02060F',
+    /** Azul estrutural (nav, foco) — contido */
+    primary: '#2A5FA8',
+    primaryLight: '#5B8ED4',
     /** CTA / ações importantes — dourado envelhecido */
     buttonPrimary: '#C4A35A',
     buttonPrimaryShadow: 'rgba(196, 163, 90, 0.32)',
-    fabShadow: 'rgba(15, 140, 232, 0.2)',
+    fabShadow: 'rgba(42, 95, 168, 0.16)',
     /** Dourado envelhecido — apenas destaques */
     accent: '#C4A35A',
     accentSoft: '#E2D2A4',
     /** Superfície de card sobre a base navy profunda */
-    surface: '#0A1528',
+    surface: '#0B1424',
     /** Borda estrutural azul-acinzentada */
-    surfaceBorder: 'rgba(27, 167, 243, 0.14)',
+    surfaceBorder: 'rgba(91, 142, 212, 0.14)',
     /** Branco levemente azulado */
     textPrimary: '#E8EEF7',
     /** Azul-acinzentado legível */
-    textSecondary: '#8AAFD0',
+    textSecondary: '#8AA3C2',
     iconVariants: {
       a: '#C4A35A',
       b: '#8BA3C4',

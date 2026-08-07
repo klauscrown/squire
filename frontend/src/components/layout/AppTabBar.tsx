@@ -1,9 +1,8 @@
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Plus } from 'lucide-react-native';
 import { useEffect } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   Extrapolation,
   interpolate,
@@ -12,36 +11,38 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
-import { ROUTES } from '@/constants';
 import {
   TabCampaignsIcon,
   TabHomeIcon,
   TabProfileIcon,
-  TabSettingsIcon,
+  TabUniverseIcon,
 } from '@/components/layout/TabBarIcons';
+import { useUniverseCreationStore } from '@/features/universe/store/useUniverseCreationStore';
 import { useComponents } from '@/hooks/useTheme';
 import { useActivePalette } from '@/store/useThemeStore';
 import { MIN_TOUCH_TARGET } from '@/theme/accessibility';
 import { fontFamily } from '@/theme/typography';
 
-type SideTab = 'home' | 'campaigns' | 'settings' | 'profile';
+type SideTab = 'home' | 'campaigns' | 'universe' | 'profile';
 
 type TabIconComponent = typeof TabHomeIcon;
 
 const LEFT_TABS: SideTab[] = ['home', 'campaigns'];
-const RIGHT_TABS: SideTab[] = ['settings', 'profile'];
+const RIGHT_TABS: SideTab[] = ['universe', 'profile'];
 
 const TAB_META: Record<SideTab, { label: string; icon: TabIconComponent; activeWidth: number }> = {
   home: { label: 'Início', icon: TabHomeIcon, activeWidth: 82 },
   campaigns: { label: 'Campanhas', icon: TabCampaignsIcon, activeWidth: 108 },
-  settings: { label: 'Ajustes', icon: TabSettingsIcon, activeWidth: 88 },
+  universe: { label: 'Universo', icon: TabUniverseIcon, activeWidth: 94 },
   profile: { label: 'Perfil', icon: TabProfileIcon, activeWidth: 82 },
 };
 
 const FAB = 50;
 const FAB_RING = 4;
+const FAB_SLOT_WIDTH = FAB + FAB_RING * 2 + 12;
 
-export const CURVED_TAB_BAR_FOOTPRINT = 96;
+/** Altura do contentor da tab + respiro do FAB elevado (não inclui safe area). */
+export const CURVED_TAB_BAR_FOOTPRINT = 100;
 
 function navigate(
   navigation: BottomTabBarProps['navigation'],
@@ -58,16 +59,26 @@ interface TabBarItemProps {
   focused: boolean;
   label: string;
   activeWidth: number;
+  compact: boolean;
   Icon: TabIconComponent;
   onPress: () => void;
   onLongPress: () => void;
 }
 
-function TabBarItem({ focused, label, activeWidth, Icon, onPress, onLongPress }: TabBarItemProps) {
+function TabBarItem({
+  focused,
+  label,
+  activeWidth,
+  compact,
+  Icon,
+  onPress,
+  onLongPress,
+}: TabBarItemProps) {
   const palette = useActivePalette();
   const components = useComponents();
   const pill = components.pill;
   const progress = useSharedValue(focused ? 1 : 0);
+  const expandedWidth = compact ? pill.inactiveSize : activeWidth;
 
   useEffect(() => {
     progress.value = withSpring(focused ? 1 : 0, pill.spring);
@@ -77,34 +88,46 @@ function TabBarItem({ focused, label, activeWidth, Icon, onPress, onLongPress }:
     width: interpolate(
       progress.value,
       [0, 1],
-      [pill.inactiveSize, activeWidth],
+      [pill.inactiveSize, expandedWidth],
       Extrapolation.CLAMP,
     ),
     height: pill.height,
     borderRadius: pill.radius,
   }));
 
-  const gradientStyle = useAnimatedStyle(() => ({
+  const fillStyle = useAnimatedStyle(() => ({
     opacity: progress.value,
   }));
 
   const labelStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    maxWidth: interpolate(progress.value, [0, 1], [0, activeWidth - 38], Extrapolation.CLAMP),
-    marginLeft: interpolate(progress.value, [0, 1], [0, 6], Extrapolation.CLAMP),
+    opacity: compact ? 0 : progress.value,
+    maxWidth: compact
+      ? 0
+      : interpolate(progress.value, [0, 1], [0, activeWidth - 38], Extrapolation.CLAMP),
+    marginLeft: compact ? 0 : interpolate(progress.value, [0, 1], [0, 6], Extrapolation.CLAMP),
   }));
 
   const shadowStyle = useAnimatedStyle(() => ({
     shadowOpacity: interpolate(
       progress.value,
       [0, 1],
-      [0, pill.shadow.opacity],
+      [0, pill.shadow.opacity * 0.6],
       Extrapolation.CLAMP,
     ),
-    elevation: interpolate(progress.value, [0, 1], [0, pill.shadow.elevation], Extrapolation.CLAMP),
+    elevation: interpolate(
+      progress.value,
+      [0, 1],
+      [0, pill.shadow.elevation * 0.5],
+      Extrapolation.CLAMP,
+    ),
   }));
 
-  const iconColor = focused ? pill.activeIcon : palette.textSecondary;
+  const pressScale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressScale.value }],
+  }));
+
+  const iconColor = focused ? palette.textPrimary : palette.textSecondary;
 
   return (
     <Pressable
@@ -114,12 +137,21 @@ function TabBarItem({ focused, label, activeWidth, Icon, onPress, onLongPress }:
       accessibilityLabel={label}
       onPress={onPress}
       onLongPress={onLongPress}
+      onPressIn={() => {
+        // eslint-disable-next-line react-hooks/immutability
+        pressScale.value = withSpring(0.92, pill.spring);
+      }}
+      onPressOut={() => {
+        // eslint-disable-next-line react-hooks/immutability
+        pressScale.value = withSpring(1, pill.spring);
+      }}
     >
       <Animated.View
         style={[
           styles.pill,
           pillStyle,
           shadowStyle,
+          pressStyle,
           Platform.OS === 'ios' && {
             shadowColor: palette.primary,
             shadowOffset: { width: 0, height: pill.shadow.offsetY },
@@ -127,13 +159,9 @@ function TabBarItem({ focused, label, activeWidth, Icon, onPress, onLongPress }:
           },
         ]}
       >
-        {/* Fundo sólido do tab ativo — sem gradiente azul→ouro */}
+        {/* Ativo: tom primary suave, alinhado ao shell flutuante */}
         <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            gradientStyle,
-            { backgroundColor: palette.primary },
-          ]}
+          style={[StyleSheet.absoluteFill, fillStyle, { backgroundColor: palette.primary }]}
         />
 
         <Icon size={20} color={iconColor} />
@@ -141,7 +169,7 @@ function TabBarItem({ focused, label, activeWidth, Icon, onPress, onLongPress }:
         <Animated.Text
           style={[
             styles.pillLabel,
-            { fontSize: pill.label.fontSize, color: pill.activeLabel },
+            { fontSize: pill.label.fontSize, color: palette.textPrimary },
             labelStyle,
           ]}
           numberOfLines={1}
@@ -154,14 +182,31 @@ function TabBarItem({ focused, label, activeWidth, Icon, onPress, onLongPress }:
 }
 
 export function AppTabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
-  const router = useRouter();
+  const { width } = useWindowDimensions();
   const palette = useActivePalette();
   const components = useComponents();
   const pill = components.pill;
   const tabBar = components.tabBar;
-  const bottom = Math.max(insets.bottom, 8);
+  const floatInset = tabBar.floatInset ?? 16;
+  const sideGroupWidth = (width - floatInset * 2 - FAB_SLOT_WIDTH) / 2;
+  const compact = sideGroupWidth < TAB_META.campaigns.activeWidth + MIN_TOUCH_TARGET;
+  const bottom = Math.max(insets.bottom, 10);
   const fabScale = useSharedValue(1);
   const fabAnim = useAnimatedStyle(() => ({ transform: [{ scale: fabScale.value }] }));
+  const openCreationMenu = useUniverseCreationStore((store) => store.openMenu);
+
+  const shellShadow = Platform.select({
+    ios: {
+      shadowColor: tabBar.shellShadow?.color ?? palette.gradientEnd,
+      shadowOffset: { width: 0, height: tabBar.shellShadow?.offsetY ?? 10 },
+      shadowOpacity: tabBar.shellShadow?.opacity ?? 0.4,
+      shadowRadius: tabBar.shellShadow?.radius ?? 22,
+    },
+    android: {
+      elevation: tabBar.shellShadow?.elevation ?? 14,
+    },
+    default: {},
+  });
 
   function renderTab(routeName: SideTab) {
     const route = state.routes.find((r) => r.name === routeName);
@@ -183,6 +228,7 @@ export function AppTabBar({ state, descriptors, navigation, insets }: BottomTabB
         focused={focused}
         label={label}
         activeWidth={meta.activeWidth}
+        compact={compact}
         Icon={meta.icon}
         onPress={() => navigate(navigation, route, focused)}
         onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
@@ -191,51 +237,67 @@ export function AppTabBar({ state, descriptors, navigation, insets }: BottomTabB
   }
 
   return (
-    <View style={[styles.root, { height: CURVED_TAB_BAR_FOOTPRINT + bottom }]}>
+    <View
+      style={[styles.root, { height: CURVED_TAB_BAR_FOOTPRINT + bottom }]}
+      pointerEvents="box-none"
+    >
+      {/* Shell flutuante — visual only; abas/FAB intactos */}
       <View
         style={[
           styles.shell,
           {
+            left: floatInset,
+            right: floatInset,
             bottom,
             height: tabBar.height,
             borderRadius: tabBar.shellRadius,
             borderColor: tabBar.shellBorder,
-            backgroundColor: tabBar.shellFill,
+            backgroundColor: Platform.OS === 'android' ? tabBar.shellAndroid : tabBar.shellFill,
+            ...shellShadow,
           },
         ]}
       />
 
-      <View style={[styles.barRow, { bottom, height: tabBar.height }]}>
+      <View
+        style={[
+          styles.barRow,
+          {
+            left: floatInset,
+            right: floatInset,
+            bottom,
+            height: tabBar.height,
+          },
+        ]}
+      >
         <View style={styles.sideGroup}>{LEFT_TABS.map(renderTab)}</View>
 
-        <View
-          style={[styles.fabSlot, { width: FAB + FAB_RING * 2 + 12, marginTop: -(FAB / 2 + 6) }]}
-        >
+        <View style={[styles.fabSlot, { width: FAB_SLOT_WIDTH, marginTop: -(FAB / 2 + 8) }]}>
           <Animated.View style={[styles.fabWrap, fabAnim]}>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Nova campanha"
+              accessibilityLabel="Criar conteúdo"
               onPressIn={() => {
                 // SharedValue do Reanimated é mutável por definição.
                 // eslint-disable-next-line react-hooks/immutability
-                fabScale.value = withSpring(0.94, pill.spring);
+                fabScale.value = withSpring(0.92, pill.spring);
               }}
               onPressOut={() => {
                 // eslint-disable-next-line react-hooks/immutability
                 fabScale.value = withSpring(1, pill.spring);
               }}
-              onPress={() => router.push(ROUTES.app.campaignCreate)}
-              style={({ pressed }) => [styles.fabPressable, pressed && styles.fabPressed]}
+              onPress={() => openCreationMenu()}
+              style={styles.fabPressable}
             >
               <View
                 pointerEvents="none"
                 style={[
                   styles.fabGlow,
                   {
-                    backgroundColor: palette.fabShadow,
-                    width: FAB + FAB_RING * 2 + 6,
-                    height: FAB + FAB_RING * 2 + 6,
-                    borderRadius: (FAB + FAB_RING * 2 + 6) / 2,
+                    backgroundColor: palette.buttonPrimaryShadow,
+                    width: FAB + FAB_RING * 2,
+                    height: FAB + FAB_RING * 2,
+                    borderRadius: (FAB + FAB_RING * 2) / 2,
+                    opacity: 0.35,
                   },
                 ]}
               />
@@ -243,17 +305,17 @@ export function AppTabBar({ state, descriptors, navigation, insets }: BottomTabB
                 style={[
                   styles.fabRing,
                   {
-                    backgroundColor: palette.gradientEnd,
-                    borderColor: palette.surfaceBorder,
+                    backgroundColor: tabBar.fabRing,
+                    borderColor: `${palette.accent}40`,
                     ...Platform.select({
                       ios: {
                         shadowColor: palette.buttonPrimary,
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowOpacity: 0.22,
-                        shadowRadius: 8,
+                        shadowOffset: { width: 0, height: 3 },
+                        shadowOpacity: 0.18,
+                        shadowRadius: 6,
                       },
                       android: {
-                        elevation: 6,
+                        elevation: 4,
                       },
                       default: {},
                     }),
@@ -261,12 +323,12 @@ export function AppTabBar({ state, descriptors, navigation, insets }: BottomTabB
                 ]}
               >
                 <LinearGradient
-                  colors={[palette.buttonPrimary, palette.primaryLight]}
+                  colors={[palette.buttonPrimary, palette.accentSoft]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.fab}
                 >
-                  <Plus size={24} color="#FFFFFF" strokeWidth={2.4} />
+                  <Plus size={24} color={palette.gradientEnd} strokeWidth={2.4} />
                 </LinearGradient>
               </View>
             </Pressable>
@@ -286,15 +348,11 @@ const styles = StyleSheet.create({
   },
   shell: {
     position: 'absolute',
-    left: 12,
-    right: 12,
     overflow: 'hidden',
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   barRow: {
     position: 'absolute',
-    left: 12,
-    right: 12,
     bottom: 0,
     flexDirection: 'row',
     alignItems: 'center',
@@ -340,9 +398,6 @@ const styles = StyleSheet.create({
   },
   fabGlow: {
     position: 'absolute',
-  },
-  fabPressed: {
-    opacity: 0.92,
   },
   fabRing: {
     padding: FAB_RING,

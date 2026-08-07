@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
+import type { Campaign } from '@/features/campaign/types';
 import { useGetSessions } from '@/features/session/hooks';
 import { useComponents } from '@/hooks/useTheme';
-import type { Campaign } from '@/features/campaign/types';
 
 import { NextSessionCard } from './NextSessionCard';
 import { resolveNextSession } from '../utils/nextSession';
@@ -14,7 +14,8 @@ interface HomeNextSessionSectionProps {
 }
 
 /**
- * Bloco "Próxima sessão" da Home — card secundário com dados reais.
+ * Próxima sessão — só quando existe sessão real.
+ * Empty-state fica a cargo de Pendências / Squire (evita cards competindo).
  */
 export function HomeNextSessionSection({ campaign }: HomeNextSessionSectionProps) {
   const router = useRouter();
@@ -23,6 +24,10 @@ export function HomeNextSessionSection({ campaign }: HomeNextSessionSectionProps
 
   const nextSession = useMemo(() => resolveNextSession(sessions), [sessions]);
   const loading = isLoading || (isFetching && sessions == null);
+
+  if (!loading && !nextSession) {
+    return null;
+  }
 
   function openSession(sessionId: string) {
     router.push(`/(app)/campaigns/${campaign.id}/sessions/${sessionId}`);

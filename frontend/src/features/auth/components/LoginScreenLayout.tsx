@@ -9,29 +9,39 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { GrimoireAtmosphereShell } from '@/components/grimoire/GrimoireAtmosphere';
 import { loginLayout } from '@/features/auth/constants/loginLayout';
-
-import { LoginAtmosphere } from './login/LoginAtmosphere';
+import { useComponents } from '@/hooks/useTheme';
 
 interface LoginScreenLayoutProps {
   children: ReactNode;
   contentStyle?: ViewStyle;
 }
 
+/**
+ * Shell da auth = mesma atmosfera da Home (`AtmosphericBackground` + tokens).
+ */
 export function LoginScreenLayout({ children, contentStyle }: LoginScreenLayoutProps) {
   const insets = useSafeAreaInsets();
+  const spacing = useComponents().spacing;
 
   return (
-    <LoginAtmosphere>
+    <GrimoireAtmosphereShell>
       <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
         <KeyboardAvoidingView
           style={styles.flex}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 6 : insets.top}
         >
           <ScrollView
             style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={[
+              styles.scrollContent,
+              {
+                paddingTop: Math.max(loginLayout.screen.paddingTop, spacing.stack),
+                paddingBottom: Math.max(loginLayout.screen.paddingBottom, spacing.section),
+              },
+            ]}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             bounces={false}
@@ -42,7 +52,7 @@ export function LoginScreenLayout({ children, contentStyle }: LoginScreenLayoutP
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </LoginAtmosphere>
+    </GrimoireAtmosphereShell>
   );
 }
 
@@ -61,8 +71,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingTop: loginLayout.screen.paddingTop,
-    paddingBottom: loginLayout.screen.paddingBottom,
   },
   inner: {
     width: '100%',

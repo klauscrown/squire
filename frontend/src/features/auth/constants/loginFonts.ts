@@ -1,14 +1,21 @@
-/** Tipografia da tela de login — serif no logo, sans no UI (como o mockup). */
+/**
+ * Fontes da auth — aliases dos tokens globais (`fontFamily` / `typeRoles`).
+ * Não inventar famílias paralelas: Cinzel (marca/título), Cormorant (lore), Inter (UI).
+ */
+import { fontFamily } from '@/theme/typography';
+
 export const loginFonts = {
-  display: 'Cinzel_700Bold',
-  displayMedium: 'Cinzel_600SemiBold',
-  body: 'Inter_400Regular',
-  bodyMedium: 'Inter_500Medium',
-  bodySemibold: 'Inter_600SemiBold',
-  bodyBold: 'Inter_700Bold',
-  label: 'Inter_500Medium',
-  button: 'Inter_600SemiBold',
-  accent: 'Inter_500Medium',
+  display: fontFamily.cinzel.bold,
+  displayMedium: fontFamily.cinzel.semibold,
+  editorial: fontFamily.cormorant.medium,
+  editorialRegular: fontFamily.cormorant.regular,
+  body: fontFamily.inter.regular,
+  bodyMedium: fontFamily.inter.medium,
+  bodySemibold: fontFamily.inter.semibold,
+  bodyBold: fontFamily.inter.bold,
+  label: fontFamily.inter.medium,
+  button: fontFamily.inter.semibold,
+  accent: fontFamily.inter.medium,
 } as const;
 
 export type LoginFontKey = keyof typeof loginFonts;

@@ -9,6 +9,10 @@ export const QUERY_KEYS = {
   items: 'items',
   quests: 'quests',
   notes: 'notes',
+  universes: 'universes',
+  universeElements: 'universe-elements',
+  universeConnections: 'universe-connections',
+  campaignUniverseLinks: 'campaign-universe-links',
 } as const;
 
 export const ROUTES = {
@@ -20,6 +24,7 @@ export const ROUTES = {
     home: '/(app)/home',
     campaigns: '/(app)/campaigns',
     campaignCreate: '/(app)/campaigns/create',
+    universe: '/(app)/universe',
     profile: '/(app)/profile',
     settings: '/(app)/settings',
   },

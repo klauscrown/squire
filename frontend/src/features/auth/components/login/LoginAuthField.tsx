@@ -3,9 +3,11 @@ import { Eye, EyeOff } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, Platform, StyleSheet, TextInput, type TextInputProps, View } from 'react-native';
 
-import { loginFonts } from '@/features/auth/constants/loginFonts';
 import { loginLayout } from '@/features/auth/constants/loginLayout';
-import { loginSpacing, loginTheme } from '@/features/auth/constants/loginTheme';
+import { loginSpacing } from '@/features/auth/constants/loginTheme';
+import { loginTypography } from '@/features/auth/constants/loginTypography';
+import { useComponents, useGrimoire } from '@/hooks/useTheme';
+import { useActivePalette } from '@/store/useThemeStore';
 
 import { AuthText } from '../AuthText';
 
@@ -15,6 +17,7 @@ interface LoginAuthFieldProps extends TextInputProps {
   secureToggle?: boolean;
 }
 
+/** Campo de auth no material `surfaceCard` da Home (borda ouro, fill navy). */
 export function LoginAuthField({
   icon: Icon,
   error,
@@ -25,27 +28,52 @@ export function LoginAuthField({
   onBlur,
   ...props
 }: LoginAuthFieldProps) {
+  const palette = useActivePalette();
+  const grimoire = useGrimoire();
+  const surface = useComponents().surfaceCard;
+  const elevated = surface.variants.elevated;
+  const interactive = surface.variants.interactive;
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(Boolean(secureTextEntry));
 
   const borderColor = error
-    ? '#ef4444'
+    ? '#EF4444'
     : focused
-      ? loginTheme.input.borderFocus
-      : loginTheme.input.border;
+      ? interactive.pressedBorder
+      : elevated.border;
+
+  const height = loginLayout.field.height;
 
   return (
     <View style={styles.container}>
-      <View style={[styles.field, { borderColor }]}>
+      <View
+        style={[
+          styles.field,
+          {
+            height,
+            borderRadius: surface.radius.md,
+            borderWidth: surface.borderWidth,
+            borderColor,
+            backgroundColor: elevated.background,
+          },
+        ]}
+      >
         <View style={styles.leadingIcon}>
-          <Icon size={18} color={loginTheme.link} strokeWidth={1.5} />
+          <Icon size={18} color={palette.accent} strokeWidth={1.6} />
         </View>
 
         <TextInput
           {...props}
           secureTextEntry={secureToggle ? hidden : secureTextEntry}
-          placeholderTextColor={loginTheme.input.placeholder}
-          style={[styles.input, style]}
+          placeholderTextColor={grimoire.colors.placeholder}
+          style={[
+            styles.input,
+            {
+              height,
+              color: palette.textPrimary,
+            },
+            style,
+          ]}
           onFocus={(event) => {
             setFocused(true);
             onFocus?.(event);
@@ -59,15 +87,15 @@ export function LoginAuthField({
         {secureToggle ? (
           <Pressable
             onPress={() => setHidden((value) => !value)}
-            style={styles.trailingButton}
+            style={[styles.trailingButton, { height }]}
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={hidden ? 'Mostrar senha' : 'Ocultar senha'}
           >
             {hidden ? (
-              <Eye size={18} color={loginTheme.text.muted} strokeWidth={1.5} />
+              <Eye size={18} color={palette.textSecondary} strokeWidth={1.5} />
             ) : (
-              <EyeOff size={18} color={loginTheme.text.muted} strokeWidth={1.5} />
+              <EyeOff size={18} color={palette.textSecondary} strokeWidth={1.5} />
             )}
           </Pressable>
         ) : null}
@@ -78,20 +106,14 @@ export function LoginAuthField({
   );
 }
 
-const FIELD_HEIGHT = loginTheme.input.height;
-
 const styles = StyleSheet.create({
   container: {
     width: '100%',
     marginBottom: loginSpacing.fieldGap,
   },
   field: {
-    height: FIELD_HEIGHT,
-    borderRadius: loginTheme.input.radius,
-    borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: loginTheme.input.background,
   },
   leadingIcon: {
     width: loginLayout.field.iconSlot,
@@ -100,10 +122,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: FIELD_HEIGHT,
-    fontFamily: loginFonts.body,
-    fontSize: 15,
-    color: loginTheme.text.title,
+    ...loginTypography.field,
     paddingRight: 12,
     paddingVertical: 0,
     ...(Platform.OS === 'android'
@@ -112,14 +131,11 @@ const styles = StyleSheet.create({
   },
   trailingButton: {
     width: loginLayout.field.iconSlot,
-    height: FIELD_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
   },
   error: {
-    fontFamily: loginFonts.body,
-    fontSize: 12,
-    color: '#ef4444',
+    ...loginTypography.fieldError,
     marginTop: 6,
     marginLeft: 4,
   },

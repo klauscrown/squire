@@ -50,7 +50,7 @@ export function createComponents(
       const shadowBase = mixTowardBlackish(palette.semantic.gradientEnd);
 
       return {
-        borderWidth: 1,
+        borderWidth: 1.5,
         radius: {
           sm: 16,
           md: 18,
@@ -64,7 +64,8 @@ export function createComponents(
         variants: {
           elevated: {
             background: fill(0.82),
-            border: border(0.28),
+            /** Borda amarela/ouro — um pouco mais forte para ler no fundo mana */
+            border: border(0.62),
             shadow: {
               color: shadowBase,
               opacity: 0.28,
@@ -75,7 +76,7 @@ export function createComponents(
           },
           subtle: {
             background: fill(0.45),
-            border: border(0.2),
+            border: border(0.52),
             shadow: {
               color: shadowBase,
               opacity: 0.1,
@@ -86,11 +87,11 @@ export function createComponents(
           },
           interactive: {
             background: fill(0.58),
-            border: border(0.22),
+            border: border(0.56),
             pressedBackground: fill(0.72),
-            pressedBorder: border(0.38),
-            pressedOpacity: 0.94,
-            pressedScale: 0.98,
+            pressedBorder: border(0.72),
+            pressedOpacity: 0.96,
+            pressedScale: 0.97,
             shadow: {
               color: shadowBase,
               opacity: 0.16,
@@ -113,8 +114,10 @@ export function createComponents(
       heroHeight: 176,
       continuityMarginTop: 20,
       shortcutsMarginTop: 28,
-      bottomSpacer: 12,
-      tabBarExtraPad: 8,
+      /** Respiro sob o último bloco da Home (acima da tab floating) */
+      bottomSpacer: 20,
+      /** Extra além do footprint da tab + safe area */
+      tabBarExtraPad: 16,
       activeCampaign: {
         minHeight: 168,
         padding: 18,
@@ -313,18 +316,29 @@ export function createComponents(
     },
 
     tabBar: {
-      height: 64,
-      shellRadius: 22,
-      /** Cor sólida — sem blur/camadas que leem como gradiente */
-      shellFill: palette.semantic.surface,
-      shellBorder: `rgba(${hexToRgbChannel(palette.semantic.accent)}, 0.18)`,
-      shellAndroid: palette.semantic.surface,
+      height: 62,
+      shellRadius: 26,
+      /** Inset horizontal — shell flutuante, não colado às bordas */
+      floatInset: 16,
+      /**
+       * Material alinhado à atmosfera navy (semi-opaco, não “barrão” chapado).
+       */
+      shellFill: `rgba(${hexToRgbChannel(palette.semantic.surface)}, 0.88)`,
+      shellBorder: `rgba(${hexToRgbChannel(palette.semantic.primaryLight)}, 0.16)`,
+      shellAndroid: `rgba(${hexToRgbChannel(palette.semantic.surface)}, 0.94)`,
+      shellShadow: {
+        color: mixTowardBlackish(palette.semantic.gradientEnd),
+        opacity: 0.42,
+        radius: 22,
+        offsetY: 10,
+        elevation: 14,
+      },
       fabGradient: brand.fabGradient,
-      fabRing: `rgba(${hexToRgbChannel(palette.semantic.gradientEnd)}, 0.96)`,
+      fabRing: `rgba(${hexToRgbChannel(palette.semantic.gradientEnd)}, 0.92)`,
       fabShadow: {
-        color: brand.accent,
-        opacity: 0.32,
-        radius: 12,
+        color: palette.semantic.buttonPrimary,
+        opacity: 0.28,
+        radius: 14,
         offsetY: 6,
       },
     },

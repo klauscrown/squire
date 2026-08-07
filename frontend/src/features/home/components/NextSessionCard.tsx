@@ -4,7 +4,7 @@ import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-nativ
 
 import { SurfaceCard } from '@/components/ui';
 import { useIsCompactWidth } from '@/hooks/useLayoutMetrics';
-import { useComponents, useGrimoire, useOpacity, usePremium } from '@/hooks/useTheme';
+import { useGrimoire, useOpacity } from '@/hooks/useTheme';
 import { useActivePalette } from '@/store/useThemeStore';
 import { MIN_TOUCH_TARGET } from '@/theme/accessibility';
 import { typeRoles } from '@/theme/typography';
@@ -35,9 +35,7 @@ export function NextSessionCard({
 }: NextSessionCardProps) {
   const palette = useActivePalette();
   const grimoire = useGrimoire();
-  const premium = usePremium();
   const opacity = useOpacity();
-  const components = useComponents();
   const compact = useIsCompactWidth();
   const secondary = grimoire.colors.ivoryDim;
 
@@ -104,9 +102,10 @@ export function NextSessionCard({
 
   return (
     <SurfaceCard
-      variant="interactive"
-      radius="md"
-      padding="md"
+      variant="subtle"
+      radius="sm"
+      padding="sm"
+      shadow={false}
       onPress={() => {
         if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onPrepare?.(session);
@@ -119,12 +118,12 @@ export function NextSessionCard({
           style={[
             styles.iconWrap,
             {
-              backgroundColor: opacity.iconCircle.goldSubtle,
-              borderColor: opacity.border.goldSubtle,
+              backgroundColor: opacity.card.subtle,
+              borderColor: opacity.border.lilacSubtle,
             },
           ]}
         >
-          <CalendarDays size={18} color={palette.accent} strokeWidth={1.85} />
+          <CalendarDays size={16} color={secondary} strokeWidth={1.75} />
         </View>
 
         <View style={styles.metaCol}>
@@ -133,6 +132,8 @@ export function NextSessionCard({
             {title}
           </Text>
         </View>
+
+        <ChevronRight size={16} color={secondary} strokeWidth={1.75} />
       </View>
 
       <View style={[styles.detailsRow, compact && styles.detailsRowCompact]}>
@@ -153,36 +154,9 @@ export function NextSessionCard({
           </View>
         ) : null}
 
-        <View
-          style={[
-            styles.prepPill,
-            {
-              backgroundColor: premium.surface.icon,
-              borderColor: premium.surface.cardBorderSubtle,
-            },
-          ]}
-        >
-          <Text style={[styles.prepText, { color: secondary }]} numberOfLines={1}>
-            {prepLabel}
-          </Text>
-        </View>
-      </View>
-
-      <View
-        style={[
-          styles.cta,
-          {
-            borderRadius: components.cta.radius - 2,
-            backgroundColor: palette.buttonPrimary,
-            minHeight: MIN_TOUCH_TARGET - 8,
-          },
-        ]}
-        pointerEvents="none"
-      >
-        <Text style={[styles.ctaLabel, { color: components.cta.foreground }]}>
-          Preparar sessão
+        <Text style={[styles.prepText, { color: secondary }]} numberOfLines={1}>
+          {prepLabel}
         </Text>
-        <ChevronRight size={15} color={components.cta.foreground} strokeWidth={2.2} />
       </View>
     </SurfaceCard>
   );
@@ -190,7 +164,7 @@ export function NextSessionCard({
 
 const styles = StyleSheet.create({
   body: {
-    gap: 12,
+    gap: 8,
   },
   loadingShell: {
     minHeight: 72,
@@ -229,9 +203,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 11,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: StyleSheet.hairlineWidth,
@@ -247,15 +221,15 @@ const styles = StyleSheet.create({
   sessionTitle: {
     ...typeRoles.label,
     fontFamily: typeRoles.buttonSm.fontFamily,
-    fontSize: 15,
-    lineHeight: 21,
+    fontSize: 14,
+    lineHeight: 19,
   },
   detailsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     gap: 8,
-    paddingLeft: 48,
+    paddingLeft: 44,
   },
   detailsRowCompact: {
     paddingLeft: 0,
@@ -274,26 +248,8 @@ const styles = StyleSheet.create({
   timeText: {
     ...typeRoles.caption,
   },
-  prepPill: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    maxWidth: '100%',
-  },
   prepText: {
     ...typeRoles.badge,
-  },
-  cta: {
-    alignSelf: 'flex-start',
-    marginLeft: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  ctaLabel: {
-    ...typeRoles.buttonSm,
+    opacity: 0.9,
   },
 });

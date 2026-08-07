@@ -16,14 +16,15 @@ import { LoginFooterArt } from '@/features/auth/components/login/LoginFooterArt'
 import { LoginOrnamentDivider } from '@/features/auth/components/login/LoginOrnamentDivider';
 import { LoginRegisterCard } from '@/features/auth/components/login/LoginRegisterCard';
 import { LoginSocialButton } from '@/features/auth/components/login/LoginSocialButton';
-import { loginFonts } from '@/features/auth/constants/loginFonts';
 import { loginLayout } from '@/features/auth/constants/loginLayout';
-import { loginTheme } from '@/features/auth/constants/loginTheme';
+import { loginTypography } from '@/features/auth/constants/loginTypography';
 import { loginSchema, type LoginInput } from '@/features/auth/types';
 import { useAppStore } from '@/store/appStore';
+import { useActivePalette } from '@/store/useThemeStore';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const palette = useActivePalette();
   const { isSupabaseConfigured, isGoogleSignInConfigured, signInWithEmail, signInWithGoogle, signInAnonymously } =
     useAuth();
   const setExplorerMode = useAppStore((state) => state.setExplorerMode);
@@ -119,7 +120,9 @@ export default function LoginScreen() {
     <LoginScreenLayout>
       <LoginBrandHeader />
 
-      {notice ? <AuthText style={styles.notice}>{notice}</AuthText> : null}
+      {notice ? (
+        <AuthText style={[styles.notice, { color: palette.accent }]}>{notice}</AuthText>
+      ) : null}
 
       <View style={styles.form}>
         <Controller
@@ -164,7 +167,9 @@ export default function LoginScreen() {
           onPress={handleForgotPassword}
           style={({ pressed }) => [styles.forgotWrap, pressed && styles.forgotPressed]}
         >
-          <AuthText style={styles.forgotText}>Esqueci minha senha</AuthText>
+          <AuthText style={[styles.forgotText, { color: palette.accent }]}>
+            Esqueci minha senha
+          </AuthText>
         </Pressable>
 
         <PremiumPrimaryButton
@@ -207,11 +212,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   notice: {
-    fontFamily: loginFonts.body,
-    color: loginTheme.link,
+    ...loginTypography.noticeBody,
     marginBottom: 10,
     textAlign: 'center',
-    fontSize: 12,
   },
   forgotWrap: {
     alignSelf: 'flex-end',
@@ -223,9 +226,7 @@ const styles = StyleSheet.create({
     opacity: 0.75,
   },
   forgotText: {
-    fontFamily: loginFonts.body,
-    fontSize: 12,
-    color: loginTheme.link,
+    ...loginTypography.link,
   },
   socialRow: {
     flexDirection: 'row',

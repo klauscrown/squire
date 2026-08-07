@@ -11,9 +11,9 @@ import { motion } from '@/theme/motion';
 const PRESS_EASE = Easing.out(Easing.quad);
 
 /**
- * Escala pressed (0.98) com Reanimated; ignora animação se reduce motion estiver ativo.
+ * Escala pressed (0.96) com Reanimated; ignora animação se reduce motion estiver ativo.
  */
-export function usePressScale(scaleTo = motion.press.scale) {
+export function usePressScale(scaleTo: number = motion.press.scale) {
   const reduceMotion = useReducedMotion();
   const scale = useSharedValue(1);
 

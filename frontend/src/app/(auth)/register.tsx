@@ -17,11 +17,12 @@ import {
 } from '@/features/auth/components';
 import { loginTypography } from '@/features/auth/constants/loginTypography';
 import { registerSchema, type RegisterInput } from '@/features/auth/types';
-import { grimoire } from '@/theme/grimoire';
 import { useAppStore } from '@/store/appStore';
+import { useActivePalette } from '@/store/useThemeStore';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const palette = useActivePalette();
   const { isSupabaseConfigured, signUpWithEmail } = useAuth();
   const setExplorerMode = useAppStore((state) => state.setExplorerMode);
   const [notice, setNotice] = useState<string | null>(null);
@@ -66,7 +67,7 @@ export default function RegisterScreen() {
       <ExplorerNoticeCard isSupabaseMode={isSupabaseConfigured} />
 
       {notice ? (
-        <Text variant="caption" style={styles.notice}>
+        <Text variant="caption" style={[styles.notice, { color: palette.accent }]}>
           {notice}
         </Text>
       ) : null}
@@ -139,7 +140,9 @@ export default function RegisterScreen() {
 
       <Link href={ROUTES.auth.login} asChild>
         <Pressable style={({ pressed }) => [styles.secondary, pressed && styles.secondaryPressed]}>
-          <AuthText style={styles.secondaryText}>Voltar ao login</AuthText>
+          <AuthText style={[styles.secondaryText, { color: palette.accent }]}>
+            Voltar ao login
+          </AuthText>
         </Pressable>
       </Link>
     </LoginScreenLayout>
@@ -152,7 +155,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   notice: {
-    color: grimoire.colors.gold,
     marginBottom: 12,
     textAlign: 'center',
   },

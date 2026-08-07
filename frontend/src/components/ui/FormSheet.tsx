@@ -26,7 +26,12 @@ export function FormSheet({ visible, onClose, children, title }: FormSheetProps)
   const isWeb = Platform.OS === 'web';
 
   const header = (
-    <View style={[styles.header, { paddingHorizontal: grimoire.spacing.screen, paddingBottom: grimoire.spacing.sm }]}>
+    <View
+      style={[
+        styles.header,
+        { paddingHorizontal: grimoire.spacing.screen, paddingBottom: grimoire.spacing.sm },
+      ]}
+    >
       <View style={styles.titleWrap}>
         <Text
           style={[
@@ -45,6 +50,8 @@ export function FormSheet({ visible, onClose, children, title }: FormSheetProps)
       <Pressable
         onPress={onClose}
         hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel={`Fechar ${title}`}
         style={[
           styles.closeBtn,
           {

@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { loginFonts } from '@/features/auth/constants/loginFonts';
 import { loginLayout } from '@/features/auth/constants/loginLayout';
+import { loginTypography } from '@/features/auth/constants/loginTypography';
+import { useActivePalette } from '@/store/useThemeStore';
 
 import { AuthText } from '../AuthText';
 
@@ -11,6 +12,8 @@ interface LoginFooterArtProps {
 }
 
 export function LoginFooterArt({ onExplore, exploreLoading }: LoginFooterArtProps) {
+  const palette = useActivePalette();
+
   if (!onExplore) return null;
 
   return (
@@ -20,7 +23,7 @@ export function LoginFooterArt({ onExplore, exploreLoading }: LoginFooterArtProp
         disabled={exploreLoading}
         style={({ pressed }) => [styles.explorerBtn, pressed && styles.explorerPressed]}
       >
-        <AuthText style={styles.explorerText}>
+        <AuthText style={[styles.explorerText, { color: palette.textSecondary }]}>
           {exploreLoading ? 'Abrindo…' : 'Continuar como explorador'}
         </AuthText>
       </Pressable>
@@ -41,9 +44,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   explorerText: {
-    fontFamily: loginFonts.body,
-    fontSize: loginLayout.footer.fontSize,
-    lineHeight: 16,
-    color: 'rgba(165, 180, 252, 0.52)',
+    ...loginTypography.explorer,
+    opacity: 0.72,
   },
 });

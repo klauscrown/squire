@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { ChevronRight, Settings } from 'lucide-react-native';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -11,7 +12,7 @@ import {
   SquireHint,
   StatTile,
 } from '@/components/grimoire';
-import { ThemePickerCards } from '@/components/ui';
+import { SurfaceCard, ThemePickerCards } from '@/components/ui';
 import { ROUTES } from '@/constants';
 import { useGetCampaigns } from '@/features/campaign/hooks';
 import { useDataMode } from '@/hooks/useAuthUserId';
@@ -132,6 +133,42 @@ export default function ProfileScreen() {
 
       <GrimoireFadeIn delay={280}>
         <View style={styles.section}>
+          <SectionLabel title="Conta e aplicativo" />
+          <SurfaceCard
+            variant="interactive"
+            radius="md"
+            padding="sm"
+            shadow={false}
+            onPress={() => router.push(ROUTES.app.settings)}
+            accessibilityLabel="Abrir configurações"
+            contentStyle={styles.settingsLinkContent}
+          >
+            <View
+              style={[
+                styles.settingsIcon,
+                {
+                  borderColor: `${palette.primaryLight}40`,
+                  backgroundColor: `${palette.primary}20`,
+                },
+              ]}
+            >
+              <Settings size={19} color={palette.primaryLight} strokeWidth={1.7} />
+            </View>
+            <View style={styles.settingsCopy}>
+              <Text style={[styles.settingsTitle, { color: palette.textPrimary }]}>
+                Configurações
+              </Text>
+              <Text style={[styles.settingsDescription, { color: palette.textSecondary }]}>
+                Tema, armazenamento e conta
+              </Text>
+            </View>
+            <ChevronRight size={17} color={palette.textSecondary} strokeWidth={1.5} />
+          </SurfaceCard>
+        </View>
+      </GrimoireFadeIn>
+
+      <GrimoireFadeIn delay={340}>
+        <View style={styles.section}>
           <SectionLabel title="Grimório" />
           <SquireHint
             variant="softGlass"
@@ -140,7 +177,7 @@ export default function ProfileScreen() {
         </View>
       </GrimoireFadeIn>
 
-      <GrimoireFadeIn delay={340}>
+      <GrimoireFadeIn delay={400}>
         <Pressable
           onPress={() => router.push(ROUTES.app.campaigns)}
           style={({ pressed }) => [styles.linkWrap, pressed && styles.linkPressed]}
@@ -214,6 +251,36 @@ const styles = StyleSheet.create({
   },
   themeCard: {
     borderWidth: 1,
+  },
+  settingsLinkContent: {
+    minHeight: 54,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  settingsIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  settingsCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
+  settingsTitle: {
+    fontFamily: fontFamily.inter.semibold,
+    fontSize: 14,
+    lineHeight: 18,
+  },
+  settingsDescription: {
+    fontFamily: fontFamily.inter.regular,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 2,
   },
   linkWrap: {
     marginTop: 24,

@@ -12,7 +12,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GrimoireBackground } from '@/features/auth/components/GrimoireBackground';
 import { AuthText } from '@/features/auth/components/AuthText';
-import { loginTheme } from '@/features/auth/constants/loginTheme';
 import { loginTypography } from '@/features/auth/constants/loginTypography';
 
 import { AppLogo } from './AppLogo';
@@ -171,7 +170,11 @@ const styles = StyleSheet.create({
   },
   title: {
     ...loginTypography.title,
+    color: '#E8EEF7',
     marginBottom: 10,
   },
-  subtitle: loginTypography.subtitle,
+  subtitle: {
+    ...loginTypography.subtitle,
+    color: '#8AA3C2',
+  },
 });

@@ -4,6 +4,7 @@ import {
   Pressable,
   View,
   type AccessibilityRole,
+  type AccessibilityState,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
@@ -34,6 +35,7 @@ export interface SurfaceCardProps {
   padding?: SurfaceCardPadding;
   accessibilityLabel?: string;
   accessibilityRole?: AccessibilityRole;
+  accessibilityState?: AccessibilityState;
   /** Sombra: elevated liga por padrão; subtle/interactive desligadas por padrão. */
   shadow?: boolean;
 }
@@ -74,12 +76,12 @@ export function SurfaceCard({
   padding = 'md',
   accessibilityLabel,
   accessibilityRole,
+  accessibilityState,
   shadow,
 }: SurfaceCardProps) {
   const components = useComponents();
   const tokens = components.surfaceCard;
-  const variant: SurfaceCardVariant =
-    variantProp ?? (onPress ? 'interactive' : 'subtle');
+  const variant: SurfaceCardVariant = variantProp ?? (onPress ? 'interactive' : 'subtle');
   const config = tokens.variants[variant];
   const resolvedRadius = resolveRadius(tokens.radius.md, tokens.radius, radius);
   const resolvedPadding = resolvePadding(tokens.padding, padding);
@@ -112,9 +114,7 @@ export function SurfaceCard({
     ...shadowStyle,
   };
 
-  const content = (
-    <View style={[{ padding: resolvedPadding }, contentStyle]}>{children}</View>
-  );
+  const content = <View style={[{ padding: resolvedPadding }, contentStyle]}>{children}</View>;
 
   if (onPress) {
     return (
@@ -125,7 +125,7 @@ export function SurfaceCard({
         onPressOut={() => setPressed(false)}
         accessibilityRole={accessibilityRole ?? 'button'}
         accessibilityLabel={accessibilityLabel}
-        accessibilityState={{ disabled }}
+        accessibilityState={{ ...accessibilityState, disabled }}
         style={[{ minHeight: MIN_TOUCH_TARGET }, style]}
       >
         {({ pressed }) => (
@@ -153,6 +153,7 @@ export function SurfaceCard({
       style={[baseStyle, style]}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
+      accessibilityState={accessibilityState}
     >
       {content}
     </View>

@@ -7,6 +7,7 @@
  * - HomeHeader, ActiveCampaignCard, NextSessionCard, QuickActionsGrid → este diretório
  */
 export { HomeHeader } from './HomeHeader';
+export type { HomeHeaderMode } from './HomeHeader';
 export { ActiveCampaignCard } from './ActiveCampaignCard';
 export type { ActiveCampaignCardProps } from './ActiveCampaignCard';
 export { HomeActiveCampaign } from './HomeActiveCampaign';
@@ -17,3 +18,5 @@ export type { NextSessionCardProps } from './NextSessionCard';
 export { QuickActionsGrid } from './QuickActionsGrid';
 export type { QuickActionsGridProps } from './QuickActionsGrid';
 export { HomeCampaignError } from './HomeCampaignError';
+export { HomeSquireContext } from './HomeSquireContext';
+export { HomePendingSection } from './HomePendingSection';

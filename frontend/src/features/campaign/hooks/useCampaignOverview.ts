@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { resolveNextSession } from '@/features/home/utils/nextSession';
 import { useGetLocations } from '@/features/location/hooks';
 import { useGetNotes } from '@/features/notes/hooks';
 import { useGetNpcs } from '@/features/npc/hooks';
@@ -59,6 +60,8 @@ export function useCampaignOverview(campaignId: string) {
 
   const lastSession = useMemo(() => getLastSession(sessionsQuery.data), [sessionsQuery.data]);
 
+  const nextSession = useMemo(() => resolveNextSession(sessionsQuery.data), [sessionsQuery.data]);
+
   const lastSessionLabel = useMemo(() => {
     if (!lastSession) return 'Nenhuma sessão registrada';
     const date = lastSession.playedAt ?? lastSession.updatedAt;
@@ -71,6 +74,12 @@ export function useCampaignOverview(campaignId: string) {
     return getRelativeTime(date);
   }, [lastSession]);
 
+  const chronicleProgress = useMemo(() => {
+    const total = stats.sessions + stats.npcs + stats.notes + stats.locations;
+    if (total === 0) return 0;
+    return Math.min(0.92, 0.1 + total / 50);
+  }, [stats]);
+
   const isLoading =
     sessionsQuery.isLoading ||
     npcsQuery.isLoading ||
@@ -80,8 +89,10 @@ export function useCampaignOverview(campaignId: string) {
   return {
     stats,
     lastSession,
+    nextSession,
     lastSessionLabel,
     lastSessionRelative,
+    chronicleProgress,
     isLoading,
   };
 }

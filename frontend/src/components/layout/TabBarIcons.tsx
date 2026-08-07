@@ -1,3 +1,4 @@
+import { Orbit } from 'lucide-react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import type { ReactNode } from 'react';
 
@@ -66,6 +67,11 @@ export function TabCampaignsIcon({ size = 22, color = '#F4F1EA' }: TabBarIconPro
       />
     </IconFrame>
   );
+}
+
+/** Órbita — Meu Universo */
+export function TabUniverseIcon({ size = 22, color = '#F4F1EA' }: TabBarIconProps) {
+  return <Orbit size={size} color={color} strokeWidth={STROKE} />;
 }
 
 /** Livro aberto — Biblioteca */

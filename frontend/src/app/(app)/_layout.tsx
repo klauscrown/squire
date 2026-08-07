@@ -2,9 +2,11 @@ import { Redirect, Tabs, useSegments } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AtmosphericBackground } from '@/components/grimoire/AtmosphericBackground';
 import { AppTabBar } from '@/components/layout/AppTabBar';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { ROUTES } from '@/constants';
+import { UniverseCreationHost } from '@/features/universe/components/UniverseCreationHost';
 import { getTabNavigatorScreenOptions } from '@/components/layout/tabNavigatorOptions';
 import { getTabScreenOptions } from '@/components/layout/tabScreenOptions';
 import { useAppStore } from '@/store/appStore';
@@ -23,15 +25,28 @@ export default function AppLayout() {
 
   return (
     <View style={styles.root}>
-      <Tabs
-        tabBar={(props) => (hideTabBar ? null : <AppTabBar {...props} />)}
-        screenOptions={getTabNavigatorScreenOptions(bottomInset)}
-      >
-        <Tabs.Screen name="home" options={getTabScreenOptions('Início')} />
-        <Tabs.Screen name="campaigns" options={getTabScreenOptions('Campanhas')} />
-        <Tabs.Screen name="profile" options={getTabScreenOptions('Perfil')} />
-        <Tabs.Screen name="settings" options={getTabScreenOptions('Ajustes')} />
-      </Tabs>
+      {/*
+        Continuidade do mana atrás da tab flutuante.
+        A cena grimoire para no contentor do navigator — sem isto, a faixa
+        inferior vira chapada (theme card / gradiente root).
+      */}
+      <AtmosphericBackground />
+      <View style={styles.tabsLayer}>
+        <Tabs
+          tabBar={(props) => (hideTabBar ? null : <AppTabBar {...props} />)}
+          screenOptions={getTabNavigatorScreenOptions(bottomInset, { hideTabBar })}
+        >
+          <Tabs.Screen name="home" options={getTabScreenOptions('Início')} />
+          <Tabs.Screen name="campaigns" options={getTabScreenOptions('Campanhas')} />
+          <Tabs.Screen name="universe" options={getTabScreenOptions('Universo')} />
+          <Tabs.Screen name="profile" options={getTabScreenOptions('Perfil')} />
+          <Tabs.Screen
+            name="settings"
+            options={{ ...getTabScreenOptions('Ajustes'), href: null }}
+          />
+        </Tabs>
+      </View>
+      <UniverseCreationHost />
     </View>
   );
 }
@@ -40,5 +55,10 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: 'transparent',
+  },
+  tabsLayer: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    zIndex: 1,
   },
 });

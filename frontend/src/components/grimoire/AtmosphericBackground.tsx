@@ -20,37 +20,44 @@ function mixHex(a: string, b: string, amount: number): string {
 }
 
 /**
- * Fundo full-bleed.
- * Grimório: arte de atmosfera (gradiente + textura do design).
- * Outros temas: gradiente vertical a partir dos tokens.
+ * Fundo full-bleed padronizado em todas as telas via GrimoireAtmosphereShell.
+ * Grimório: arte + scrim escuro (topo leve, base mais densa).
+ * Tormenta: gradiente por tokens.
  */
 export function AtmosphericBackground() {
   const themeId = useVisualThemeId();
   const grimoire = useGrimoire();
 
+  const top = grimoire.backgroundAtmosphericTop;
+  const middle = grimoire.backgroundAtmosphericMiddle;
+  const bottom = grimoire.backgroundAtmosphericBottom;
+
   if (themeId === 'default') {
     return (
       <View pointerEvents="none" style={styles.root}>
-        {/* Base sólida enquanto a imagem carrega + previne flash */}
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            { backgroundColor: grimoire.backgroundAtmosphericBottom },
-          ]}
-        />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: bottom }]} />
         <Image
           source={grimoireImages.atmosphereBg}
           style={styles.image}
           resizeMode="cover"
           accessibilityIgnoresInvertColors
         />
+        {/* Escurece e unifica: top ainda com respiro azul, base quase preta */}
+        <LinearGradient
+          colors={[
+            'rgba(1, 4, 14, 0.28)',
+            'rgba(1, 4, 14, 0.42)',
+            'rgba(1, 4, 14, 0.62)',
+            'rgba(0, 2, 10, 0.78)',
+          ]}
+          locations={[0, 0.28, 0.62, 1]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
       </View>
     );
   }
-
-  const top = grimoire.backgroundAtmosphericTop;
-  const middle = grimoire.backgroundAtmosphericMiddle;
-  const bottom = grimoire.backgroundAtmosphericBottom;
 
   const colors = [
     top,
